@@ -33,12 +33,12 @@ const CustomHeader = ({
   return (
     <View className="flex-row items-center justify-between py-2 bg-white shadow">
       {renderLeftIcon()}
-      {logo && (
+      {/* {logo && (
         <Image
           source={require("../../assets/favicon.png")}
           className="w-10 h-10 object-contain"
         />
-      )}
+      )} */}
       {notification && (
         <TouchableOpacity activeOpacity={0.3}>
           <Ionicons name="notifications-outline" size={24} />
