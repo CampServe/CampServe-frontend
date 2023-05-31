@@ -1,5 +1,6 @@
+import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
-import StackNavigator from "./StackNavigator";
+import { DrawerNavigator, StackNavigator } from "./Navigator";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const clearAsyncStorage = async () => {

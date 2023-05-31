@@ -16,7 +16,7 @@ const CustomModal = ({
         <Text className="text-lg font-bold mb-2">{title}</Text>
         <Text className="text-gray-700 mb-4">{message}</Text>
         <TouchableOpacity
-          className="bg-green-500 text-white py-2 px-4 rounded-lg w-full"
+          className="bg-green-500 text-white py-2 px-4 rounded-lg w-[50%]"
           onPress={onButtonPress}
         >
           <Text className="text-center text-base text-white">{buttonText}</Text>
