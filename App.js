@@ -12,7 +12,7 @@ const clearAsyncStorage = async () => {
   }
 };
 
-// clearAsyncStorage();
+clearAsyncStorage();
 
 export default function App() {
   return (

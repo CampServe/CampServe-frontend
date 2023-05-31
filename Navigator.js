@@ -18,6 +18,7 @@ import CustomDrawerContent from "./src/components/CustomDrawerContent";
 import { useNavigation } from "@react-navigation/native";
 import SearchScreen from "./src/screens/user_screens/SearchScreen";
 import ProfileScreen from "./src/screens/user_screens/ProfileScreen";
+import StudentVerificationScreen from "./src/screens/common_screens/StudentVerificationScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -115,6 +116,10 @@ export const StackNavigator = () => {
       >
         <Stack.Group>
           <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+          <Stack.Screen
+            name="StudentVerification"
+            component={StudentVerificationScreen}
+          />
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="UserSignup" component={UserSignupScreen} />
         </Stack.Group>

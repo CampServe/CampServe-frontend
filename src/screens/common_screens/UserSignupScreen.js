@@ -12,26 +12,27 @@ import Icon from "react-native-vector-icons/Ionicons";
 import Backbutton from "../../components/Backbutton";
 import CustomModal from "../../components/CustomModal";
 import { DotIndicator } from "react-native-indicators";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const UserSignupScreen = () => {
+  const navigation = useNavigation();
+  const { params } = useRoute();
   const initialFormData = {
     fullname: "",
     email: "",
     username: "",
     password: "",
-    studentRefNumber: "",
+    studentRefNumber: params.studentRefNumber,
     confirmPassword: "",
   };
-
   const [formData, setFormData] = useState(initialFormData);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordMatch, setPasswordMatch] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [signupError, setSignupError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
-  const navigation = useNavigation();
 
   const closeModal = () => {
     setIsModalVisible(false);
@@ -57,7 +58,6 @@ const UserSignupScreen = () => {
       !username ||
       !password ||
       !confirmPassword ||
-      !studentRefNumber ||
       !email ||
       !passwordMatch ||
       hasFieldErrors
@@ -76,11 +76,6 @@ const UserSignupScreen = () => {
       case "username":
         if (value.length < 4) {
           error = "Username should be at least 4 characters long.";
-        }
-        break;
-      case "studentRefNumber":
-        if (value.length !== 8 || isNaN(value)) {
-          error = "Student Reference Number should be exactly 8 numbers.";
         }
         break;
       case "email":
@@ -146,26 +141,34 @@ const UserSignupScreen = () => {
 
   const handleUserSignup = () => {
     setIsLoading(true);
-    console.log("You have Signed up");
-    setIsModalVisible(true);
-    setFormData(initialFormData);
+    console.log(formData);
 
     setTimeout(() => {
       setIsLoading(false);
-      // Continue with signup logic
+      setIsModalVisible(true);
+      setSignupError(null);
+      setFormData(initialFormData);
     }, 2000);
+
+    // setTimeout(() => {
+    //   setIsLoading(false);
+    //   setIsModalVisible(true);
+    //   setSignupError("Error signing up.");
+    //   setFormData(initialFormData);
+    // }, 2000);
   };
 
   return (
     <SafeAreaView className="flex-1 items-center justify-center p-6 bg-white">
       <Backbutton />
       <Text className="text-2xl font-bold mb-6">Sign Up</Text>
-
       <ScrollView
         contentContainerStyle={{
+          // flex: 1,
           alignItems: "center",
           justifyContent: "center",
           width: 336,
+          height: 600,
         }}
         showsVerticalScrollIndicator={false}
       >
@@ -207,30 +210,6 @@ const UserSignupScreen = () => {
           {fieldErrors.username && (
             <Text className="text-xs text-red-500 mt-1">
               {fieldErrors.username}
-            </Text>
-          )}
-        </View>
-
-        <View className="w-full mb-4">
-          <Text className="text-sm font-bold mb-1">
-            Enter Student Reference Number
-          </Text>
-          <TextInput
-            className="border focus:border-2 border-green-500 rounded-lg px-4 py-2 focus:border-green-700 focus:outline-none"
-            placeholder="Student Reference Number"
-            keyboardType="number-pad"
-            value={formData.studentRefNumber}
-            onChangeText={(value) =>
-              setFormData((prevFormData) => ({
-                ...prevFormData,
-                studentRefNumber: value,
-              }))
-            }
-            onBlur={() => handleFieldBlur("studentRefNumber")}
-          />
-          {fieldErrors.studentRefNumber && (
-            <Text className="text-xs text-red-500 mt-1">
-              {fieldErrors.studentRefNumber}
             </Text>
           )}
         </View>
@@ -339,13 +318,31 @@ const UserSignupScreen = () => {
           </>
         )}
       </ScrollView>
+
+      <View className="text-gray-700 text-sm mt-4 flex-row justify-center items-center pt-4">
+        <Text>Want to be a service provider?</Text>
+        <TouchableOpacity onPress={() => console.log("Service Provider")}>
+          <Text style={{ color: "#34D399", fontWeight: "bold" }}>
+            {" "}
+            Sign up{" "}
+          </Text>
+        </TouchableOpacity>
+      </View>
       <CustomModal
         isVisible={isModalVisible}
-        onClose={closeModal}
-        title="Signup Error"
-        message="Only KNUST students are allowed to create an account."
-        buttonText="OK"
-        onButtonPress={closeModal}
+        onClose={() => setIsModalVisible(false)}
+        title={signupError ? "Signup Error" : "Signup Successful"}
+        message={
+          signupError ||
+          "Congratulations! Your account has been created successfully."
+        }
+        buttonText={signupError || "Go to Login."}
+        onButtonPress={() => {
+          setIsModalVisible(false);
+          if (!signupError) {
+            navigation.navigate("Login");
+          }
+        }}
       />
     </SafeAreaView>
   );

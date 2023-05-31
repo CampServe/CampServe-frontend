@@ -141,8 +141,10 @@ const LoginScreen = () => {
       </View>
 
       <View className="text-gray-700 text-sm mt-4 flex-row justify-center items-center pt-4">
-        <Text>Want to be a service provider?</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("UserSignup")}>
+        <Text>Don't have an account?</Text>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("StudentVerification")}
+        >
           <Text style={{ color: "#34D399", fontWeight: "bold" }}>
             {" "}
             Sign up{" "}
