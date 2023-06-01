@@ -4,8 +4,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  KeyboardAvoidingView,
-  ScrollView,
+  Keyboard,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -13,6 +12,7 @@ import Backbutton from "../../components/Backbutton";
 import CustomModal from "../../components/CustomModal";
 import { DotIndicator } from "react-native-indicators";
 import { useNavigation } from "@react-navigation/native";
+import useAuth from "../../hooks/useAuth";
 
 const StudentVerificationScreen = () => {
   const initialVerificationData = {
@@ -28,8 +28,8 @@ const StudentVerificationScreen = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalMessage, setModalMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+  const { studentVerification, isVerified, isLoadingVerify } = useAuth();
   const navigation = useNavigation();
 
   const handleTogglePassword = () => {
@@ -60,11 +60,6 @@ const StudentVerificationScreen = () => {
           error = "Student Reference Number should be exactly 8 numbers.";
         }
         break;
-      case "password":
-        if (value.length < 5) {
-          error = "Password should be at least 5 characters long.";
-        }
-        break;
       default:
         break;
     }
@@ -80,33 +75,36 @@ const StudentVerificationScreen = () => {
     validateField(field, value);
   };
 
-  const handleVerification = () => {
-    setIsLoading(true);
-    // Simulating API request
-    setTimeout(() => {
-      setIsLoading(false);
+  const handleVerification = async () => {
+    Keyboard.dismiss();
+    try {
+      const credentials = {
+        username: verificationData.schoolUsername,
+        ref_number: verificationData.studentRefNumber,
+        password: verificationData.password,
+      };
 
-      // Simulating successful verification
-      if (
-        verificationData.schoolUsername === "iensam" &&
-        verificationData.studentRefNumber === "20665968" &&
-        verificationData.password === "epaphras"
-      ) {
+      await studentVerification(credentials);
+
+      if (isVerified) {
         setModalTitle("Successful Verification");
         setModalMessage("You may sign up now.");
         setIsModalVisible(true);
       } else {
         setModalTitle("Verification Failed");
-        setModalMessage("Please check your details and try again.");
+        setModalMessage("Only KNUST students can signup");
         setIsModalVisible(true);
         setVerificationData(initialVerificationData);
       }
-    }, 2000);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleModalButtonPress = () => {
     setIsModalVisible(false);
     if (modalTitle === "Successful Verification") {
+      setVerificationData(initialVerificationData);
       navigation.navigate("UserSignup", {
         studentRefNumber: verificationData.studentRefNumber,
       });
@@ -151,6 +149,7 @@ const StudentVerificationScreen = () => {
               className="border focus:border-2 border-green-500 rounded-lg px-4 py-2 focus:border-green-700 focus:outline-none"
               placeholder="Student reference number"
               value={verificationData.studentRefNumber}
+              keyboardType="number-pad"
               onChangeText={(text) =>
                 setVerificationData((prevState) => ({
                   ...prevState,
@@ -185,7 +184,6 @@ const StudentVerificationScreen = () => {
                     password: text,
                   }))
                 }
-                onBlur={() => handleFieldBlur("password")}
               />
               <TouchableOpacity onPress={handleTogglePassword} className="ml-2">
                 <Icon
@@ -195,14 +193,9 @@ const StudentVerificationScreen = () => {
                 />
               </TouchableOpacity>
             </View>
-            {fieldErrors.password && (
-              <Text className="text-xs text-red-500 mt-1">
-                {fieldErrors.password}
-              </Text>
-            )}
           </View>
 
-          {isLoading ? (
+          {isLoadingVerify ? (
             <View className="h-14 flex items-center justify-center">
               <DotIndicator color="green" count={3} size={10} />
             </View>

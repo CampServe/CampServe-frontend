@@ -2,6 +2,7 @@ import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
 import { DrawerNavigator, StackNavigator } from "./Navigator";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AuthProvider } from "./src/hooks/useAuth";
 
 const clearAsyncStorage = async () => {
   try {
@@ -12,12 +13,14 @@ const clearAsyncStorage = async () => {
   }
 };
 
-clearAsyncStorage();
+// clearAsyncStorage();
 
 export default function App() {
   return (
     <NavigationContainer>
-      <StackNavigator />
+      <AuthProvider>
+        <StackNavigator />
+      </AuthProvider>
     </NavigationContainer>
   );
 }

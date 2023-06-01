@@ -19,22 +19,11 @@ import { useNavigation } from "@react-navigation/native";
 import SearchScreen from "./src/screens/user_screens/SearchScreen";
 import ProfileScreen from "./src/screens/user_screens/ProfileScreen";
 import StudentVerificationScreen from "./src/screens/common_screens/StudentVerificationScreen";
+import useAuth from "./src/hooks/useAuth";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
-
-const CustomBackButton = ({ onPress }) => {
-  return (
-    <Ionicons
-      name="arrow-back"
-      size={24}
-      color="black"
-      style={{ marginLeft: 10 }}
-      onPress={onPress}
-    />
-  );
-};
 
 const TabNavigator = () => {
   return (
@@ -108,25 +97,28 @@ const DrawerNavigator = () => {
 };
 
 export const StackNavigator = () => {
+  const { user } = useAuth();
   return (
     <AppWrapper>
       <Stack.Navigator
         screenOptions={{ headerShown: false }}
-        initialRouteName="Onboarding"
+        // initialRouteName="Onboarding"
       >
-        <Stack.Group>
-          <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-          <Stack.Screen
-            name="StudentVerification"
-            component={StudentVerificationScreen}
-          />
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="UserSignup" component={UserSignupScreen} />
-        </Stack.Group>
-
-        <Stack.Group>
-          <Stack.Screen name="User" component={DrawerNavigator} />
-        </Stack.Group>
+        {!user ? (
+          <Stack.Group>
+            <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+            <Stack.Screen
+              name="StudentVerification"
+              component={StudentVerificationScreen}
+            />
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="UserSignup" component={UserSignupScreen} />
+          </Stack.Group>
+        ) : (
+          <Stack.Group>
+            <Stack.Screen name="User" component={DrawerNavigator} />
+          </Stack.Group>
+        )}
       </Stack.Navigator>
     </AppWrapper>
   );

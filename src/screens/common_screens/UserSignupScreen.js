@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   ScrollView,
+  Keyboard,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -13,12 +14,14 @@ import Backbutton from "../../components/Backbutton";
 import CustomModal from "../../components/CustomModal";
 import { DotIndicator } from "react-native-indicators";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import useAuth from "../../hooks/useAuth";
 
 const UserSignupScreen = () => {
   const navigation = useNavigation();
   const { params } = useRoute();
   const initialFormData = {
-    fullname: "",
+    firstName: "",
+    lastName: "",
     email: "",
     username: "",
     password: "",
@@ -30,13 +33,8 @@ const UserSignupScreen = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordMatch, setPasswordMatch] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [signupError, setSignupError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
-
-  const closeModal = () => {
-    setIsModalVisible(false);
-  };
+  const { isLoadingSignup, error, userSignup } = useAuth();
 
   const handleTogglePassword = (field) => {
     if (field === "password") {
@@ -47,7 +45,7 @@ const UserSignupScreen = () => {
   };
 
   const isSignupDisabled = () => {
-    const { username, password, confirmPassword, studentRefNumber, email } =
+    const { firstName, lastName, username, password, confirmPassword, email } =
       formData;
 
     const hasFieldErrors = Object.values(fieldErrors).some(
@@ -55,6 +53,8 @@ const UserSignupScreen = () => {
     );
 
     return (
+      !firstName ||
+      !lastName ||
       !username ||
       !password ||
       !confirmPassword ||
@@ -68,9 +68,14 @@ const UserSignupScreen = () => {
     let error = "";
 
     switch (field) {
-      case "fullname":
-        if (value.length < 7) {
-          error = "Full Name should be at least 7 characters long.";
+      case "firstName":
+        if (value.length < 2) {
+          error = "First Name should be at least 2 characters long.";
+        }
+        break;
+      case "lastName":
+        if (value.length < 2) {
+          error = "Last Name should be at least 2 characters long.";
         }
         break;
       case "username":
@@ -139,23 +144,30 @@ const UserSignupScreen = () => {
     }
   };
 
-  const handleUserSignup = () => {
-    setIsLoading(true);
-    console.log(formData);
+  const handleUserSignup = async () => {
+    Keyboard.dismiss();
+    try {
+      const credentials = {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        username: formData.username,
+        password: formData.password,
+        email: formData.email,
+        ref_number: formData.studentRefNumber,
+      };
 
-    setTimeout(() => {
-      setIsLoading(false);
-      setIsModalVisible(true);
-      setSignupError(null);
+      const isAccountCreated = await userSignup(credentials);
+
+      if (isAccountCreated) {
+        navigation.navigate("Login");
+      } else {
+        setIsModalVisible(true);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
       setFormData(initialFormData);
-    }, 2000);
-
-    // setTimeout(() => {
-    //   setIsLoading(false);
-    //   setIsModalVisible(true);
-    //   setSignupError("Error signing up.");
-    //   setFormData(initialFormData);
-    // }, 2000);
+    }
   };
 
   return (
@@ -164,7 +176,6 @@ const UserSignupScreen = () => {
       <Text className="text-2xl font-bold mb-6">Sign Up</Text>
       <ScrollView
         contentContainerStyle={{
-          // flex: 1,
           alignItems: "center",
           justifyContent: "center",
           width: 336,
@@ -173,22 +184,43 @@ const UserSignupScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <View className="w-full mb-4">
-          <Text className="text-sm font-bold mb-1">Enter Full Name</Text>
+          <Text className="text-sm font-bold mb-1">Enter First Name</Text>
           <TextInput
             className="border focus:border-2 border-green-500 rounded-lg px-4 py-2 focus:border-green-700 focus:outline-none"
-            placeholder="Full Name"
-            value={formData.fullname}
+            placeholder="First Name"
+            value={formData.firstName}
             onChangeText={(value) =>
               setFormData((prevFormData) => ({
                 ...prevFormData,
-                fullname: value,
+                firstName: value,
               }))
             }
-            onBlur={() => handleFieldBlur("fullname")}
+            onBlur={() => handleFieldBlur("firstName")}
           />
-          {fieldErrors.fullname && (
+          {fieldErrors.firstName && (
             <Text className="text-xs text-red-500 mt-1">
-              {fieldErrors.fullname}
+              {fieldErrors.firstName}
+            </Text>
+          )}
+        </View>
+
+        <View className="w-full mb-4">
+          <Text className="text-sm font-bold mb-1">Enter Last Name</Text>
+          <TextInput
+            className="border focus:border-2 border-green-500 rounded-lg px-4 py-2 focus:border-green-700 focus:outline-none"
+            placeholder="Last Name"
+            value={formData.lastName}
+            onChangeText={(value) =>
+              setFormData((prevFormData) => ({
+                ...prevFormData,
+                lastName: value,
+              }))
+            }
+            onBlur={() => handleFieldBlur("lastName")}
+          />
+          {fieldErrors.lastName && (
+            <Text className="text-xs text-red-500 mt-1">
+              {fieldErrors.lastName}
             </Text>
           )}
         </View>
@@ -237,12 +269,9 @@ const UserSignupScreen = () => {
 
         <View className="w-full mb-4">
           <Text className="text-sm font-bold mb-1">Enter Password</Text>
-          <View
-            className="flex-row items-center border border-green-500 
-                rounded-lg px-4 py-2  focus:border-green-700 focus:border-2"
-          >
+          <View className="flex-row items-center border border-green-500 rounded-lg px-4 py-2  focus:border-green-700 focus:border-2">
             <TextInput
-              className="flex-1 text-sm "
+              className="flex-1 text-sm"
               placeholder="Password"
               secureTextEntry={!showPassword}
               value={formData.password}
@@ -271,10 +300,7 @@ const UserSignupScreen = () => {
 
         <View className="w-full mb-4">
           <Text className="text-sm font-bold mb-1">Confirm Password</Text>
-          <View
-            className="flex-row items-center border border-green-500 
-                rounded-lg px-4 py-2  focus:border-green-700 focus:border-2"
-          >
+          <View className="flex-row items-center border border-green-500 rounded-lg px-4 py-2  focus:border-green-700 focus:border-2">
             <TextInput
               className="flex-1 text-sm "
               placeholder="Confirm Password"
@@ -300,7 +326,7 @@ const UserSignupScreen = () => {
           )}
         </View>
 
-        {isLoading ? (
+        {isLoadingSignup ? (
           <View className="h-14 flex items-center justify-center">
             <DotIndicator color="green" count={3} size={10} />
           </View>
@@ -319,8 +345,8 @@ const UserSignupScreen = () => {
         )}
       </ScrollView>
 
-      <View className="text-gray-700 text-sm mt-4 flex-row justify-center items-center pt-4">
-        <Text>Want to be a service provider?</Text>
+      <View className="text-gray-700 text-sm  flex-row justify-center items-center pt-4">
+        <Text>Want to be a Service Provider?</Text>
         <TouchableOpacity onPress={() => console.log("Service Provider")}>
           <Text style={{ color: "#34D399", fontWeight: "bold" }}>
             {" "}
@@ -328,22 +354,37 @@ const UserSignupScreen = () => {
           </Text>
         </TouchableOpacity>
       </View>
-      <CustomModal
-        isVisible={isModalVisible}
-        onClose={() => setIsModalVisible(false)}
-        title={signupError ? "Signup Error" : "Signup Successful"}
-        message={
-          signupError ||
-          "Congratulations! Your account has been created successfully."
-        }
-        buttonText={signupError || "Go to Login."}
-        onButtonPress={() => {
-          setIsModalVisible(false);
-          if (!signupError) {
-            navigation.navigate("Login");
+
+      <View className="text-gray-700 text-sm mt-2 flex-row justify-center items-center pt-2">
+        <Text className="mr-1">Already have an account?</Text>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Login")}
+          className="text-blue-500"
+        >
+          <Text className="text-blue-500">Login</Text>
+        </TouchableOpacity>
+      </View>
+
+      {error && (
+        <CustomModal
+          isVisible={isModalVisible}
+          title="SignUp Error"
+          message={error}
+          buttonText={
+            error === "reference number is already registered to a user"
+              ? "Go back to Verify Student"
+              : "OK"
           }
-        }}
-      />
+          onButtonPress={() => {
+            if (error === "reference number is already registered to a user") {
+              setIsModalVisible(false);
+              navigation.navigate("StudentVerification");
+            } else {
+              setIsModalVisible(false);
+            }
+          }}
+        />
+      )}
     </SafeAreaView>
   );
 };

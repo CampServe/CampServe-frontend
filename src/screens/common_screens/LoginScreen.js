@@ -9,40 +9,40 @@ import {
   Keyboard,
 } from "react-native";
 import { Icon } from "react-native-elements";
-import { Ionicons } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { DotIndicator } from "react-native-indicators";
+import useAuth from "../../hooks/useAuth";
+import CustomModal from "../../components/CustomModal";
 
 const LoginScreen = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [isServiceProviderLogin, setIsServiceProviderLogin] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const { isLoadingLogin, login, error } = useAuth();
   const navigation = useNavigation();
 
-  const handleUserLogin = () => {
-    setIsLoading(true);
-
-    Keyboard.dismiss();
-    setFormData({ username: "", password: "" });
-
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-
-    navigation.navigate("User");
+  const handleCloseModal = () => {
+    setIsModalVisible(false);
   };
 
-  const handleServiceProviderLogin = () => {
-    setIsLoading(true);
-
+  const handleLogin = async () => {
     Keyboard.dismiss();
-    setFormData({ username: "", password: "" });
+    const credentials = {
+      username: formData.username,
+      password: formData.password,
+    };
 
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+    try {
+      const AccountLoggedIn = await login(credentials, isServiceProviderLogin);
+      if (!AccountLoggedIn) {
+        setIsModalVisible(true);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setFormData({ username: "", password: "" });
+    }
   };
 
   const handleToggleLoginType = () => {
@@ -104,7 +104,7 @@ const LoginScreen = () => {
       </View>
 
       <View className="w-72">
-        {isLoading ? (
+        {isLoadingLogin ? (
           <View className="flex justify-center items-center h-10">
             <DotIndicator color="green" count={3} size={10} />
           </View>
@@ -115,11 +115,7 @@ const LoginScreen = () => {
                 className={`${
                   !isLoginDisabled ? "bg-green-500" : "bg-gray-500"
                 } text-white py-2 px-4 w-72 rounded-lg`}
-                onPress={
-                  isServiceProviderLogin
-                    ? handleServiceProviderLogin
-                    : handleUserLogin
-                }
+                onPress={handleLogin}
                 disabled={isLoginDisabled}
               >
                 <Text className="text-center text-base text-white">Log In</Text>
@@ -151,6 +147,17 @@ const LoginScreen = () => {
           </Text>
         </TouchableOpacity>
       </View>
+
+      {error && (
+        <CustomModal
+          isVisible={isModalVisible}
+          title="Login Error"
+          message={error}
+          buttonText="OK"
+          onButtonPress={handleCloseModal}
+          onClose={handleCloseModal}
+        />
+      )}
     </KeyboardAvoidingView>
     // </SafeAreaView>
   );

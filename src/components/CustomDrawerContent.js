@@ -9,9 +9,9 @@ import {
   StyleSheet,
   TouchableHighlight,
 } from "react-native";
-import { DrawerContentScrollView } from "@react-navigation/drawer";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+import useAuth from "../hooks/useAuth";
 
 const data = [
   {
@@ -42,6 +42,7 @@ const data = [
 
 const CustomDrawerContent = () => {
   const navigation = useNavigation();
+  const { user, logout } = useAuth();
 
   const DrawerItem = ({ icon, title, screen }) => (
     <TouchableHighlight
@@ -72,9 +73,9 @@ const CustomDrawerContent = () => {
 
   return (
     <Animated.View style={styles.drawerContainer}>
-      <View className="flex-1 flex-col h-full px-2">
-        <View className="flex flex-row-reverse justify-between mt-4">
-          <View>
+      <View className="flex-1 flex-col h-full px-2 pt-4">
+        <View className="flex flex-start mt-4">
+          {/* <View>
             <TouchableOpacity
               activeOpacity={0.5}
               //   onPress={closeDrawer}
@@ -82,17 +83,19 @@ const CustomDrawerContent = () => {
             >
               <Ionicons name="close" size={24} color="gray" />
             </TouchableOpacity>
-          </View>
+          </View> */}
           <View className="flex flex-col  ">
             <Image
               source={{ uri: "https://i.redd.it/ppohcjn7kfl71.jpg" }}
               className="w-14 h-14 rounded-full"
             />
             <Text className="text-gray-500 text-2xl font-bold mt-4">
-              Isaac Sam
+              {user.first_name} {user.last_name}
             </Text>
-            <Text className="text-gray-400 text-xl font-semibold">iensam</Text>
-            <Text className="text-gray-400 text-lg">20665968</Text>
+            <Text className="text-gray-400 text-xl font-semibold">
+              {user.username}
+            </Text>
+            <Text className="text-gray-400 text-lg">{user.email}</Text>
           </View>
         </View>
         <View className="border border-t-1 border-gray-200 my-10" />
@@ -113,7 +116,7 @@ const CustomDrawerContent = () => {
         <TouchableOpacity
           activeOpacity={0.5}
           className="flex flex-row flex-1 space-x-6 mt-10 items-center rounded-lg bg-red-500 p-3 pl-4"
-          onPress={() => navigation.navigate("Login")}
+          onPress={logout}
         >
           <Ionicons name="log-out" size={24} color="white" className="mr-3 " />
           <Text className="text-white text-lg">Logout</Text>
