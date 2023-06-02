@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  KeyboardAvoidingView,
   ScrollView,
   Keyboard,
 } from "react-native";
@@ -22,10 +21,9 @@ const UserSignupScreen = () => {
   const initialFormData = {
     firstName: "",
     lastName: "",
-    email: "",
+    email: params.params.email,
     username: "",
     password: "",
-    studentRefNumber: params.studentRefNumber,
     confirmPassword: "",
   };
   const [formData, setFormData] = useState(initialFormData);
@@ -34,6 +32,7 @@ const UserSignupScreen = () => {
   const [passwordMatch, setPasswordMatch] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+  const [isSignupSuccess, setIsSignupSuccess] = useState(false);
   const { isLoadingSignup, error, userSignup } = useAuth();
 
   const handleTogglePassword = (field) => {
@@ -45,7 +44,7 @@ const UserSignupScreen = () => {
   };
 
   const isSignupDisabled = () => {
-    const { firstName, lastName, username, password, confirmPassword, email } =
+    const { firstName, lastName, username, password, confirmPassword } =
       formData;
 
     const hasFieldErrors = Object.values(fieldErrors).some(
@@ -58,7 +57,6 @@ const UserSignupScreen = () => {
       !username ||
       !password ||
       !confirmPassword ||
-      !email ||
       !passwordMatch ||
       hasFieldErrors
     );
@@ -81,12 +79,6 @@ const UserSignupScreen = () => {
       case "username":
         if (value.length < 4) {
           error = "Username should be at least 4 characters long.";
-        }
-        break;
-      case "email":
-        const emailRegex = /\S+@\S+\.\S+/;
-        if (!emailRegex.test(value)) {
-          error = "Invalid email format.";
         }
         break;
       case "password":
@@ -153,14 +145,18 @@ const UserSignupScreen = () => {
         username: formData.username,
         password: formData.password,
         email: formData.email,
-        ref_number: formData.studentRefNumber,
       };
 
       const isAccountCreated = await userSignup(credentials);
-
       if (isAccountCreated) {
-        navigation.navigate("Login");
+        setIsModalVisible(true);
+        setIsSignupSuccess(true);
+        setTimeout(() => {
+          setIsModalVisible(false);
+          navigation.navigate("Login");
+        }, 2000);
       } else {
+        setIsModalVisible(false);
         setIsModalVisible(true);
       }
     } catch (error) {
@@ -172,7 +168,7 @@ const UserSignupScreen = () => {
 
   return (
     <SafeAreaView className="flex-1 items-center justify-center p-6 bg-white">
-      <Backbutton />
+      <Backbutton loc="StudentVerification" />
       <Text className="text-2xl font-bold mb-6">Sign Up</Text>
       <ScrollView
         contentContainerStyle={{
@@ -242,27 +238,6 @@ const UserSignupScreen = () => {
           {fieldErrors.username && (
             <Text className="text-xs text-red-500 mt-1">
               {fieldErrors.username}
-            </Text>
-          )}
-        </View>
-
-        <View className="w-full mb-4">
-          <Text className="text-sm font-bold mb-1">Enter Email</Text>
-          <TextInput
-            className="border focus:border-2 border-green-500 rounded-lg px-4 py-2 focus:border-green-700 focus:outline-none"
-            placeholder="Email"
-            value={formData.email}
-            onChangeText={(value) =>
-              setFormData((prevFormData) => ({
-                ...prevFormData,
-                email: value,
-              }))
-            }
-            onBlur={() => handleFieldBlur("email")}
-          />
-          {fieldErrors.email && (
-            <Text className="text-xs text-red-500 mt-1">
-              {fieldErrors.email}
             </Text>
           )}
         </View>
@@ -345,34 +320,23 @@ const UserSignupScreen = () => {
         )}
       </ScrollView>
 
-      <View className="text-gray-700 text-sm  flex-row justify-center items-center pt-4">
-        <Text>Want to be a Service Provider?</Text>
-        <TouchableOpacity onPress={() => console.log("Service Provider")}>
-          <Text style={{ color: "#34D399", fontWeight: "bold" }}>
-            {" "}
-            Sign up{" "}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
       <View className="text-gray-700 text-sm mt-2 flex-row justify-center items-center pt-2">
         <Text className="mr-1">Already have an account?</Text>
         <TouchableOpacity
           onPress={() => navigation.navigate("Login")}
           className="text-blue-500"
         >
-          <Text className="text-blue-500">Login</Text>
+          <Text style={{ color: "#34D399", fontWeight: "bold" }}>Login</Text>
         </TouchableOpacity>
       </View>
-
-      {error && (
+      {!isSignupSuccess ? (
         <CustomModal
           isVisible={isModalVisible}
           title="SignUp Error"
           message={error}
           buttonText={
             error === "reference number is already registered to a user"
-              ? "Go back to Verify Student"
+              ? "Back to Verify Student"
               : "OK"
           }
           onButtonPress={() => {
@@ -383,6 +347,13 @@ const UserSignupScreen = () => {
               setIsModalVisible(false);
             }
           }}
+        />
+      ) : (
+        <CustomModal
+          isVisible={isModalVisible}
+          title="Signup Success"
+          message="Accont has been created successfully"
+          showbutton={false}
         />
       )}
     </SafeAreaView>

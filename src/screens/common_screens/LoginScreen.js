@@ -29,8 +29,8 @@ const LoginScreen = () => {
   const handleLogin = async () => {
     Keyboard.dismiss();
     const credentials = {
-      username: formData.username,
-      password: formData.password,
+      username: formData.username.trim(),
+      password: formData.password.trim(),
     };
 
     try {

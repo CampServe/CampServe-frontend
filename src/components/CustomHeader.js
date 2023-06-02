@@ -31,7 +31,7 @@ const CustomHeader = ({
   const notification = !showBackIcon && showMenuIcon;
 
   return (
-    <View className="flex-row items-center justify-between py-2 bg-white shadow">
+    <View className="flex-row items-center justify-between py-2 bg-white">
       {renderLeftIcon()}
       {/* {logo && (
         <Image

@@ -3,11 +3,15 @@ import { TouchableOpacity, Text, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
 
-const Backbutton = () => {
+const Backbutton = ({ loc }) => {
   const navigation = useNavigation();
 
   const handleGoBack = () => {
-    navigation.goBack();
+    if (!loc) {
+      navigation.goBack();
+    } else {
+      navigation.navigate(loc);
+    }
   };
 
   return (

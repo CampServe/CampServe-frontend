@@ -72,10 +72,6 @@ const SearchScreen = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white px-4">
-      <CustomHeader
-        showMenuIcon={true}
-        OpenDrawer={() => navigation.openDrawer()}
-      />
       <View className="flex flex-row h-10 w-full my-4 items-center px-2 rounded-full bg-gray-200">
         <Feather name="search" size={20} className="mr-2 text-gray-500" />
         <TextInput
@@ -158,7 +154,7 @@ const SearchScreen = () => {
             </View>
           )}
           {searchInput !== "" && (
-            <View className="flex-1 items-center justify-center">
+            <View className=" items-center justify-center">
               <Text>No results found.</Text>
             </View>
           )}

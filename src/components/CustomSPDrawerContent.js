@@ -18,33 +18,22 @@ const data = [
     id: "1",
     icon: "person-circle-outline",
     title: "Profile",
-    screen: "Profile",
+    screen: "SPSettings",
   },
   {
     id: "2",
-    icon: "help-circle-outline",
-    title: "Help and FAQs",
-    screen: "Help",
-  },
-  {
-    id: "3",
-    icon: "information-circle-outline",
-    title: "About Us",
-    screen: "About",
-  },
-  {
-    id: "4",
     icon: "settings",
     title: "Settings",
-    screen: "Settings",
+    screen: "SPSettings",
   },
 ];
 
-const CustomDrawerContent = () => {
+const CustomSPDrawerContent = () => {
   const navigation = useNavigation();
   const { user, logout } = useAuth();
 
-  const userServiceProvider = false;
+  const isServiceProvider = false;
+  const userServiceProvider = true;
 
   const DrawerItem = ({ icon, title, screen }) => (
     <TouchableHighlight
@@ -107,20 +96,11 @@ const CustomDrawerContent = () => {
         />
       </View>
       <View className="border border-t-1 border-gray-200 " />
-
       <TouchableOpacity
         className="flex flex-row space-x-6 mt-10 items-center justify-center rounded-lg bg-blue-500 p-3 pl-4"
-        onPress={() =>
-          navigation.navigate(
-            userServiceProvider ? "Service Provider" : "SPOnboarding"
-          )
-        }
+        onPress={() => navigation.navigate("User")}
       >
-        <Text className="text-white text-center text-lg">
-          {userServiceProvider
-            ? "Switch to Service Provider"
-            : "Become a Service Provider"}
-        </Text>
+        <Text className="text-white text-center text-lg">Switch to User</Text>
       </TouchableOpacity>
       <View className=" flex-row items-center px-2">
         <TouchableOpacity
@@ -136,7 +116,7 @@ const CustomDrawerContent = () => {
   );
 };
 
-export default CustomDrawerContent;
+export default CustomSPDrawerContent;
 
 const styles = StyleSheet.create({
   drawerContainer: {

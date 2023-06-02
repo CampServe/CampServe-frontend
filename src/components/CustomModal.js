@@ -8,6 +8,7 @@ const CustomModal = ({
   title,
   message,
   buttonText,
+  showbutton = true,
   onButtonPress,
 }) => {
   return (
@@ -15,12 +16,16 @@ const CustomModal = ({
       <View className="bg-white p-4 rounded-md items-center justify-center">
         <Text className="text-lg font-bold mb-2">{title}</Text>
         <Text className="text-gray-700 mb-4 capitalize">{message}</Text>
-        <TouchableOpacity
-          className="bg-green-500 text-white py-2 px-4 rounded-lg w-[50%]"
-          onPress={onButtonPress}
-        >
-          <Text className="text-center text-base text-white">{buttonText}</Text>
-        </TouchableOpacity>
+        {showbutton && (
+          <TouchableOpacity
+            className="bg-green-500 text-white py-2 px-4 rounded-lg w-[70%]"
+            onPress={onButtonPress}
+          >
+            <Text className="text-center text-base text-white">
+              {buttonText}
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </Modal>
   );
