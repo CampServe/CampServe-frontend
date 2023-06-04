@@ -97,7 +97,7 @@ const CustomSPDrawerContent = () => {
       </View>
       <View className="border border-t-1 border-gray-200 " />
       <TouchableOpacity
-        className="flex flex-row space-x-6 mt-10 items-center justify-center rounded-lg bg-blue-500 p-3 pl-4"
+        className="flex flex-row space-x-6 mt-10 items-center justify-center rounded-lg bg-green-500 p-3 pl-4"
         onPress={() => navigation.navigate("User")}
       >
         <Text className="text-white text-center text-lg">Switch to User</Text>

@@ -53,15 +53,15 @@ const OnboardingScreen = ({ onComplete }) => {
       image: require("../../../assets/onboarding2.jpg"),
     },
     {
-      title: "Connect",
-      description: "Connect with friends and loved ones.",
-      image: require("../../../assets/onboarding3.jpg"),
-    },
-    {
       title: "Get Started",
       description: "Join our community and start exploring!",
-      image: require("../../../assets/onboarding4.jpg"),
+      image: require("../../../assets/onboarding3.jpg"),
     },
+    // {
+    //   title: "Get Started",
+    //   description: "Join our community and start exploring!",
+    //   image: require("../../../assets/onboarding4.jpg"),
+    // },
   ];
 
   const currentScreen = onboardingScreens[activeScreenIndex];

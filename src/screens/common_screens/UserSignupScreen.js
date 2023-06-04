@@ -182,7 +182,13 @@ const UserSignupScreen = () => {
         <View className="w-full mb-4">
           <Text className="text-sm font-bold mb-1">Enter First Name</Text>
           <TextInput
-            className="border focus:border-2 border-green-500 rounded-lg px-4 py-2 focus:border-green-700 focus:outline-none"
+            className={`border focus:border-2 ${
+              fieldErrors.firstName ? "border-red-500" : "border-green-500"
+            } rounded-lg px-4 py-2 ${
+              fieldErrors.firstName
+                ? "focus:border-red-700"
+                : "focus:border-green-700"
+            } focus:outline-none`}
             placeholder="First Name"
             value={formData.firstName}
             onChangeText={(value) =>
@@ -203,7 +209,13 @@ const UserSignupScreen = () => {
         <View className="w-full mb-4">
           <Text className="text-sm font-bold mb-1">Enter Last Name</Text>
           <TextInput
-            className="border focus:border-2 border-green-500 rounded-lg px-4 py-2 focus:border-green-700 focus:outline-none"
+            className={`border focus:border-2 ${
+              fieldErrors.lastName ? "border-red-500" : "border-green-500"
+            } rounded-lg px-4 py-2 ${
+              fieldErrors.lastName
+                ? "focus:border-red-700"
+                : "focus:border-green-700"
+            } focus:outline-none`}
             placeholder="Last Name"
             value={formData.lastName}
             onChangeText={(value) =>
@@ -224,7 +236,13 @@ const UserSignupScreen = () => {
         <View className="w-full mb-4">
           <Text className="text-sm font-bold mb-1">Enter username</Text>
           <TextInput
-            className="border focus:border-2 border-green-500 rounded-lg px-4 py-2 focus:border-green-700 focus:outline-none"
+            className={`border focus:border-2 ${
+              fieldErrors.username ? "border-red-500" : "border-green-500"
+            } rounded-lg px-4 py-2 ${
+              fieldErrors.username
+                ? "focus:border-red-700"
+                : "focus:border-green-700"
+            } focus:outline-none`}
             placeholder="Username"
             value={formData.username}
             onChangeText={(value) =>
@@ -244,7 +262,15 @@ const UserSignupScreen = () => {
 
         <View className="w-full mb-4">
           <Text className="text-sm font-bold mb-1">Enter Password</Text>
-          <View className="flex-row items-center border border-green-500 rounded-lg px-4 py-2  focus:border-green-700 focus:border-2">
+          <View
+            className={`flex-row items-center border ${
+              fieldErrors.password ? "border-red-500" : "border-green-500"
+            } rounded-lg px-4 py-2  ${
+              fieldErrors.password
+                ? "focus:border-red-700"
+                : "focus:border-green-700"
+            } focus:border-2`}
+          >
             <TextInput
               className="flex-1 text-sm"
               placeholder="Password"
@@ -275,7 +301,17 @@ const UserSignupScreen = () => {
 
         <View className="w-full mb-4">
           <Text className="text-sm font-bold mb-1">Confirm Password</Text>
-          <View className="flex-row items-center border border-green-500 rounded-lg px-4 py-2  focus:border-green-700 focus:border-2">
+          <View
+            className={`flex-row items-center border ${
+              fieldErrors.confirmPassword
+                ? "border-red-500"
+                : "border-green-500"
+            } rounded-lg px-4 py-2  ${
+              fieldErrors.confirmPassword
+                ? "focus:border-red-700"
+                : "focus:border-green-700"
+            } focus:border-2`}
+          >
             <TextInput
               className="flex-1 text-sm "
               placeholder="Confirm Password"
@@ -321,7 +357,7 @@ const UserSignupScreen = () => {
       </ScrollView>
 
       <View className="text-gray-700 text-sm mt-2 flex-row justify-center items-center pt-2">
-        <Text className="mr-1">Already have an account?</Text>
+        <Text clasesName="mr-1">Already have an account?</Text>
         <TouchableOpacity
           onPress={() => navigation.navigate("Login")}
           className="text-blue-500"

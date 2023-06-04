@@ -15,7 +15,7 @@ import useAuth from "../../hooks/useAuth";
 const StudentVerificationScreen = () => {
   const [email, setEmail] = useState("");
   const [isEmailValid, setIsEmailValid] = useState(false);
-  const { studentVerification, isVerified, isLoadingVerify } = useAuth();
+  const { studentVerification, isLoadingVerify } = useAuth();
   const navigation = useNavigation();
 
   const handleEmailChange = (text) => {
@@ -31,24 +31,13 @@ const StudentVerificationScreen = () => {
   const handleVerification = async () => {
     Keyboard.dismiss();
     try {
-      const otp = generateOTP();
-      await sendVerificationEmail(email, otp);
-      navigation.navigate("OTPVerification", { email, otp });
+      await studentVerification(email);
+      navigation.navigate("OTPVerification", { email });
     } catch (error) {
       console.log(error);
+    } finally {
+      setEmail("");
     }
-    setEmail("");
-  };
-
-  const sendVerificationEmail = async (email, otp) => {
-    console.log("OTP:", otp);
-    // Implement the logic to send the verification email with the OTP
-  };
-
-  const generateOTP = () => {
-    // Implement the logic to generate a random OTP
-    // Here, I'll just generate a random 6-digit number
-    return Math.floor(100000 + Math.random() * 900000);
   };
 
   return (
@@ -60,13 +49,13 @@ const StudentVerificationScreen = () => {
         <View className="items-center justify-center w-full">
           <View className="w-full mb-4">
             <Text className="text-sm font-bold mb-1">
-              Enter your Email Address
+              Enter your School Email address
             </Text>
             <TextInput
               className={`border focus:border-2 border-green-500 rounded-lg px-4 py-2 focus:border-green-700 focus:outline-none ${
                 isEmailValid || email === "" ? "" : "border-red-500"
               }`}
-              placeholder="Email address"
+              placeholder=" School Email address"
               value={email}
               onChangeText={handleEmailChange}
             />

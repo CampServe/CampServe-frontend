@@ -8,7 +8,6 @@ export function AuthProvider({ children }) {
   const [isLoadingLogin, setIsLoadingLogin] = useState(false);
   const [isLoadingSignup, setIsLoadingSignup] = useState(false);
   const [isLoadingVerify, setIsLoadingVerify] = useState(false);
-  const [isVerified, setIsVerified] = useState(false);
   const [error, setError] = useState(null);
 
   const login = async (credentials, isServiceProviderLogin) => {
@@ -38,22 +37,39 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const studentVerification = async (credentials) => {
+  const studentVerification = async (email) => {
+    setIsLoadingVerify(true);
     try {
-      setIsLoadingVerify(true);
-      setError(null);
-
-      const response = await axios.post("/student_verification", credentials);
-      if (response.data.status === "Student") {
-        setIsVerified(true);
+      const response = await axios.post("/student_verification", { email });
+      if (response.data.status === "OTP sent to email") {
+        return true;
       } else {
-        setIsVerified(false);
+        setError(response.data.status);
+        return false;
       }
-
-      setIsLoading(false);
     } catch (error) {
+      setError("An error occurred");
+      return false;
+    } finally {
       setIsLoadingVerify(false);
-      setError(error.response?.data?.message || "An error occurred");
+    }
+  };
+
+  const studentEmailVerification = async (email, otp) => {
+    try {
+      const response = await axios.post("/otp_verification", {
+        email,
+        otp,
+      });
+      if (response.data.status === "Email verification successful") {
+        return true;
+      } else {
+        setError(response.data.status);
+        return false;
+      }
+    } catch (error) {
+      setError("An error occurred");
+      return false;
     }
   };
 
@@ -94,11 +110,11 @@ export function AuthProvider({ children }) {
       isLoadingSignup,
       isLoadingVerify,
       error,
-      isVerified,
       login,
       logout,
       userSignup,
       studentVerification,
+      studentEmailVerification,
     }),
     [user, isLoadingLogin, isLoadingSignup, isLoadingVerify, error]
   );
