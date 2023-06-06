@@ -94,6 +94,27 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const signupAsProvider = async (user_id, providerData) => {
+    try {
+      const response = await axios.post(
+        `/signup_as_provider/${user_id}`,
+        providerData
+      );
+      console.log("Response data:", response.data);
+      if (response.data.status === "Provider created with credentials") {
+        setUser((prevUser) => ({
+          ...prevUser,
+          is_service_provider: true,
+        }));
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "An error occurred");
+    }
+  };
+
   const logout = async () => {
     try {
       setUser(null);
@@ -115,6 +136,7 @@ export function AuthProvider({ children }) {
       userSignup,
       studentVerification,
       studentEmailVerification,
+      signupAsProvider,
     }),
     [user, isLoadingLogin, isLoadingSignup, isLoadingVerify, error]
   );

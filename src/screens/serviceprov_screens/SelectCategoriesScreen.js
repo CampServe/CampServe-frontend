@@ -1,4 +1,4 @@
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
   View,
@@ -7,8 +7,10 @@ import {
   ScrollView,
   SafeAreaView,
   Modal,
+  ActivityIndicator,
 } from "react-native";
 import Backbutton from "../../components/Backbutton";
+import useAuth from "../../hooks/useAuth";
 
 const categories = [
   {
@@ -33,8 +35,14 @@ const SelectCategoriesScreen = () => {
   const [selectedSubcategories, setSelectedSubcategories] = useState([]);
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] =
     useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
 
   const { params } = useRoute();
+  const navigation = useNavigation();
+  const { user, signupAsProvider } = useAuth();
 
   const handleCategorySelection = (categoryId) => {
     setSelectedCategories((prevSelectedCategories) => {
@@ -117,23 +125,55 @@ const SelectCategoriesScreen = () => {
     selectedSubcategories
   );
 
-  console.log(conselectedSubcategories);
-
   const handleDonePress = () => {
     setIsConfirmationModalVisible(true);
   };
 
-  const handleConfirm = () => {
-    const payload = {
-      formData: params.formData,
+  const trimObjectValues = (obj) => {
+    const trimmedObj = {};
+    for (let key in obj) {
+      if (typeof obj[key] === "string") {
+        trimmedObj[key] = obj[key].trim();
+      } else {
+        trimmedObj[key] = obj[key];
+      }
+    }
+    return trimmedObj;
+  };
+
+  const handleConfirm = async () => {
+    const providerData = {
+      ...trimObjectValues(params.formData),
       selectedSubcategories: conselectedSubcategories,
     };
 
-    // console.log(payload);
+    try {
+      setIsConfirming(true);
+      const success = await signupAsProvider(user.user_id, providerData);
+      setIsConfirming(false);
 
-    setSelectedCategories([]);
-    setSelectedCategories([]);
-    setIsConfirmationModalVisible(false);
+      setIsConfirmationModalVisible(false);
+      setIsSuccess(success);
+      setModalMessage(success ? "SignUp successful" : "SignUp failed");
+      setIsModalVisible(true);
+    } catch (error) {
+      console.log(error);
+      setIsConfirming(false);
+      setIsSuccess(false);
+      setIsModalVisible(true);
+      setModalMessage("An error occurred while signing up as a provider");
+    } finally {
+      setSelectedCategories([]);
+      setSelectedCategories([]);
+      setIsConfirmationModalVisible(false);
+    }
+  };
+
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+    if (isSuccess) {
+      navigation.replace("User");
+    }
   };
 
   const handleCancel = () => {
@@ -248,23 +288,46 @@ const SelectCategoriesScreen = () => {
           className="flex-1 p-4 justify-center items-center"
           style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
         >
-          <View className="bg-white p-6 rounded-2xl">
-            <Text className="text-xl text-center font-bold mb-4">
-              Confirm Account Creation
-            </Text>
-            <Text className="mb-6 text-lg">
-              Are you sure you want to create your service provider account?
-            </Text>
-            <View className="flex-row-reverse justify-evenly">
-              <TouchableOpacity onPress={handleConfirm}>
-                <Text className="text-green-500 text-xl font-bold">
-                  Confirm
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={handleCancel}>
-                <Text className="text-red-500 font-bold text-xl">Cancel</Text>
-              </TouchableOpacity>
+          {isConfirming ? (
+            <ActivityIndicator color="green" size="large" />
+          ) : (
+            <View className="bg-white p-6 rounded-2xl">
+              <Text className="text-xl text-center font-bold mb-4">
+                Confirm Account Creation
+              </Text>
+              <Text className="mb-6 text-lg">
+                Are you sure you want to create your service provider account?
+              </Text>
+              <View className="flex-row-reverse justify-evenly">
+                <TouchableOpacity onPress={handleConfirm}>
+                  <Text className="text-green-500 text-xl font-bold">
+                    Confirm
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleCancel}>
+                  <Text className="text-red-500 font-bold text-xl">Cancel</Text>
+                </TouchableOpacity>
+              </View>
             </View>
+          )}
+        </View>
+      </Modal>
+
+      <Modal visible={isModalVisible} animationType="slide" transparent={true}>
+        <View
+          className="flex-1 justify-center items-center"
+          style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
+        >
+          <View className="bg-white p-6 rounded-2xl">
+            <Text className="text-xl font-bold mb-4">{modalMessage}</Text>
+            <TouchableOpacity
+              onPress={handleModalClose}
+              className="bg-green-500 py-2 px-4 rounded-lg"
+            >
+              <Text className="text-white text-center text-lg">
+                {isSuccess ? "Back to UserDashboard" : "Close"}
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
