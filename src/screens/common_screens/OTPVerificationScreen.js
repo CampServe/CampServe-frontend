@@ -108,7 +108,7 @@ const OTPVerificationScreen = () => {
           title="Validation Success"
           message="You may sign up now"
           buttonText="OK"
-          onButtonPress={() => navigation.replace("UserSignup", { params })}
+          onButtonPress={() => navigation.replace("UserSignup")}
         />
       ) : (
         <CustomModal

@@ -44,8 +44,6 @@ const CustomDrawerContent = () => {
   const navigation = useNavigation();
   const { user, logout } = useAuth();
 
-  const userServiceProvider = false;
-
   const DrawerItem = ({ icon, title, screen }) => (
     <TouchableHighlight
       underlayColor="#DDDDDD"
@@ -112,12 +110,12 @@ const CustomDrawerContent = () => {
         className="flex flex-row space-x-6 mt-10 items-center justify-center rounded-lg bg-green-500 p-3 pl-4"
         onPress={() =>
           navigation.navigate(
-            userServiceProvider ? "Service Provider" : "SPOnboarding"
+            !user.is_service_provider ? "Service Provider" : "SPOnboarding"
           )
         }
       >
         <Text className="text-white text-center text-lg">
-          {userServiceProvider
+          {!user.is_service_provider
             ? "Switch to Service Provider"
             : "Become a Service Provider"}
         </Text>

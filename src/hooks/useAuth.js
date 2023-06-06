@@ -30,7 +30,7 @@ export function AuthProvider({ children }) {
       }
     } catch (error) {
       console.log(error);
-      setIsLoading(false);
+      setIsLoadingLogin(false);
       throw new Error(error.response?.data?.message || "An error occurred");
     } finally {
       setIsLoadingLogin(false);

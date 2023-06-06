@@ -31,6 +31,7 @@ import ServiceProviderMessageScreen from "./src/screens/serviceprov_screens/Serv
 import ServiceProviderPaymentScreen from "./src/screens/serviceprov_screens/ServiceProviderPaymentScreen";
 import CustomSPDrawerContent from "./src/components/CustomSPDrawerContent";
 import SProfileSetup from "./src/screens/serviceprov_screens/SProfileSetup";
+import SelectCategoriesScreen from "./src/screens/serviceprov_screens/SelectCategoriesScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -207,6 +208,10 @@ export const StackNavigator = () => {
               component={ServiceProviderOnboardingScreen}
             />
             <Stack.Screen name="SProfileSetup" component={SProfileSetup} />
+            <Stack.Screen
+              name="SelectCategories"
+              component={SelectCategoriesScreen}
+            />
             <Stack.Screen
               name="Service Provider"
               component={SPDrawerNavigator}

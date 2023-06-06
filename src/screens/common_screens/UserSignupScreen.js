@@ -17,11 +17,9 @@ import useAuth from "../../hooks/useAuth";
 
 const UserSignupScreen = () => {
   const navigation = useNavigation();
-  const { params } = useRoute();
   const initialFormData = {
     firstName: "",
     lastName: "",
-    email: params.params.email,
     username: "",
     password: "",
     confirmPassword: "",
@@ -140,11 +138,10 @@ const UserSignupScreen = () => {
     Keyboard.dismiss();
     try {
       const credentials = {
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        username: formData.username,
-        password: formData.password,
-        email: formData.email,
+        first_name: formData.firstName.trim(),
+        last_name: formData.lastName.trim(),
+        username: formData.username.trim(),
+        password: formData.password.trim(),
       };
 
       const isAccountCreated = await userSignup(credentials);

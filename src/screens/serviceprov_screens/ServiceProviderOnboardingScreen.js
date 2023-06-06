@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Image, View, Text, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import useAuth from "../../hooks/useAuth";
 
 const ServiceProviderOnboardingScreen = ({ onComplete }) => {
   const [activeScreenIndex, setActiveScreenIndex] = useState(0);
   const navigation = useNavigation();
+  const { user } = useAuth();
 
   const handleOnboardingComplete = () => {
     navigation.replace("SProfileSetup");
@@ -25,12 +27,7 @@ const ServiceProviderOnboardingScreen = ({ onComplete }) => {
 
   const onboardingScreens = [
     {
-      title: "Welcome to the Service Provider signup",
-      description: "Become a Service Provider today.",
-      image: require("../../../assets/onboarding1.jpg"),
-    },
-    {
-      title: "Welcome, Synx",
+      title: `Welcome, ${user.username}`,
       description: "Setup your business profile. Let's get started",
       image: require("../../../assets/onboarding4.jpg"),
     },
@@ -85,17 +82,6 @@ const ServiceProviderOnboardingScreen = ({ onComplete }) => {
               <Text className="text-center text-2xl text-white">Start</Text>
             </TouchableOpacity>
           )}
-        </View>
-
-        <View className="flex flex-row items-center justify-center mt-2">
-          {onboardingScreens.map((screen, index) => (
-            <View
-              key={index}
-              className={`w-2 h-2 rounded-full mx-1 ${
-                index === activeScreenIndex ? "bg-green-500" : "bg-gray-300"
-              }`}
-            />
-          ))}
         </View>
       </View>
     </View>
