@@ -16,12 +16,12 @@ const categories = [
   {
     id: 1,
     name: "Room",
-    subcategories: ["Laundry", "Gas Filling"],
+    subcategories: ["Laundry", "Room Decoration"],
   },
   {
     id: 2,
     name: "Tutoring",
-    subcategories: ["Courses Tutoring", "Languages Tutoring"],
+    subcategories: ["Academic Tutoring", "Exams Preparation"],
   },
   {
     id: 3,
@@ -319,7 +319,9 @@ const SelectCategoriesScreen = () => {
           style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
         >
           <View className="bg-white p-6 rounded-2xl">
-            <Text className="text-xl font-bold mb-4">{modalMessage}</Text>
+            <Text className="text-xl text-center font-bold mb-4">
+              {modalMessage}
+            </Text>
             <TouchableOpacity
               onPress={handleModalClose}
               className="bg-green-500 py-2 px-4 rounded-lg"

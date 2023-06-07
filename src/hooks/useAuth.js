@@ -16,16 +16,20 @@ export function AuthProvider({ children }) {
       setError(null);
 
       const route = isServiceProviderLogin
-        ? "/login/service-provider"
+        ? "/login_as_provider"
         : "/user_login";
       const response = await axios.post(route, credentials);
 
-      if (response.data.status === "Login successful") {
+      if (
+        ["Login successful", "Provider login successful"].includes(
+          response.data.status
+        )
+      ) {
         const { status, ...userData } = response.data;
         setUser(userData);
         return true;
       } else {
-        setError(response.data);
+        setError(response.data.status || response.data);
         return false;
       }
     } catch (error) {
@@ -100,7 +104,6 @@ export function AuthProvider({ children }) {
         `/signup_as_provider/${user_id}`,
         providerData
       );
-      console.log("Response data:", response.data);
       if (response.data.status === "Provider created with credentials") {
         setUser((prevUser) => ({
           ...prevUser,

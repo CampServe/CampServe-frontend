@@ -110,14 +110,16 @@ const CustomDrawerContent = () => {
         className="flex flex-row space-x-6 mt-10 items-center justify-center rounded-lg bg-green-500 p-3 pl-4"
         onPress={() =>
           navigation.navigate(
-            user.is_service_provider === "true"
+            user.is_service_provider == "true" ||
+              user.is_service_provider === true
               ? "Service Provider"
               : "SPOnboarding"
           )
         }
       >
         <Text className="text-white text-center text-lg">
-          {user.is_service_provider === "true"
+          {user.is_service_provider == "true" ||
+          user.is_service_provider === true
             ? "Switch to Service Provider"
             : "Become a Service Provider"}
         </Text>

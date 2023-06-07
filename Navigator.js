@@ -178,13 +178,10 @@ const SPDrawerNavigator = () => {
 
 export const StackNavigator = () => {
   const { user } = useAuth();
-  const isServiceProvider = false;
+
   return (
     <AppWrapper>
-      <Stack.Navigator
-        screenOptions={{ headerShown: false }}
-        // initialRouteName="Onboarding"
-      >
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!user ? (
           <Stack.Group>
             <Stack.Screen name="Onboarding" component={OnboardingScreen} />
@@ -201,22 +198,43 @@ export const StackNavigator = () => {
             <Stack.Screen name="UserSignup" component={UserSignupScreen} />
           </Stack.Group>
         ) : (
-          <Stack.Group>
-            <Stack.Screen name="User" component={UserDrawerNavigator} />
-            <Stack.Screen
-              name="SPOnboarding"
-              component={ServiceProviderOnboardingScreen}
-            />
-            <Stack.Screen name="SProfileSetup" component={SProfileSetup} />
-            <Stack.Screen
-              name="SelectCategories"
-              component={SelectCategoriesScreen}
-            />
-            <Stack.Screen
-              name="Service Provider"
-              component={SPDrawerNavigator}
-            />
-          </Stack.Group>
+          <>
+            {user.account_type === "regular user" && (
+              <Stack.Group>
+                <Stack.Screen name="User" component={UserDrawerNavigator} />
+              </Stack.Group>
+            )}
+
+            {user.account_type === "regular user" &&
+              (user.is_service_provider !== true ||
+                user.is_service_provider !== "true") && (
+                <Stack.Group>
+                  <Stack.Screen
+                    name="SPOnboarding"
+                    component={ServiceProviderOnboardingScreen}
+                  />
+                  <Stack.Screen
+                    name="SProfileSetup"
+                    component={SProfileSetup}
+                  />
+                  <Stack.Screen
+                    name="SelectCategories"
+                    component={SelectCategoriesScreen}
+                  />
+                </Stack.Group>
+              )}
+
+            {user.account_type == "provider" &&
+              (user.is_service_provider !== false ||
+                user.is_service_provider !== "false") && (
+                <Stack.Group>
+                  <Stack.Screen
+                    name="Service Provider"
+                    component={SPDrawerNavigator}
+                  />
+                </Stack.Group>
+              )}
+          </>
         )}
       </Stack.Navigator>
     </AppWrapper>
