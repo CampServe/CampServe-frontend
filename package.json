@@ -9,6 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo-google-fonts/montserrat": "^0.2.3",
     "@expo/vector-icons": "^13.0.0",
     "@react-native-async-storage/async-storage": "1.17.11",
     "@react-navigation/bottom-tabs": "^6.5.7",
@@ -20,8 +21,13 @@
     "autoprefixer": "^10.4.14",
     "axios": "^1.4.0",
     "expo": "~48.0.15",
+    "expo-app-loading": "^2.1.1",
+    "expo-font": "~11.1.1",
+    "expo-splash-screen": "~0.18.2",
     "expo-status-bar": "~1.4.4",
     "formik": "^2.4.0",
+    "jsonwebtoken": "^9.0.0",
+    "jwt-decode": "^3.1.2",
     "nativewind": "^2.0.11",
     "postcss": "^8.4.23",
     "react": "18.2.0",

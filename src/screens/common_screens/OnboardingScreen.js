@@ -11,7 +11,7 @@ import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import useOnboardingStatus from "../../hooks/useOnboardingStatus";
 
-const OnboardingScreen = ({ onComplete }) => {
+const OnboardingScreen = () => {
   const [activeScreenIndex, setActiveScreenIndex] = useState(0);
   const { completedOnboarding, completeOnboarding, loading } =
     useOnboardingStatus();
@@ -64,8 +64,6 @@ const OnboardingScreen = ({ onComplete }) => {
     // },
   ];
 
-  const currentScreen = onboardingScreens[activeScreenIndex];
-
   if (loading) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center">
@@ -73,6 +71,8 @@ const OnboardingScreen = ({ onComplete }) => {
       </SafeAreaView>
     );
   }
+
+  const currentScreen = onboardingScreens[activeScreenIndex];
 
   return (
     <View className="flex-1 bg-white">

@@ -1,6 +1,6 @@
 import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
-import { DrawerNavigator, StackNavigator } from "./Navigator";
+import { StackNavigator } from "./Navigator";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthProvider } from "./src/hooks/useAuth";
 

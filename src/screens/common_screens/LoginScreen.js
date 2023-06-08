@@ -56,9 +56,8 @@ const LoginScreen = () => {
   const isLoginDisabled = !formData.username || !formData.password;
 
   return (
-    // <SafeAreaView>
     <KeyboardAvoidingView
-      className="flex-1 items-center justify-center space-y-4 p-6 bg-white"
+      className="flex-1 items-center justify-center space-y-4 p-6 bg-white font-mont"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <Text className="text-2xl font-bold mb-6">
@@ -159,7 +158,6 @@ const LoginScreen = () => {
         />
       )}
     </KeyboardAvoidingView>
-    // </SafeAreaView>
   );
 };
 
