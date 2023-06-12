@@ -207,7 +207,7 @@ const SelectCategoriesScreen = () => {
               className={`rounded-full p-4 m-4 items-center justify-center w-24 h-24 ${
                 selectedCategories.includes(category.id)
                   ? "bg-green-900"
-                  : "bg-gray-600"
+                  : "bg-green-900 opacity-60"
               }`}
             >
               <Text className="text-white text-center">{category.name}</Text>
@@ -249,7 +249,7 @@ const SelectCategoriesScreen = () => {
                                   item.subcategory.has(subcategory)
                               )
                                 ? "bg-green-900"
-                                : "bg-gray-600"
+                                : "bg-green-900 opacity-60"
                             }`}
                           >
                             <Text className="text-white text-center">

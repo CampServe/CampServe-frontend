@@ -96,20 +96,25 @@ const CustomSPDrawerContent = () => {
         />
       </View>
       <View className="border border-t-1 border-gray-200 " />
-      <TouchableOpacity
-        className="flex flex-row space-x-6 mt-10 items-center justify-center rounded-lg bg-green-500 p-3 pl-4"
-        onPress={() => navigation.navigate("User")}
-      >
-        <Text className="text-white text-center text-lg">Switch to User</Text>
-      </TouchableOpacity>
-      <View className=" flex-row items-center px-2">
+
+      <View className=" px-4">
+        <TouchableOpacity
+          className="flex flex-row space-x-6  mt-10 items-center justify-center rounded-lg bg-green-500 p-3 pl-4"
+          onPress={() => navigation.navigate("User")}
+        >
+          <Text className="text-white text-center text-base">
+            Switch to User
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <View className=" flex-row items-center px-4">
         <TouchableOpacity
           activeOpacity={0.5}
           className="flex flex-row flex-1 space-x-6 mt-5 items-center rounded-lg bg-red-500 p-3 pl-4"
           onPress={logout}
         >
           <Ionicons name="log-out" size={24} color="white" className="mr-3 " />
-          <Text className="text-white text-lg">Logout</Text>
+          <Text className="text-white text-base">Logout</Text>
         </TouchableOpacity>
       </View>
     </Animated.View>

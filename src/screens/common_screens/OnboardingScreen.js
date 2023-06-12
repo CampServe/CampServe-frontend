@@ -10,6 +10,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import useOnboardingStatus from "../../hooks/useOnboardingStatus";
+import Loader from "../../components/Loader";
 
 const OnboardingScreen = () => {
   const [activeScreenIndex, setActiveScreenIndex] = useState(0);
@@ -65,11 +66,7 @@ const OnboardingScreen = () => {
   ];
 
   if (loading) {
-    return (
-      <SafeAreaView className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" />
-      </SafeAreaView>
-    );
+    return <Loader />;
   }
 
   const currentScreen = onboardingScreens[activeScreenIndex];
