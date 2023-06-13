@@ -129,11 +129,15 @@ const UserDashboard = () => {
               style={{ flex: 1 }}
               contentContainerStyle={{ flexGrow: 1 }}
               horizontal
+              showsHorizontalScrollIndicator={false}
               className="gap-2 mb-2"
             >
               {mainCategories.map((category) => (
                 <TouchableOpacity
                   key={category}
+                  style={{
+                    width: 120,
+                  }}
                   onPress={() => filterProvidersByCategory(category)}
                   className={`flex-1 items-center justify-center py-2 rounded-lg ${
                     category === selectedCategory
@@ -166,7 +170,7 @@ const UserDashboard = () => {
                       .map((filteredProvider) => (
                         <CustomCard
                           key={filteredProvider.user_id}
-                          image={getImageByCategory(selectedCategory)}
+                          // image={getImageByCategory(selectedCategory)}
                           businessName={filteredProvider.business_name}
                           bio={filteredProvider.bio}
                           contactNumber={filteredProvider.provider_contact}

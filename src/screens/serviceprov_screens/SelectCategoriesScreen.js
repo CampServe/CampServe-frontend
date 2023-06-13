@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import Backbutton from "../../components/Backbutton";
 import useAuth from "../../hooks/useAuth";
+import DescriptionModal from "../../components/DescriptionModal";
 
 const categories = [
   {
@@ -39,6 +40,9 @@ const SelectCategoriesScreen = () => {
   const [modalMessage, setModalMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
+  const [selectedDescriptions, setSelectedDescriptions] = useState([]);
+  const [isDescriptionModalVisible, setIsDescriptionModalVisible] =
+    useState(false);
 
   const { params } = useRoute();
   const navigation = useNavigation();
@@ -126,6 +130,11 @@ const SelectCategoriesScreen = () => {
   );
 
   const handleDonePress = () => {
+    setIsDescriptionModalVisible(true);
+  };
+
+  const handleSaveDescriptions = (updatedSelectedDescriptions) => {
+    setSelectedDescriptions(updatedSelectedDescriptions);
     setIsConfirmationModalVisible(true);
   };
 
@@ -144,9 +153,9 @@ const SelectCategoriesScreen = () => {
   const handleConfirm = async () => {
     const providerData = {
       ...trimObjectValues(params.formData),
-      selectedSubcategories: conselectedSubcategories,
+      selectedSubcategories: selectedDescriptions,
     };
-
+    console.log(JSON.stringify(providerData, null, 2));
     try {
       setIsConfirming(true);
       const success = await signupAsProvider(user.user_id, providerData);
@@ -274,7 +283,7 @@ const SelectCategoriesScreen = () => {
               isDoneDisabled() ? "gray" : "green"
             }-500 w-52 text-white py-2 px-4 rounded-lg mt-8`}
           >
-            <Text className="text-center text-lg">Done</Text>
+            <Text className="text-center text-lg">Next</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -333,6 +342,13 @@ const SelectCategoriesScreen = () => {
           </View>
         </View>
       </Modal>
+
+      <DescriptionModal
+        visible={isDescriptionModalVisible}
+        onClose={() => setIsDescriptionModalVisible(false)}
+        subcategories={conselectedSubcategories}
+        onSave={handleSaveDescriptions}
+      />
     </>
   );
 };
