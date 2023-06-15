@@ -28,7 +28,7 @@ const CustomCard = ({
       style={{
         backgroundColor: "white",
         borderRadius: 8,
-        padding: 8,
+        // padding: 8,
         margin: 8,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
@@ -47,11 +47,13 @@ const CustomCard = ({
             width: "100%",
             height: undefined,
             // aspectRatio: 2,
+            borderTopLeftRadius: 8,
+            borderTopRightRadius: 8,
           }}
-          resizeMode="stretch"
+          resizeMode="contain"
         />
       </View>
-      <View style={{ padding: 8 }} className="flex-1 pb-4 h-1/2">
+      <View className="flex-1 pb-4 px-4 h-1/2">
         <Text
           className="capitalize"
           style={{ fontSize: 20, fontWeight: "bold", marginTop: 8 }}
@@ -60,7 +62,11 @@ const CustomCard = ({
           {truncatedbusinessName}
         </Text>
         <Text className="capitalize" style={{ color: "gray", marginTop: 8 }}>
-          <Ionicons name="clipboard-outline" size={20} color="#0A4014" />{" "}
+          <Ionicons
+            name="information-circle-outline"
+            size={20}
+            color="#0A4014"
+          />{" "}
           {truncatedBio}
         </Text>
         <Text style={{ color: "gray", marginTop: 8 }}>
@@ -68,7 +74,7 @@ const CustomCard = ({
           {contactNumber}
         </Text>
         <Text style={{ color: "gray", marginTop: 8 }}>
-          <Ionicons name="star-half-outline" size={20} color="#0A4014" /> 4.5
+          <Ionicons name="star" size={20} color="#0A4014" /> 4.5
         </Text>
       </View>
     </TouchableOpacity>

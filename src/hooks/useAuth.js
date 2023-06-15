@@ -68,7 +68,6 @@ export function AuthProvider({ children }) {
           )
         ) {
           const { status, expiration, ...userData } = response;
-
           axios.defaults.headers.common[
             "Authorization"
           ] = `Bearer ${tokenData}`;
@@ -175,9 +174,48 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const logout = async () => {
+  const switchAccount = async () => {
+    const route =
+      user.account_type == "regular user"
+        ? "/switch_to_provider"
+        : "/switch_to_user";
+
     try {
-      const response = await axios.post("/logout");
+      const tokenResponse = await axios.get(route);
+      const tokenData = tokenResponse.data.token;
+
+      console.log(tokenResponse.data);
+
+      // if (tokenData) {
+      //   const response = jwtDecode(tokenData);
+
+      //   const { expiration, ...userData } = response;
+      //   axios.defaults.headers.common["Authorization"] = `Bearer ${tokenData}`;
+
+      //   try {
+      //     await AsyncStorage.setItem("token", tokenData);
+      //   } catch (storageError) {
+      //     console.log("Error storing token in AsyncStorage:", storageError);
+      //   }
+
+      //   setUser(userData);
+      //   return true;
+      // } else {
+      //   setError(response.status);
+      //   return false;
+      // }
+    } catch (error) {
+      console.log(error);
+      setError("An error occurred");
+    }
+  };
+
+  const logout = async () => {
+    const route =
+      user.account_type == "regular user" ? "/logout" : "/provider_logout";
+
+    try {
+      const response = await axios.post(route);
       if (response.data.message === "Logout successful") {
         AsyncStorage.removeItem("token");
         delete axios.defaults.headers.common["Authorization"];
@@ -204,6 +242,7 @@ export function AuthProvider({ children }) {
       studentVerification,
       studentEmailVerification,
       signupAsProvider,
+      switchAccount,
       isLoadingToken,
     }),
     [

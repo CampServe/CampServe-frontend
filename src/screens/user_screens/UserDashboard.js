@@ -1,12 +1,5 @@
-import {
-  View,
-  Text,
-  TouchableWithoutFeedback,
-  ActivityIndicator,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import CustomHeader from "../../components/CustomHeader";
@@ -17,25 +10,24 @@ import Loader from "../../components/Loader";
 
 const UserDashboard = () => {
   const navigation = useNavigation();
-  const { isLoadingToken } = useAuth();
+  const { isLoadingToken, user } = useAuth();
   const [serviceProviders, setServiceProviders] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("Featured");
   const [selectedProviders, setSelectedProviders] = useState([]);
   const [loadingCategory, setLoadingCategory] = useState(true);
 
   if (isLoadingToken) {
-    return (
-      <SafeAreaView className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" />
-      </SafeAreaView>
-    );
+    return <Loader />;
   }
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await getServiceProviders();
-        setServiceProviders(data);
+        const filteredData = data.filter(
+          (provider) => provider.user_id !== user.user_id
+        );
+        setServiceProviders(filteredData);
       } catch (error) {
         console.log(error);
       } finally {
@@ -54,18 +46,21 @@ const UserDashboard = () => {
     {
       id: 1,
       business_name: "Featured Provider 1",
+      sub_categories: "Featured",
       bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
       provider_contact: "1234567890",
     },
     {
       id: 2,
       business_name: "Featured Provider 2",
+      sub_categories: "Featured",
       bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
       provider_contact: "9876543210",
     },
     {
       id: 3,
       business_name: "Featured Provider 3",
+      sub_categories: "Featured",
       bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
       provider_contact: "0126543210",
     },
@@ -91,23 +86,46 @@ const UserDashboard = () => {
       setSelectedProviders(filteredProviders);
     }
   };
+
   const handleCardPress = (provider) => {
-    console.log(provider);
+    const image = getImageBySubCategory(provider.sub_categories);
+    navigation.navigate("ServiceDetails", {
+      provider: {
+        image: image,
+        ...provider,
+      },
+    });
   };
 
-  const getImageByCategory = (category) => {
-    switch (category) {
+  const getImageBySubCategory = (subCategory) => {
+    let image;
+
+    switch (subCategory) {
       case "Featured":
         return require("../../../assets/onboarding4.jpg");
-      case "Tutoring":
-        return require("../../../assets/onboarding3.jpg");
-      case "Room":
-        return require("../../../assets/onboarding2.jpg");
-      case "Design":
-        return require("../../../assets/onboarding1.jpg");
+      case "Laundry":
+        image = require("../../../assets/sub4.jpg");
+        break;
+      case "Room Decoration":
+        image = require("../../../assets/sub6.jpg");
+        break;
+      case "Academic Tutoring":
+        image = require("../../../assets/sub8.jpg");
+        break;
+      case "Exams Preparation":
+        image = require("../../../assets/sub2.jpg");
+        break;
+      case "UI/UX Design":
+        image = require("../../../assets/sub5.jpg");
+        break;
+      case "Graphic Design":
+        image = require("../../../assets/onboarding1.jpg");
+        break;
       default:
         return null;
     }
+
+    return image;
   };
 
   return (
@@ -156,7 +174,7 @@ const UserDashboard = () => {
               {uniqueSubCategories.map((subCategory) => (
                 <View key={subCategory}>
                   <Text className="font-bold text-[#0A4014] uppercase text-lg">
-                    {subCategory}
+                    {subCategory !== "Featured" && subCategory}
                   </Text>
                   <ScrollView
                     horizontal
@@ -170,7 +188,9 @@ const UserDashboard = () => {
                       .map((filteredProvider) => (
                         <CustomCard
                           key={filteredProvider.user_id}
-                          // image={getImageByCategory(selectedCategory)}
+                          image={getImageBySubCategory(
+                            filteredProvider.sub_categories
+                          )}
                           businessName={filteredProvider.business_name}
                           bio={filteredProvider.bio}
                           contactNumber={filteredProvider.provider_contact}

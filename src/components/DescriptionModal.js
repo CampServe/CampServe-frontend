@@ -77,7 +77,7 @@ const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
       isVisible={visible}
       animationIn="slideInUp"
       animationOut="slideOutDown"
-      backdropOpacity={0.2}
+      backdropOpacity={0.5}
       style={{ margin: 0 }}
     >
       <View className="flex-1 justify-end">

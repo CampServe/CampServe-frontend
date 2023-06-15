@@ -32,6 +32,7 @@ import ServiceProviderPaymentScreen from "./src/screens/serviceprov_screens/Serv
 import CustomSPDrawerContent from "./src/components/CustomSPDrawerContent";
 import SProfileSetup from "./src/screens/serviceprov_screens/SProfileSetup";
 import SelectCategoriesScreen from "./src/screens/serviceprov_screens/SelectCategoriesScreen";
+import ServiceDetailsScreen from "./src/screens/user_screens/ServiceDetailsScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -79,6 +80,7 @@ const UserDrawerStackNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="UDrawerTabs" component={UserTabNavigator} />
+      <Stack.Screen name="ServiceDetails" component={ServiceDetailsScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
       <Stack.Screen name="Help" component={HelpsAndFaqsScreen} />

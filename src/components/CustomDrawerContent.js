@@ -42,7 +42,7 @@ const data = [
 
 const CustomDrawerContent = () => {
   const navigation = useNavigation();
-  const { user, logout } = useAuth();
+  const { user, logout, switchAccount } = useAuth();
 
   const DrawerItem = ({ icon, title, screen }) => (
     <TouchableHighlight
@@ -109,13 +109,19 @@ const CustomDrawerContent = () => {
         <TouchableOpacity
           className="flex flex-row space-x-6  mt-10 items-center justify-center rounded-lg bg-green-500 p-3 pl-4"
           onPress={() =>
-            navigation.navigate(
-              user.is_service_provider == "true" ||
-                user.is_service_provider === true
-                ? "Service Provider"
-                : "SPOnboarding"
-            )
+            user.is_service_provider == "true" ||
+            user.is_service_provider === true
+              ? switchAccount()
+              : navigation.navigate("SPOnboarding")
           }
+          // onPress={() =>
+          //   navigation.navigate(
+          //     user.is_service_provider == "true" ||
+          //       user.is_service_provider === true
+          //       ? "Service Provider"
+          //       : "SPOnboarding"
+          //   )
+          // }
         >
           <Text className="text-white text-center text-base">
             {user.is_service_provider == "true" ||
