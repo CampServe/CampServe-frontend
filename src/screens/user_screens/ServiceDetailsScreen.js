@@ -93,7 +93,7 @@ const ServiceDetailsScreen = () => {
           </View>
         </View>
 
-        <RatingsandReviews ratings={ratings} />
+        <RatingsandReviews ratings={ratings} provider_id={provider.user_id} />
       </ScrollView>
 
       <View className="flex-row justify-around items-center p-4 border-t border-gray-300">

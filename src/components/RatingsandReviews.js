@@ -19,7 +19,7 @@ export const calculateAverageRating = (ratings) => {
   return Math.round(averageRating * 10) / 10;
 };
 
-const RatingsAndReviews = ({ ratings }) => {
+const RatingsAndReviews = ({ ratings, provider_id }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [displayedReviews, setDisplayedReviews] = useState([]);
   const [isReviewsModalVisible, setIsReviewsModalVisible] = useState(false);
@@ -30,6 +30,7 @@ const RatingsAndReviews = ({ ratings }) => {
   const addRatingAndReview = () => {
     const newRating = {
       id: user.user_id,
+      provider_id: provider_id,
       ratings: selectedRating,
       review: review,
       timestamp: new Date(),
