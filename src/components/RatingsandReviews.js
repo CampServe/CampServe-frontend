@@ -10,7 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 import Modal from "react-native-modal";
 import React, { useState, useEffect } from "react";
 import useAuth from "../hooks/useAuth";
-import { storeRatings } from "../hooks/useApi";
+import { getRatings, storeRatings } from "../hooks/useApi";
 import { DotIndicator } from "react-native-indicators";
 
 export const calculateAverageRating = (ratings) => {
@@ -21,7 +21,8 @@ export const calculateAverageRating = (ratings) => {
   return Math.round(averageRating * 10) / 10;
 };
 
-const RatingsAndReviews = ({ ratings, provider_id }) => {
+const RatingsAndReviews = ({ rating, provider_id, business_name }) => {
+  const [ratings, setRatings] = useState(rating);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [displayedReviews, setDisplayedReviews] = useState([]);
   const [isReviewsModalVisible, setIsReviewsModalVisible] = useState(false);
@@ -30,7 +31,7 @@ const RatingsAndReviews = ({ ratings, provider_id }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
 
-  const addRatingAndReview = () => {
+  const addRatingAndReview = async () => {
     const newRating = {
       id: user.user_id,
       provider_id: provider_id,
@@ -38,12 +39,14 @@ const RatingsAndReviews = ({ ratings, provider_id }) => {
       review: review.trim(),
       timestamp: new Date(),
     };
+
     setIsLoading(true);
 
     try {
-      const ratingSent = storeRatings(newRating);
+      const ratingSent = await storeRatings(newRating);
       if (ratingSent) {
-        console.log("Success");
+        const newRatings = await getRatings(provider_id);
+        setRatings(newRatings);
       } else {
         console.log("Failure");
       }
@@ -76,7 +79,7 @@ const RatingsAndReviews = ({ ratings, provider_id }) => {
           <Ionicons
             name={isSelected ? "star" : "star-outline"}
             size={32}
-            color={isSelected ? "green" : "gray"}
+            color={isSelected ? "gold" : "gray"}
           />
         </TouchableOpacity>
       );
@@ -113,13 +116,25 @@ const RatingsAndReviews = ({ ratings, provider_id }) => {
   return (
     <>
       <View className="px-4 pt-4">
-        <Text className="text-lg font-bold">Ratings and Reviews</Text>
+        <View className="flex-row justify-between">
+          <Text className="text-lg font-bold">Ratings and Reviews</Text>
+          <TouchableOpacity
+            className="flex items-center justify-center rounded-lg"
+            onPress={() => {
+              setIsReviewsModalVisible(true);
+            }}
+          >
+            <Text className="text-green-600">Post a review</Text>
+          </TouchableOpacity>
+        </View>
         {displayedReviews.length > 0 ? (
           <View className="bg-white rounded-lg p-4 pb-0">
             <View className="flex-row space-x-10 mb-4">
               <View className="flex justify-between mb-4">
                 <View>
-                  <Text className="text-2xl font-bold">{averageRating}</Text>
+                  <Text className="text-2xl text-center font-bold">
+                    {averageRating}
+                  </Text>
                   <View className="flex flex-row items-center mt-1">
                     {Array.from({ length: 5 }, (_, index) => (
                       <Ionicons
@@ -132,7 +147,7 @@ const RatingsAndReviews = ({ ratings, provider_id }) => {
                             : "star-outline"
                         }
                         size={12}
-                        color="green"
+                        color="gold"
                         style={{ marginRight: 2 }}
                       />
                     ))}
@@ -168,7 +183,9 @@ const RatingsAndReviews = ({ ratings, provider_id }) => {
                   className="h-10 w-10 rounded-full mr-3"
                 />
                 <View className="flex flex-grow">
-                  <Text className="font-semibold">{rating.name}</Text>
+                  <Text className="font-semibold">
+                    {rating.first_name} {rating.last_name}
+                  </Text>
                   <View className="flex-row gap-2">
                     <View className="flex flex-row items-center mt-1">
                       {Array.from({ length: 5 }, (_, index) => (
@@ -176,7 +193,7 @@ const RatingsAndReviews = ({ ratings, provider_id }) => {
                           key={index}
                           name={index < rating.stars ? "star" : "star-outline"}
                           size={12}
-                          color={index < rating.stars ? "green" : "gray"}
+                          color={index < rating.stars ? "gold" : "gray"}
                           style={{ marginRight: 2 }}
                         />
                       ))}
@@ -204,8 +221,8 @@ const RatingsAndReviews = ({ ratings, provider_id }) => {
           </View>
         )}
 
-        <View className="flex-row justify-between">
-          {displayedReviews.length > 0 && (
+        {displayedReviews.length > 0 &&
+          displayedReviews.length < ratings.length && (
             <TouchableOpacity
               className="flex items-center justify-center rounded-lg pb-4"
               onPress={() => {
@@ -215,15 +232,6 @@ const RatingsAndReviews = ({ ratings, provider_id }) => {
               <Text className="text-green-600">See all Reviews</Text>
             </TouchableOpacity>
           )}
-          <TouchableOpacity
-            className="flex items-center justify-center rounded-lg pb-4"
-            onPress={() => {
-              setIsReviewsModalVisible(true);
-            }}
-          >
-            <Text className="text-green-600">Post a review</Text>
-          </TouchableOpacity>
-        </View>
       </View>
 
       <Modal
@@ -237,7 +245,7 @@ const RatingsAndReviews = ({ ratings, provider_id }) => {
           <View className="bg-white h-[90%] rounded-t-3xl px-4">
             <View className="flex-row items-center justify-between">
               <Text className="text-2xl flex-1 text-center font-bold my-5">
-                All Reviews
+                {ratings.length} reviews
               </Text>
               <TouchableOpacity
                 onPress={() => setIsModalVisible(false)}
@@ -259,7 +267,9 @@ const RatingsAndReviews = ({ ratings, provider_id }) => {
                     className="h-10 w-10 rounded-full mr-3"
                   />
                   <View className="flex flex-grow">
-                    <Text className="font-semibold">{rating.name}</Text>
+                    <Text className="font-semibold">
+                      {rating.first_name} {rating.last_name}
+                    </Text>
                     <View className="flex-row gap-2">
                       <View className="flex flex-row items-center mt-1">
                         {Array.from({ length: 5 }, (_, index) => (
@@ -269,7 +279,7 @@ const RatingsAndReviews = ({ ratings, provider_id }) => {
                               index < rating.stars ? "star" : "star-outline"
                             }
                             size={12}
-                            color={index < rating.stars ? "green" : "gray"}
+                            color={index < rating.stars ? "gold" : "gray"}
                             style={{ marginRight: 2 }}
                           />
                         ))}
@@ -305,8 +315,8 @@ const RatingsAndReviews = ({ ratings, provider_id }) => {
         <View className="flex-1 justify-end">
           <View className="bg-white rounded-t-3xl px-4">
             <View className="flex-row items-center justify-between">
-              <Text className="text-2xl flex-1 text-center font-bold my-5">
-                Rate Service Provider
+              <Text className="text-2xl flex-1 text-center font-bold my-5 capitalize">
+                Rate {business_name}
               </Text>
               <TouchableOpacity onPress={closeReview} className="p-4">
                 <Ionicons name="close-sharp" size={24} color="black" />

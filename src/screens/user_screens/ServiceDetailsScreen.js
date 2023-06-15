@@ -7,10 +7,12 @@ import RatingsandReviews, {
   calculateAverageRating,
 } from "../../components/RatingsandReviews";
 import { getRatings } from "../../hooks/useApi";
+import Loader from "../../components/Loader";
 
 const ServiceDetailsScreen = () => {
   const navigation = useNavigation();
-  // const [ratings, setRatings] = useState([])
+  const [ratings, setRatings] = useState([]);
+  const [isRatingsLoading, setIsRatingsLoading] = useState(false);
   const route = useRoute();
   const { provider } = route.params;
 
@@ -19,51 +21,61 @@ const ServiceDetailsScreen = () => {
   };
 
   useEffect(() => {
-    try {
-      const response = getRatings(provider.user_id);
-      // setRatings(response)
-      console.log(response);
-    } catch (error) {
-      console.log(error);
-    }
+    const fetchData = async () => {
+      try {
+        setIsRatingsLoading(true);
+        const response = await getRatings(provider.provider_id);
+        if (response.length !== 0) {
+          setRatings(response);
+        } else {
+          setRatings([]);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsRatingsLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  const ratings = [
-    {
-      id: 1,
-      name: "John Doe",
-      stars: 4,
-      review: "Great service! Highly recommended.",
-      timestamp: "2023-06-15T10:37:06.565Z",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      stars: 5,
-      review: "Excellent work! Very satisfied.",
-      timestamp: "2023-06-15T10:37:06.565Z",
-    },
-    {
-      id: 3,
-      name: "Jane Smith",
-      stars: 5,
-      review: "Excellent work! Very satisfied.",
-      timestamp: "2023-06-15T10:37:06.565Z",
-    },
-    {
-      id: 4,
-      name: "Jane Smith",
-      stars: 5,
-      review: "Excellent work! Very satisfied.",
-      timestamp: "2023-06-15T10:37:06.565Z",
-    },
-    {
-      id: 5,
-      name: "Jane Smith",
-      stars: 2,
-      review: "",
-    },
-  ];
+  // const ratings = [
+  //   {
+  //     id: 1,
+  //     name: "John Doe",
+  //     stars: 4,
+  //     review: "Great service! Highly recommended.",
+  //     timestamp: "2023-06-15T10:37:06.565Z",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Jane Smith",
+  //     stars: 5,
+  //     review: "Excellent work! Very satisfied.",
+  //     timestamp: "2023-06-15T10:37:06.565Z",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Jane Smith",
+  //     stars: 5,
+  //     review: "Excellent work! Very satisfied.",
+  //     timestamp: "2023-06-15T10:37:06.565Z",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Jane Smith",
+  //     stars: 5,
+  //     review: "Excellent work! Very satisfied.",
+  //     timestamp: "2023-06-15T10:37:06.565Z",
+  //   },
+  //   {
+  //     id: 5,
+  //     name: "Jane Smith",
+  //     stars: 2,
+  //     review: "",
+  //   },
+  // ];
 
   const averageRating = calculateAverageRating(ratings);
 
@@ -79,33 +91,49 @@ const ServiceDetailsScreen = () => {
             <Feather name="arrow-left" size={24} color="black" />
           </TouchableOpacity>
         </View>
-        <View className="px-4 pt-4">
-          <Text className="text-3xl font-bold capitalize">
-            {provider.business_name}
-          </Text>
-          <View className="flex-row items-center mt-2">
-            <MaterialIcons name="info" size={20} color="#888" />
-            <Text className="text-base ml-2 capitalize">{provider.bio}</Text>
-          </View>
-          <View className="flex-row items-center mt-2">
-            <FontAwesome name="star" size={20} color="green" />
-            <Text className="text-base ml-2">{averageRating || "N/A"}</Text>
-          </View>
-          <View className="flex-row items-center mt-2">
-            <Feather name="phone" size={20} color="#888" />
-            <Text className="text-base ml-2">{provider.provider_contact}</Text>
-          </View>
-          <View className="px-4 pt-4">
-            <Text className=" text-lg font-bold">Description</Text>
-            <View className="bg-white rounded-lg p-2">
-              <Text className="text-base text-gray-600">
-                {provider.subcategories_description}
+        {isRatingsLoading ? (
+          <Loader />
+        ) : (
+          <>
+            <View className="px-4 pt-4">
+              <Text className="text-3xl font-bold capitalize">
+                {provider.business_name}
               </Text>
+              <View className="flex-row items-center mt-2">
+                <MaterialIcons name="info-outline" size={20} color="#888" />
+                <Text className="text-base ml-2 capitalize">
+                  {provider.bio}
+                </Text>
+              </View>
+              <View className="flex-row items-center mt-2">
+                <FontAwesome name="star" size={20} color="gold" />
+                <Text className="text-base ml-2">{averageRating || "N/A"}</Text>
+              </View>
+              <View className="flex-row items-center mt-2">
+                <Feather name="phone" size={20} color="#888" />
+                <Text className="text-base ml-2">
+                  {provider.provider_contact}
+                </Text>
+              </View>
+              <View className="px-4 pt-4">
+                <Text className=" text-lg font-bold">Description</Text>
+                <View className="bg-white rounded-lg p-2">
+                  <Text className="text-base text-gray-600">
+                    {provider.subcategories_description}
+                  </Text>
+                </View>
+              </View>
             </View>
-          </View>
-        </View>
 
-        <RatingsandReviews ratings={ratings} provider_id={provider.user_id} />
+            <View className="border border-gray-100 m-2 mx-4" />
+
+            <RatingsandReviews
+              business_name={provider.business_name}
+              rating={ratings}
+              provider_id={provider.provider_id}
+            />
+          </>
+        )}
       </ScrollView>
 
       <View className="flex-row justify-around items-center p-4 border-t border-gray-300">
