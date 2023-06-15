@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -6,15 +6,27 @@ import { FontAwesome, Feather, MaterialIcons } from "@expo/vector-icons";
 import RatingsandReviews, {
   calculateAverageRating,
 } from "../../components/RatingsandReviews";
+import { getRatings } from "../../hooks/useApi";
 
 const ServiceDetailsScreen = () => {
   const navigation = useNavigation();
+  // const [ratings, setRatings] = useState([])
   const route = useRoute();
   const { provider } = route.params;
 
   const handleGoBack = () => {
     navigation.goBack();
   };
+
+  useEffect(() => {
+    try {
+      const response = getRatings(provider.user_id);
+      // setRatings(response)
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
 
   const ratings = [
     {
@@ -85,7 +97,7 @@ const ServiceDetailsScreen = () => {
           </View>
           <View className="px-4 pt-4">
             <Text className=" text-lg font-bold">Description</Text>
-            <View className="bg-white rounded-lg shadow p-2">
+            <View className="bg-white rounded-lg p-2">
               <Text className="text-base text-gray-600">
                 {provider.subcategories_description}
               </Text>

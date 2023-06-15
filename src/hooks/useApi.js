@@ -9,3 +9,25 @@ export const getServiceProviders = async () => {
     throw error;
   }
 };
+
+export const storeRatings = async (commentData) => {
+  try {
+    const response = await axios.post("./store_ratings", commentData);
+    if (response.data.message == "Ratings stored successfully.") {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getRatings = async (provider_id) => {
+  try {
+    const response = await axios.get("./get_ratings", { provider_id });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

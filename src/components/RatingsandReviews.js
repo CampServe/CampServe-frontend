@@ -10,6 +10,8 @@ import { Ionicons } from "@expo/vector-icons";
 import Modal from "react-native-modal";
 import React, { useState, useEffect } from "react";
 import useAuth from "../hooks/useAuth";
+import { storeRatings } from "../hooks/useApi";
+import { DotIndicator } from "react-native-indicators";
 
 export const calculateAverageRating = (ratings) => {
   if (ratings.length === 0) return 0;
@@ -25,6 +27,7 @@ const RatingsAndReviews = ({ ratings, provider_id }) => {
   const [isReviewsModalVisible, setIsReviewsModalVisible] = useState(false);
   const [selectedRating, setSelectedRating] = useState(0);
   const [review, setReview] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
 
   const addRatingAndReview = () => {
@@ -32,13 +35,24 @@ const RatingsAndReviews = ({ ratings, provider_id }) => {
       id: user.user_id,
       provider_id: provider_id,
       ratings: selectedRating,
-      review: review,
+      review: review.trim(),
       timestamp: new Date(),
     };
+    setIsLoading(true);
 
-    console.log(newRating);
-
-    closeReview();
+    try {
+      const ratingSent = storeRatings(newRating);
+      if (ratingSent) {
+        console.log("Success");
+      } else {
+        console.log("Failure");
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+      closeReview();
+    }
   };
 
   const closeReview = () => {
@@ -314,15 +328,21 @@ const RatingsAndReviews = ({ ratings, provider_id }) => {
             </View>
 
             <View className="flex items-center justify-center">
-              <TouchableOpacity
-                onPress={addRatingAndReview}
-                disabled={selectedRating === 0}
-                className={`${
-                  selectedRating === 0 ? "bg-gray-500" : "bg-green-500"
-                }  w-52 text-white py-2 px-4 my-10 rounded-lg`}
-              >
-                <Text className="text-center text-lg">Post</Text>
-              </TouchableOpacity>
+              {isLoading ? (
+                <View className="flex justify-center items-center py-2 px-4 my-10 h-10">
+                  <DotIndicator color="green" count={3} size={10} />
+                </View>
+              ) : (
+                <TouchableOpacity
+                  onPress={addRatingAndReview}
+                  disabled={selectedRating === 0}
+                  className={`${
+                    selectedRating === 0 ? "bg-gray-500" : "bg-green-500"
+                  }  w-52 text-white py-2 px-4 my-10 rounded-lg`}
+                >
+                  <Text className="text-center text-lg">Post</Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         </View>
