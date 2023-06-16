@@ -17,6 +17,8 @@ export function AuthProvider({ children }) {
   const [isLoadingSignup, setIsLoadingSignup] = useState(false);
   const [isLoadingVerify, setIsLoadingVerify] = useState(false);
   const [isLoadingToken, setIsLoadingToken] = useState(true);
+  const [isLoadingLogout, setIsLoadingLogout] = useState(false);
+  const [isSwitchingAcount, setIsSwitchingAcount] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -29,7 +31,7 @@ export function AuthProvider({ children }) {
           const currentDate = new Date();
 
           if (currentDate <= expirationDate) {
-            axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+            axios.defaults.headers.common["Authorization"] = `${token}`;
             setUser(userData);
           } else {
             delete axios.defaults.headers.common["Authorization"];
@@ -68,9 +70,7 @@ export function AuthProvider({ children }) {
           )
         ) {
           const { status, expiration, ...userData } = response;
-          axios.defaults.headers.common[
-            "Authorization"
-          ] = `Bearer ${tokenData}`;
+          axios.defaults.headers.common["Authorization"] = `${tokenData}`;
 
           try {
             await AsyncStorage.setItem("token", tokenData);
@@ -175,6 +175,7 @@ export function AuthProvider({ children }) {
   };
 
   const switchAccount = async () => {
+    setIsSwitchingAcount(true);
     const route =
       user.account_type == "regular user"
         ? "/switch_to_provider"
@@ -183,37 +184,35 @@ export function AuthProvider({ children }) {
     try {
       const tokenResponse = await axios.get(route);
       const tokenData = tokenResponse.data.token;
+      if (tokenData) {
+        const response = jwtDecode(tokenData);
 
-      console.log(tokenResponse.data);
+        const { expiration, ...userData } = response;
+        axios.defaults.headers.common["Authorization"] = `${tokenData}`;
+        try {
+          await AsyncStorage.setItem("token", tokenData);
+        } catch (storageError) {
+          console.log("Error storing token in AsyncStorage:", storageError);
+        }
 
-      // if (tokenData) {
-      //   const response = jwtDecode(tokenData);
-
-      //   const { expiration, ...userData } = response;
-      //   axios.defaults.headers.common["Authorization"] = `Bearer ${tokenData}`;
-
-      //   try {
-      //     await AsyncStorage.setItem("token", tokenData);
-      //   } catch (storageError) {
-      //     console.log("Error storing token in AsyncStorage:", storageError);
-      //   }
-
-      //   setUser(userData);
-      //   return true;
-      // } else {
-      //   setError(response.status);
-      //   return false;
-      // }
+        setUser(userData);
+        return true;
+      } else {
+        setError(response.status);
+        return false;
+      }
     } catch (error) {
       console.log(error);
       setError("An error occurred");
+    } finally {
+      setIsSwitchingAcount(false);
     }
   };
 
   const logout = async () => {
+    setIsLoadingLogout(true);
     const route =
       user.account_type == "regular user" ? "/logout" : "/provider_logout";
-
     try {
       const response = await axios.post(route);
       if (response.data.message === "Logout successful") {
@@ -226,6 +225,8 @@ export function AuthProvider({ children }) {
     } catch (error) {
       console.log(error);
       setError("An error occurred");
+    } finally {
+      setIsLoadingLogout(false);
     }
   };
 
@@ -235,6 +236,8 @@ export function AuthProvider({ children }) {
       isLoadingLogin,
       isLoadingSignup,
       isLoadingVerify,
+      isLoadingLogout,
+      isSwitchingAcount,
       error,
       login,
       logout,

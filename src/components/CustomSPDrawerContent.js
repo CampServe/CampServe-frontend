@@ -12,6 +12,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import useAuth from "../hooks/useAuth";
+import { DotIndicator } from "react-native-indicators";
 
 const data = [
   {
@@ -30,10 +31,8 @@ const data = [
 
 const CustomSPDrawerContent = () => {
   const navigation = useNavigation();
-  const { user, logout } = useAuth();
-
-  const isServiceProvider = false;
-  const userServiceProvider = true;
+  const { user, logout, switchAccount, isLoadingLogout, isSwitchingAcount } =
+    useAuth();
 
   const DrawerItem = ({ icon, title, screen }) => (
     <TouchableHighlight
@@ -97,26 +96,44 @@ const CustomSPDrawerContent = () => {
       </View>
       <View className="border border-t-1 border-gray-200 " />
 
-      <View className=" px-4">
-        <TouchableOpacity
-          className="flex flex-row space-x-6  mt-10 items-center justify-center rounded-lg bg-green-500 p-3 pl-4"
-          onPress={() => navigation.navigate("User")}
-        >
-          <Text className="text-white text-center text-base">
-            Switch to User
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <View className=" flex-row items-center px-4">
-        <TouchableOpacity
-          activeOpacity={0.5}
-          className="flex flex-row flex-1 space-x-6 mt-5 items-center rounded-lg bg-red-500 p-3 pl-4"
-          onPress={logout}
-        >
-          <Ionicons name="log-out" size={24} color="white" className="mr-3 " />
-          <Text className="text-white text-base">Logout</Text>
-        </TouchableOpacity>
-      </View>
+      {isSwitchingAcount ? (
+        <View className="flex justify-center items-center h-10 mt-5 p-3 pl-4">
+          <DotIndicator color="green" count={3} size={10} />
+        </View>
+      ) : (
+        <View className=" px-4">
+          <TouchableOpacity
+            className="flex flex-row space-x-6  mt-10 items-center justify-center rounded-lg bg-green-500 p-3 pl-4"
+            onPress={switchAccount}
+          >
+            <Text className="text-white text-center text-base">
+              Switch to User
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {isLoadingLogout ? (
+        <View className="flex justify-center items-center h-10 mt-5 p-3 pl-4">
+          <DotIndicator color="red" count={3} size={10} />
+        </View>
+      ) : (
+        <View className=" flex-row justify-center items-center px-4">
+          <TouchableOpacity
+            activeOpacity={0.5}
+            className="flex flex-row flex-1 space-x-6 mt-5 items-center rounded-lg bg-red-500 p-3 pl-4"
+            onPress={logout}
+          >
+            <Ionicons
+              name="log-out"
+              size={24}
+              color="white"
+              className="mr-3 "
+            />
+            <Text className="text-white text-base">Logout</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </Animated.View>
   );
 };

@@ -22,7 +22,13 @@ export const calculateAverageRating = (ratings) => {
     0
   );
   const averageRating = totalStars / ratings.length;
-  return Math.round(averageRating * 10) / 10;
+  const roundedRating = averageRating.toFixed(1);
+
+  if (roundedRating.endsWith(".0")) {
+    return roundedRating;
+  } else {
+    return parseFloat(roundedRating);
+  }
 };
 
 const RatingsAndReviews = ({ rating, provider_id, business_name }) => {

@@ -22,13 +22,12 @@ const CustomCard = ({
 
   return (
     <TouchableOpacity
-      className="flex flex-1"
+      className="flex flex-1 ml-[2px]"
       onPress={onPress}
       activeOpacity={0.7}
       style={{
         backgroundColor: "white",
         borderRadius: 8,
-        // padding: 8,
         margin: 8,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },

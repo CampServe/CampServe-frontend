@@ -83,9 +83,9 @@ const ServiceDetailsScreen = () => {
                   {provider.provider_contact}
                 </Text>
               </View>
-              <View className="px-4 pt-4">
+              <View className="pt-4">
                 <Text className=" text-lg font-bold">Description</Text>
-                <View className="bg-white rounded-lg p-2">
+                <View className="bg-white rounded-lg py-2">
                   <Text className="text-base text-gray-600">
                     {provider.subcategories_description}
                   </Text>
