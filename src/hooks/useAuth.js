@@ -59,9 +59,11 @@ export function AuthProvider({ children }) {
       const tokenResponse = await axios.post(route, credentials);
       const tokenData = tokenResponse.data.token;
 
+      console.log("Token:", tokenData);
+
       if (tokenData) {
         const response = jwtDecode(tokenData);
-
+       
         if (
           ["Login successful", "Provider login successful"].includes(
             response.status
@@ -174,17 +176,17 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const switchAccount = async () => {
-    const route =
-      user.account_type == "regular user"
-        ? "/switch_to_provider"
-        : "/switch_to_user";
+  // const switchAccount = async () => {
+  //   const route =
+  //     user.account_type == "regular user"
+  //       ? "/switch_to_provider"
+  //       : "/switch_to_user";
 
-    try {
-      const tokenResponse = await axios.get(route);
-      const tokenData = tokenResponse.data.token;
+  //   try {
+  //     const tokenResponse = await axios.get(route);
+  //     const tokenData = tokenResponse.data.token;
 
-      console.log(tokenResponse.data);
+  //     console.log(tokenResponse.data);
 
       // if (tokenData) {
       //   const response = jwtDecode(tokenData);
@@ -204,11 +206,48 @@ export function AuthProvider({ children }) {
       //   setError(response.status);
       //   return false;
       // }
+  //   } catch (error) {
+  //     console.log(error);
+  //     setError("An error occurred");
+  //   }
+  // };
+
+  const switchAccount = async () => {
+    const route =
+      user.account_type == "regular user"
+        ? "/switch_to_provider"
+        : "/switch_to_user";
+  
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        setError("No token found");
+        return false;
+      }
+
+      //console.log("Token from switch acc:", token);
+  
+      const config = {
+        headers: {
+          Authorization: `${token}`,
+        },
+      };
+
+    //console.log("token:" + token)
+  
+      const tokenResponse = await axios.get(route, config);
+      const tokenData = tokenResponse.data.token;
+  
+      console.log(tokenResponse.data);
+  
+      // Rest of your code to handle the token and set the user
+  
     } catch (error) {
       console.log(error);
       setError("An error occurred");
     }
   };
+  
 
   const logout = async () => {
     const route =

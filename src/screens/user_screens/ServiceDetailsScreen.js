@@ -40,6 +40,8 @@ const ServiceDetailsScreen = () => {
     fetchData();
   }, []);
 
+  // console.log(provider.provider_id);
+
   // const ratings = [
   //   {
   //     id: 1,
