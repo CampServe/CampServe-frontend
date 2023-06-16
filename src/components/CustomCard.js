@@ -74,7 +74,7 @@ const CustomCard = ({
           {contactNumber}
         </Text>
         <Text style={{ color: "gray", marginTop: 8 }}>
-          <Ionicons name="star" size={20} color="gold" /> 4.5
+          <Ionicons name="star" size={20} color="gold" /> {ratings || "N/A"}
         </Text>
       </View>
     </TouchableOpacity>

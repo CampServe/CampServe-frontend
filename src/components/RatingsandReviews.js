@@ -12,11 +12,15 @@ import React, { useState, useEffect } from "react";
 import useAuth from "../hooks/useAuth";
 import { getRatings, storeRatings } from "../hooks/useApi";
 import { DotIndicator } from "react-native-indicators";
+import useProvider from "../hooks/useProvider";
 
 export const calculateAverageRating = (ratings) => {
-  if (ratings.length === 0) return 0;
+  if (!ratings || ratings.length === 0 || ratings[0] == null) return 0;
 
-  const totalStars = ratings.reduce((sum, rating) => sum + rating.stars, 0);
+  const totalStars = ratings.reduce(
+    (sum, rating) => sum + (rating.stars || rating),
+    0
+  );
   const averageRating = totalStars / ratings.length;
   return Math.round(averageRating * 10) / 10;
 };
@@ -30,6 +34,7 @@ const RatingsAndReviews = ({ rating, provider_id, business_name }) => {
   const [review, setReview] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
+  const { setAverageRate } = useProvider();
 
   const addRatingAndReview = async () => {
     const newRating = {
@@ -47,6 +52,7 @@ const RatingsAndReviews = ({ rating, provider_id, business_name }) => {
       if (ratingSent) {
         const newRatings = await getRatings(provider_id);
         setRatings(newRatings);
+        setAverageRate(calculateAverageRating(newRatings));
       } else {
         console.log("Failure");
       }
@@ -142,7 +148,8 @@ const RatingsAndReviews = ({ rating, provider_id, business_name }) => {
                         name={
                           index < Math.floor(averageRating)
                             ? "star"
-                            : index - Math.floor(averageRating) < 0.5
+                            : index === Math.floor(averageRating) &&
+                              averageRating % 1 !== 0
                             ? "star-half"
                             : "star-outline"
                         }
@@ -152,6 +159,7 @@ const RatingsAndReviews = ({ rating, provider_id, business_name }) => {
                       />
                     ))}
                   </View>
+
                   <Text className="text-gray-600">
                     {ratings.length} reviews
                   </Text>
@@ -205,7 +213,7 @@ const RatingsAndReviews = ({ rating, provider_id, business_name }) => {
                   {rating.review ? (
                     <Text className="text-gray-600 mt-1">{rating.review}</Text>
                   ) : (
-                    <Text className="text-gray-600 mt-1">
+                    <Text className="text-gray-600 text-xs mt-1">
                       No comment provided
                     </Text>
                   )}

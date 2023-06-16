@@ -13,6 +13,7 @@ export const getServiceProviders = async () => {
 export const storeRatings = async (commentData) => {
   try {
     const response = await axios.post("./store_ratings", commentData);
+    // console.log(response.data);
     if (response.data.message == "Ratings stored successfully.") {
       return true;
     } else {

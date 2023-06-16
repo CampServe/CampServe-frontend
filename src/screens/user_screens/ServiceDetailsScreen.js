@@ -8,6 +8,7 @@ import RatingsandReviews, {
 } from "../../components/RatingsandReviews";
 import { getRatings } from "../../hooks/useApi";
 import Loader from "../../components/Loader";
+import useProvider from "../../hooks/useProvider";
 
 const ServiceDetailsScreen = () => {
   const navigation = useNavigation();
@@ -15,6 +16,7 @@ const ServiceDetailsScreen = () => {
   const [isRatingsLoading, setIsRatingsLoading] = useState(false);
   const route = useRoute();
   const { provider } = route.params;
+  const { averageRate } = useProvider();
 
   const handleGoBack = () => {
     navigation.goBack();
@@ -25,7 +27,9 @@ const ServiceDetailsScreen = () => {
       try {
         setIsRatingsLoading(true);
         const response = await getRatings(provider.provider_id);
-        if (response.length !== 0) {
+        if (response.error === "could not retrieve the information") {
+          setRatings([]);
+        } else if (response.length !== 0) {
           setRatings(response);
         } else {
           setRatings([]);
@@ -40,44 +44,8 @@ const ServiceDetailsScreen = () => {
     fetchData();
   }, []);
 
-  // const ratings = [
-  //   {
-  //     id: 1,
-  //     name: "John Doe",
-  //     stars: 4,
-  //     review: "Great service! Highly recommended.",
-  //     timestamp: "2023-06-15T10:37:06.565Z",
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "Jane Smith",
-  //     stars: 5,
-  //     review: "Excellent work! Very satisfied.",
-  //     timestamp: "2023-06-15T10:37:06.565Z",
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "Jane Smith",
-  //     stars: 5,
-  //     review: "Excellent work! Very satisfied.",
-  //     timestamp: "2023-06-15T10:37:06.565Z",
-  //   },
-  //   {
-  //     id: 4,
-  //     name: "Jane Smith",
-  //     stars: 5,
-  //     review: "Excellent work! Very satisfied.",
-  //     timestamp: "2023-06-15T10:37:06.565Z",
-  //   },
-  //   {
-  //     id: 5,
-  //     name: "Jane Smith",
-  //     stars: 2,
-  //     review: "",
-  //   },
-  // ];
-
-  const averageRating = calculateAverageRating(ratings);
+  const averageRating =
+    averageRate === 0 ? calculateAverageRating(ratings) : averageRate;
 
   return (
     <SafeAreaView className="flex-1 bg-white">

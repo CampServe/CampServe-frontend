@@ -1,46 +1,53 @@
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import CustomHeader from "../../components/CustomHeader";
 import useAuth from "../../hooks/useAuth";
 import { getServiceProviders } from "../../hooks/useApi";
 import CustomCard from "../../components/CustomCard";
 import Loader from "../../components/Loader";
+import { calculateAverageRating } from "../../components/RatingsandReviews";
+import useProvider from "../../hooks/useProvider";
 
 const UserDashboard = () => {
   const navigation = useNavigation();
   const { isLoadingToken, user } = useAuth();
   const [serviceProviders, setServiceProviders] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("Featured");
+  const [selectedCategory, setSelectedCategory] = useState("Room");
   const [selectedProviders, setSelectedProviders] = useState([]);
   const [loadingCategory, setLoadingCategory] = useState(true);
+  const { setAverageRate } = useProvider();
 
   if (isLoadingToken) {
     return <Loader />;
   }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getServiceProviders();
-        const filteredData = data.filter(
-          (provider) => provider.user_id !== user.user_id
-        );
-        setServiceProviders(filteredData);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoadingCategory(false);
-      }
-    };
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        try {
+          const data = await getServiceProviders();
+          const filteredData = data.filter(
+            (provider) => provider.user_id !== user.user_id
+          );
+          setServiceProviders(filteredData);
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setLoadingCategory(false);
+        }
+      };
+      setAverageRate(0);
+      fetchData();
+    }, [])
+  );
 
-    fetchData();
-  }, []);
-
   useEffect(() => {
-    filterProvidersByCategory(selectedCategory);
-  }, [selectedCategory]);
+    if (serviceProviders.length > 0) {
+      filterProvidersByCategory(selectedCategory);
+    }
+  }, [selectedCategory, serviceProviders]);
 
   const dummyFeaturedProviders = [
     {
@@ -67,7 +74,7 @@ const UserDashboard = () => {
   ];
 
   const mainCategories = [
-    "Featured",
+    // "Featured",
     ...new Set(serviceProviders.map((provider) => provider.main_categories)),
   ];
 
@@ -194,7 +201,9 @@ const UserDashboard = () => {
                           businessName={filteredProvider.business_name}
                           bio={filteredProvider.bio}
                           contactNumber={filteredProvider.provider_contact}
-                          // ratings={filteredProvider.ratings}
+                          ratings={calculateAverageRating(
+                            filteredProvider.no_of_stars
+                          )}
                           onPress={() => handleCardPress(filteredProvider)}
                         />
                       ))}

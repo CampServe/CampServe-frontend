@@ -33,6 +33,7 @@ import CustomSPDrawerContent from "./src/components/CustomSPDrawerContent";
 import SProfileSetup from "./src/screens/serviceprov_screens/SProfileSetup";
 import SelectCategoriesScreen from "./src/screens/serviceprov_screens/SelectCategoriesScreen";
 import ServiceDetailsScreen from "./src/screens/user_screens/ServiceDetailsScreen";
+import { RatingProvider } from "./src/hooks/useProvider";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -78,14 +79,16 @@ const UserTabNavigator = () => {
 
 const UserDrawerStackNavigator = () => {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="UDrawerTabs" component={UserTabNavigator} />
-      <Stack.Screen name="ServiceDetails" component={ServiceDetailsScreen} />
-      <Stack.Screen name="Profile" component={ProfileScreen} />
-      <Stack.Screen name="Settings" component={SettingsScreen} />
-      <Stack.Screen name="Help" component={HelpsAndFaqsScreen} />
-      <Stack.Screen name="About" component={AboutUsScreen} />
-    </Stack.Navigator>
+    <RatingProvider>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="UDrawerTabs" component={UserTabNavigator} />
+        <Stack.Screen name="ServiceDetails" component={ServiceDetailsScreen} />
+        <Stack.Screen name="Profile" component={ProfileScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
+        <Stack.Screen name="Help" component={HelpsAndFaqsScreen} />
+        <Stack.Screen name="About" component={AboutUsScreen} />
+      </Stack.Navigator>
+    </RatingProvider>
   );
 };
 
