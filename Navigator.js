@@ -16,7 +16,7 @@ import UserSignupScreen from "./src/screens/common_screens/UserSignupScreen";
 import UserDashboard from "./src/screens/user_screens/UserDashboard";
 import PaymentScreen from "./src/screens/user_screens/PaymentScreen";
 import ActivityScreen from "./src/screens/user_screens/ActivityScreen";
-import MessageScreen from "./src/screens/user_screens/MessageScreen";
+import MessageScreen from "./src/screens/common_screens/MessageScreen";
 import SettingsScreen from "./src/screens/user_screens/SettingsScreen";
 import HelpsAndFaqsScreen from "./src/screens/user_screens/HelpsAndFaqsScreen";
 import AboutUsScreen from "./src/screens/user_screens/AboutUsScreen";
@@ -34,6 +34,7 @@ import SProfileSetup from "./src/screens/serviceprov_screens/SProfileSetup";
 import SelectCategoriesScreen from "./src/screens/serviceprov_screens/SelectCategoriesScreen";
 import ServiceDetailsScreen from "./src/screens/user_screens/ServiceDetailsScreen";
 import { RatingProvider } from "./src/hooks/useProvider";
+import ChatScreen from "./src/screens/common_screens/ChatScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -83,6 +84,7 @@ const UserDrawerStackNavigator = () => {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="UDrawerTabs" component={UserTabNavigator} />
         <Stack.Screen name="ServiceDetails" component={ServiceDetailsScreen} />
+        <Stack.Screen name="Chat" component={ChatScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
         <Stack.Screen name="Help" component={HelpsAndFaqsScreen} />
@@ -142,7 +144,7 @@ const ServiceProviderTabNavigator = () => {
       />
       <Tab.Screen
         name="ServiceProviderMessage"
-        component={ServiceProviderMessageScreen}
+        component={MessageScreen}
         options={{ tabBarLabel: "Message" }}
       />
     </Tab.Navigator>
@@ -165,7 +167,6 @@ const SPDrawerStackNavigator = () => {
 };
 
 const SPDrawerNavigator = () => {
-  const navigation = useNavigation();
   return (
     <Drawer.Navigator
       useLegacyImplementation={true}

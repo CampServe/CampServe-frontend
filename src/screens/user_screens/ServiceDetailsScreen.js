@@ -9,6 +9,17 @@ import RatingsandReviews, {
 import { getRatings } from "../../hooks/useApi";
 import Loader from "../../components/Loader";
 import useProvider from "../../hooks/useProvider";
+import useAuth from "../../hooks/useAuth";
+import {
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  onSnapshot,
+  getDocs,
+  deleteDoc,
+} from "firebase/firestore";
+import { db } from "../../utils/firebase";
 
 const ServiceDetailsScreen = () => {
   const navigation = useNavigation();
@@ -17,6 +28,7 @@ const ServiceDetailsScreen = () => {
   const route = useRoute();
   const { provider } = route.params;
   const { averageRate } = useProvider();
+  const { user } = useAuth();
 
   const handleGoBack = () => {
     navigation.goBack();
@@ -46,6 +58,38 @@ const ServiceDetailsScreen = () => {
 
   const averageRating =
     averageRate === 0 ? calculateAverageRating(ratings) : averageRate;
+  {
+  }
+
+  const matchDetails = {
+    id: `${user.user_id}-${provider.user_id}`,
+    users: {
+      [user.user_id]: user,
+      [provider.user_id]: provider,
+    },
+    usersMatched: [user.user_id.toString(), provider.user_id.toString()],
+  };
+
+  const initiateChat = async () => {
+    navigation.navigate("Chat", { matchDetails });
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", async () => {
+      const matchDocRef = doc(db, "matches", matchDetails.id);
+      const messagesCollectionRef = collection(matchDocRef, "messages");
+      const messagesSnapshot = await getDocs(messagesCollectionRef);
+
+      if (messagesSnapshot.empty) {
+        // Delete matchDetails from Firestore if there are no messages
+        await deleteDoc(matchDocRef);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [navigation, provider]);
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -109,7 +153,10 @@ const ServiceDetailsScreen = () => {
           <MaterialIcons name="book-online" size={24} color="white" />
           <Text className="text-white font-bold ml-2">Book Services</Text>
         </TouchableOpacity>
-        <TouchableOpacity className="bg-green-500 p-2 rounded-full">
+        <TouchableOpacity
+          onPress={initiateChat}
+          className="bg-green-500 p-2 rounded-full"
+        >
           <FontAwesome name="comments" size={24} color="white" />
         </TouchableOpacity>
       </View>

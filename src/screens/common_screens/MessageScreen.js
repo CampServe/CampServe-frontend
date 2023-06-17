@@ -3,6 +3,7 @@ import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import CustomHeader from "../../components/CustomHeader";
+import ChatList from "../../components/ChatList";
 
 const MessageScreen = () => {
   const navigation = useNavigation();
@@ -13,9 +14,7 @@ const MessageScreen = () => {
         OpenDrawer={() => navigation.openDrawer()}
         showMenuIcon={true}
       />
-      <View className="items-center justify-center">
-        <Text>MessageScreen</Text>
-      </View>
+      <ChatList />
     </SafeAreaView>
   );
 };
