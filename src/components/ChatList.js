@@ -41,7 +41,7 @@ const ChatList = () => {
             const messageSnapshot = await getDocs(
               query(
                 collection(db, "matches", match.id, "messages"),
-                orderBy("timestamp", "desc"),
+                orderBy("timestamp", "asc"),
                 limit(1)
               )
             );
@@ -66,7 +66,6 @@ const ChatList = () => {
               }
 
               const userId = lastMessage.userId;
-              const isUserSentMessage = userId === user.user_id;
 
               if (user.account_type === "provider") {
                 return (
