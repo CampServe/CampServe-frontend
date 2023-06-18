@@ -72,12 +72,13 @@ const ChatList = () => {
                 return (
                   match.lastMessageTimestamp !== null &&
                   match.users[user.user_id] &&
-                  !isUserSentMessage
+                  userId !== user.user_id
                 );
               } else {
                 return (
                   match.lastMessageTimestamp !== null &&
-                  (userId === user.user_id || isUserSentMessage)
+                  match.users[user.user_id] &&
+                  userId === user.user_id
                 );
               }
             })

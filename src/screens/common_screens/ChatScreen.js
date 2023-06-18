@@ -158,12 +158,11 @@ const ChatScreen = () => {
           <View
             className="flex-row flex-1 bg-white justify-between items-center px-5 my-2 mt-2 mx-2 rounded-3xl"
             style={{
-              maxHeight: maxTextInputHeight + 16,
               overflow: "hidden",
             }}
           >
             <TextInput
-              style={{ lineHeight: lineHeight, height: textInputHeight }}
+              style={{ maxHeight: maxTextInputHeight }}
               className="flex-1 text-lg pr-2 bg-white rounded-3xl py-2 px-4"
               placeholder="Send Message"
               onChangeText={setInput}
