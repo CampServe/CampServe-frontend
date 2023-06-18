@@ -72,10 +72,10 @@ const CustomSPDrawerContent = () => {
               }}
               className="w-14 h-14 rounded-full"
             />
-            <Text className="text-gray-500 text-xl font-bold mt-0">
-              {user.first_name} {user.last_name}
+            <Text className="text-gray-500 text-xl capitalize font-bold mt-0">
+              {user.business_name}
             </Text>
-            <Text className="text-gray-400 text-lg font-semibold">
+            <Text className="text-gray-400 text-lg capitalize font-semibold">
               {user.username}
             </Text>
             <Text className="text-gray-400 text-base">{user.email}</Text>

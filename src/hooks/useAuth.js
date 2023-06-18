@@ -8,6 +8,8 @@ import React, {
 import axios from "../utils/axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import jwtDecode from "jwt-decode";
+import { collection, deleteDoc, getDocs, doc } from "firebase/firestore";
+import { db } from "../utils/firebase";
 
 const AuthContext = createContext({});
 
@@ -47,6 +49,26 @@ export function AuthProvider({ children }) {
     };
 
     checkTokenExpiration();
+  }, []);
+
+  useEffect(() => {
+    const deletionTimer = setTimeout(async () => {
+      const matchesCollectionRef = collection(db, "matches");
+      const matchesQuerySnapshot = await getDocs(matchesCollectionRef);
+
+      matchesQuerySnapshot.forEach(async (matchDoc) => {
+        const messagesCollectionRef = collection(matchDoc.ref, "messages");
+        const messagesSnapshot = await getDocs(messagesCollectionRef);
+
+        if (messagesSnapshot.empty) {
+          await deleteDoc(matchDoc.ref);
+        }
+      });
+    }, 3600000);
+
+    return () => {
+      clearTimeout(deletionTimer);
+    };
   }, []);
 
   const login = async (credentials, isServiceProviderLogin) => {
@@ -175,7 +197,7 @@ export function AuthProvider({ children }) {
   };
 
   const switchAccount = async () => {
-    setIsSwitchingAcount(true);
+    // setIsSwitchingAcount(true);
     const route =
       user.account_type == "regular user"
         ? "/switch_to_provider"
@@ -205,7 +227,7 @@ export function AuthProvider({ children }) {
       console.log(error);
       setError("An error occurred");
     } finally {
-      setIsSwitchingAcount(false);
+      // setIsSwitchingAcount(false);
     }
   };
 

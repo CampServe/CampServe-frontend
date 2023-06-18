@@ -1,4 +1,10 @@
-import { View, Text, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import {
   collection,
@@ -17,6 +23,9 @@ const ChatList = () => {
   const [matches, setMatches] = useState([]);
   const { user } = useAuth();
   const [loadingChats, setLoadingChats] = useState(true);
+  const [filteredMatches, setFilteredMatches] = useState([]);
+  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
+  const [subCategories, setSubCategories] = useState([]);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -38,21 +47,46 @@ const ChatList = () => {
             );
             const lastMessage = messageSnapshot.docs[0];
             if (lastMessage) {
-              return lastMessage.data().timestamp;
+              return lastMessage.data();
             } else {
               return null;
             }
           });
 
-          const lastMessageTimestamps = await Promise.all(timestampPromises);
-
+          const lastMessages = await Promise.all(timestampPromises);
           const matchesWithMessages = matchesData
             .map((match, index) => ({
               ...match,
-              lastMessageTimestamp: lastMessageTimestamps[index],
+              lastMessage: lastMessages[index],
             }))
-            .filter((match) => match.lastMessageTimestamp !== null)
-            .sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
+            .filter((match) => {
+              const lastMessage = match.lastMessage;
+              if (!lastMessage) {
+                return false;
+              }
+
+              const userId = lastMessage.userId;
+              const isUserSentMessage = userId === user.user_id;
+
+              if (user.account_type === "provider") {
+                return (
+                  match.lastMessageTimestamp !== null &&
+                  match.users[user.user_id] &&
+                  !isUserSentMessage
+                );
+              } else {
+                return (
+                  match.lastMessageTimestamp !== null &&
+                  (userId === user.user_id || isUserSentMessage)
+                );
+              }
+            })
+
+            .sort(
+              (a, b) =>
+                b.lastMessage.timestamp.toMillis() -
+                a.lastMessage.timestamp.toMillis()
+            );
 
           setLoadingChats(false);
           setMatches(matchesWithMessages);
@@ -67,23 +101,84 @@ const ChatList = () => {
     };
   }, [user, db, matches]);
 
+  useEffect(() => {
+    if (matches.length > 0) {
+      const uniqueSubCategories = [
+        ...new Set(
+          matches.flatMap((match) =>
+            Object.values(match.users).map((user) => user.sub_categories)
+          )
+        ),
+      ].filter(Boolean);
+
+      setSubCategories(uniqueSubCategories);
+
+      if (uniqueSubCategories.length > 0 && !selectedSubCategory) {
+        handleSubCategorySelect(uniqueSubCategories[0]);
+      }
+    }
+  }, [matches, selectedSubCategory]);
+
+  const handleSubCategorySelect = (subCategory) => {
+    setSelectedSubCategory(subCategory);
+    const filtered = matches.filter((match) => {
+      const users = Object.values(match.users);
+      return users.some(
+        (user) =>
+          user.sub_categories && user.sub_categories.includes(subCategory)
+      );
+    });
+
+    setFilteredMatches(filtered);
+  };
+
   return (
-    <>
+    <View className="flex">
       {loadingChats ? (
         <Loader />
       ) : matches.length > 0 ? (
-        <FlatList
-          className="h-full"
-          data={matches}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <ChatRow matchDetails={item} />}
-        />
+        <>
+          <ScrollView
+            // style={{ flex: 1 }}
+            contentContainerStyle={{ flexGrow: 1 }}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="gap-2 mb-4"
+          >
+            {subCategories.map((subCategory) => (
+              <TouchableOpacity
+                key={subCategory}
+                style={{
+                  width: 120,
+                }}
+                onPress={() => handleSubCategorySelect(subCategory)}
+                className={`flex-1 h-10 items-center justify-center py-2 rounded-lg ${
+                  subCategory === selectedSubCategory
+                    ? "bg-green-900"
+                    : "bg-green-900 opacity-60"
+                }`}
+              >
+                <Text className="text-white text-bold text-center text-base">
+                  {subCategory}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+
+          <FlatList
+            data={filteredMatches}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => <ChatRow matchDetails={item} />}
+          />
+        </>
       ) : (
-        <View className="p-5">
-          <Text className="text-center text-lg">No messages at the moment</Text>
+        <View className="flex items-center justify-center">
+          <Text className="font-semibold text-base">
+            No messages at the moment
+          </Text>
         </View>
       )}
-    </>
+    </View>
   );
 };
 

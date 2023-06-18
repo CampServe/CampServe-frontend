@@ -118,7 +118,10 @@ const ChatRow = ({ matchDetails }) => {
         />
         <View className="flex-row justify-between">
           <View>
-            <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+            <Text
+              className="capitalize"
+              style={{ fontSize: 16, fontWeight: "bold" }}
+            >
               {matchedUserInfo?.business_name ||
               matchedUserInfo?.business_name == "undefined"
                 ? matchedUserInfo?.business_name

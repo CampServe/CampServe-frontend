@@ -162,6 +162,7 @@ const SPDrawerStackNavigator = () => {
         name="SPSettings"
         component={ServiceProviderSettingsScreen}
       />
+      <Stack.Screen name="Chat" component={ChatScreen} />
     </Stack.Navigator>
   );
 };
@@ -173,7 +174,7 @@ const SPDrawerNavigator = () => {
       initialRouteName="SPDrawerTabs"
       screenOptions={{
         headerTitle: () => null,
-        // headerShown: false,
+        headerShown: false,
       }}
       drawerContent={(props) => <CustomSPDrawerContent {...props} />}
     >

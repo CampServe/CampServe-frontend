@@ -61,8 +61,12 @@ const ServiceDetailsScreen = () => {
   {
   }
 
+  const subCategories = provider.sub_categories
+    .replace(/[^\w\s]/gi, "")
+    .replace(/\s/g, "");
+
   const matchDetails = {
-    id: `${user.user_id}-${provider.user_id}`,
+    id: `${user.user_id}-${provider.user_id}-${subCategories}`,
     users: {
       [user.user_id]: user,
       [provider.user_id]: provider,
@@ -70,26 +74,28 @@ const ServiceDetailsScreen = () => {
     usersMatched: [user.user_id.toString(), provider.user_id.toString()],
   };
 
+  // console.log(matchDetails);
+
   const initiateChat = async () => {
     navigation.navigate("Chat", { matchDetails });
   };
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", async () => {
-      const matchDocRef = doc(db, "matches", matchDetails.id);
-      const messagesCollectionRef = collection(matchDocRef, "messages");
-      const messagesSnapshot = await getDocs(messagesCollectionRef);
+  // useEffect(() => {
+  //   const unsubscribe = navigation.addListener("focus", async () => {
+  //     const matchDocRef = doc(db, "matches", matchDetails.id);
+  //     const messagesCollectionRef = collection(matchDocRef, "messages");
+  //     const messagesSnapshot = await getDocs(messagesCollectionRef);
 
-      if (messagesSnapshot.empty) {
-        // Delete matchDetails from Firestore if there are no messages
-        await deleteDoc(matchDocRef);
-      }
-    });
+  //     if (messagesSnapshot.empty) {
+  //       // Delete matchDetails from Firestore if there are no messages
+  //       await deleteDoc(matchDocRef);
+  //     }
+  //   });
 
-    return () => {
-      unsubscribe();
-    };
-  }, [navigation, provider]);
+  //   return () => {
+  //     unsubscribe();
+  //   };
+  // }, [navigation, provider]);
 
   return (
     <SafeAreaView className="flex-1 bg-white">
