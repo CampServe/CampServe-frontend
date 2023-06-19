@@ -2,13 +2,13 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDvoIuz31C_krcpIVbPQ8NYaLripjJkWhg",
-  authDomain: "camp-serve-2.firebaseapp.com",
-  projectId: "camp-serve-2",
-  storageBucket: "camp-serve-2.appspot.com",
-  messagingSenderId: "85235367144",
-  appId: "1:85235367144:web:be9a6cd5e1664db6efdd5d",
-  measurementId: "G-54X6P354ZB",
+  apiKey: "AIzaSyCxi3-XywxK7OGUElhmK-f4YSkEUpvp_os",
+  authDomain: "camp-serve.firebaseapp.com",
+  projectId: "camp-serve",
+  storageBucket: "camp-serve.appspot.com",
+  messagingSenderId: "637010377958",
+  appId: "1:637010377958:web:8450ca015df361cbc20f27",
+  measurementId: "G-B0TYZE9BLR",
 };
 
 const app = initializeApp(firebaseConfig);

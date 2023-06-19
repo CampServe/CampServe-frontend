@@ -74,28 +74,9 @@ const ServiceDetailsScreen = () => {
     usersMatched: [user.user_id.toString(), provider.user_id.toString()],
   };
 
-  // console.log(matchDetails);
-
   const initiateChat = async () => {
     navigation.navigate("Chat", { matchDetails });
   };
-
-  // useEffect(() => {
-  //   const unsubscribe = navigation.addListener("focus", async () => {
-  //     const matchDocRef = doc(db, "matches", matchDetails.id);
-  //     const messagesCollectionRef = collection(matchDocRef, "messages");
-  //     const messagesSnapshot = await getDocs(messagesCollectionRef);
-
-  //     if (messagesSnapshot.empty) {
-  //       // Delete matchDetails from Firestore if there are no messages
-  //       await deleteDoc(matchDocRef);
-  //     }
-  //   });
-
-  //   return () => {
-  //     unsubscribe();
-  //   };
-  // }, [navigation, provider]);
 
   return (
     <SafeAreaView className="flex-1 bg-white">

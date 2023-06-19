@@ -12,6 +12,8 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import Loader from "./Loader";
+import { Ionicons } from "@expo/vector-icons";
+import { Audio } from "expo-av";
 
 const ChatRow = ({ matchDetails }) => {
   const navigation = useNavigation();
@@ -26,6 +28,24 @@ const ChatRow = ({ matchDetails }) => {
     setMatchedUserInfo(getMatchedUserInfo(matchDetails.users, user.user_id));
   }, [matchDetails, user]);
 
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60000);
+    const seconds = ((time % 60000) / 1000).toFixed(0);
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
+  //  try {
+  //         const soundObject = new Audio.Sound();
+  //         await soundObject.loadAsync({ uri: message.audio });
+  //         setSound(soundObject);
+
+  // soundObject.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
+  // const status = await soundObject.getStatusAsync();
+  //         setDuration(status.durationMillis);
+  //       } catch (error) {
+  //         console.log("Error loading audio:", error);
+  //       }
+
   useEffect(
     () =>
       onSnapshot(
@@ -33,9 +53,27 @@ const ChatRow = ({ matchDetails }) => {
           collection(db, "matches", matchDetails.id, "messages"),
           orderBy("timestamp", "desc")
         ),
-        (snapshot) => {
+        async (snapshot) => {
           const messages = snapshot.docs.map((doc) => doc.data());
-          setLastMessage(messages[0]?.message);
+          // console.log(messages[0]);
+          setLastMessage(messages[0]);
+
+          if (messages[0]?.messageType === "audio") {
+            const sound = new Audio.Sound();
+            try {
+              await sound.loadAsync({ uri: messages[0]?.audio });
+              const status = await sound.getStatusAsync();
+              const duration = status.durationMillis;
+              setLastMessage({
+                ...messages[0],
+                duration: formatTime(duration),
+              });
+            } catch (error) {
+              console.log("Error loading audio file:", error);
+            } finally {
+              await sound.unloadAsync();
+            }
+          }
           const date = messages[0]?.timestamp
             ? new Date(
                 messages[0]?.timestamp.seconds * 1000 +
@@ -64,6 +102,8 @@ const ChatRow = ({ matchDetails }) => {
     [matchDetails, db, user]
   );
 
+  // console.log(lastMessage.duration);
+
   const markMessagesAsRead = async () => {
     const messageDocs = await query(
       collection(db, "matches", matchDetails.id, "messages")
@@ -85,6 +125,8 @@ const ChatRow = ({ matchDetails }) => {
   if (loadingChats) {
     return <Loader />;
   }
+
+  // console.log(lastMessage);
 
   return (
     <TouchableOpacity
@@ -129,11 +171,25 @@ const ChatRow = ({ matchDetails }) => {
                   " " +
                   matchedUserInfo?.last_name}
             </Text>
-            <Text style={{ color: "#888" }}>
-              {lastMessage && lastMessage.length > 28
-                ? `${lastMessage.substring(0, 28)}...`
-                : lastMessage}
-            </Text>
+            {lastMessage && lastMessage.messageType === "audio" ? (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Ionicons name="mic" size={16} color="gray" />
+                <Text className="text-gray-400 ml-2 text-sm">
+                  {lastMessage.duration}
+                </Text>
+              </View>
+            ) : lastMessage && lastMessage.messageType === "image" ? (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Ionicons name="image" size={16} color="gray" />
+                <Text className="text-gray-400 ml-2 text-sm">Photo</Text>
+              </View>
+            ) : (
+              <Text className="text-gray-400 ml-[2px] text-sm">
+                {lastMessage && lastMessage.message && lastMessage.length > 28
+                  ? `${lastMessage.message.substring(0, 28)}...`
+                  : lastMessage.message}
+              </Text>
+            )}
           </View>
         </View>
       </View>

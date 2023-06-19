@@ -82,11 +82,7 @@ const ChatList = () => {
               }
             })
 
-            .sort(
-              (a, b) =>
-                b.lastMessage.timestamp.toMillis() -
-                a.lastMessage.timestamp.toMillis()
-            );
+            .sort((a, b) => a.lastMessage.timestamp - b.lastMessage.timestamp);
 
           setLoadingChats(false);
           setMatches(matchesWithMessages);
