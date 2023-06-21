@@ -13,11 +13,13 @@ import {
   onSnapshot,
   orderBy,
   query,
+  where,
 } from "firebase/firestore";
 import { db } from "../utils/firebase";
 import useAuth from "../hooks/useAuth";
 import ChatRow from "./ChatRow";
 import Loader from "./Loader";
+import { useIsFocused } from "@react-navigation/native";
 
 const ChatList = () => {
   const [matches, setMatches] = useState([]);
@@ -26,46 +28,78 @@ const ChatList = () => {
   const [filteredMatches, setFilteredMatches] = useState([]);
   const [selectedSubCategory, setSelectedSubCategory] = useState(null);
   const [subCategories, setSubCategories] = useState([]);
+  const isFocused = useIsFocused();
+
+  const sortMessagesByTimestamp = (matches) => {
+    return matches.sort((a, b) => {
+      const aTimestamp = a.lastMessage?.timestamp || 0;
+      const bTimestamp = b.lastMessage?.timestamp || 0;
+      return aTimestamp - bTimestamp;
+    });
+  };
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(
-      query(collection(db, "matches")),
-      (snapshot) => {
-        const matchesData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+    if (isFocused) {
+      setLoadingChats(true);
 
-        const fetchLastMessageTimestamp = async () => {
-          const timestampPromises = matchesData.map(async (match) => {
-            const messageSnapshot = await getDocs(
-              query(
-                collection(db, "matches", match.id, "messages"),
-                orderBy("timestamp", "asc"),
-                limit(1)
-              )
+      const fetchData = async () => {
+        try {
+          const snapshot = await new Promise((resolve, reject) => {
+            const unsubscribe = onSnapshot(
+              query(collection(db, "matches")),
+              resolve,
+              reject
             );
-            const lastMessage = messageSnapshot.docs[0];
-            if (lastMessage) {
-              return lastMessage.data();
-            } else {
-              return null;
-            }
+
+            return unsubscribe;
           });
 
-          const lastMessages = await Promise.all(timestampPromises);
-          const matchesWithMessages = matchesData
-            .map((match, index) => ({
-              ...match,
-              lastMessage: lastMessages[index],
-            }))
-            .filter((match) => {
-              const lastMessage = match.lastMessage;
-              if (!lastMessage) {
+          const matchesData = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+
+          const fetchMessageData = async () => {
+            const messagePromises = matchesData.map(async (match) => {
+              const messageSnapshot = await getDocs(
+                query(
+                  collection(db, "matches", match.id, "messages"),
+                  orderBy("timestamp", "asc")
+                  // limit(1)
+                )
+              );
+
+              const firstMessage = messageSnapshot.docs[0];
+              const lastMessage =
+                messageSnapshot.docs[messageSnapshot.docs.length - 1];
+              // console.log("first:", firstMessage.data());
+              // console.log("last:", lastMessage.data());
+              let firstMessageData = null;
+              if (firstMessage) {
+                firstMessageData = firstMessage.data();
+              }
+
+              let lastMessageData = null;
+              if (lastMessage) {
+                lastMessageData = lastMessage.data();
+              }
+
+              return {
+                ...match,
+                firstMessage: firstMessageData,
+                lastMessage: lastMessageData,
+              };
+            });
+
+            const messagesData = await Promise.all(messagePromises);
+            const filteredMessages = messagesData.filter((match) => {
+              const { firstMessage, lastMessage } = match;
+
+              if (!firstMessage || !lastMessage) {
                 return false;
               }
 
-              const userId = lastMessage.userId;
+              const userId = firstMessage.userId;
 
               if (user.account_type === "provider") {
                 return (
@@ -80,22 +114,28 @@ const ChatList = () => {
                   userId === user.user_id
                 );
               }
-            })
+            });
 
-            .sort((a, b) => a.lastMessage.timestamp - b.lastMessage.timestamp);
+            const sortedMessages = await sortMessagesByTimestamp(
+              filteredMessages
+            );
 
-          setLoadingChats(false);
-          setMatches(matchesWithMessages);
-        };
+            // console.log(filteredMessages);
+            // console.log(sortedMessages);
 
-        fetchLastMessageTimestamp();
-      }
-    );
+            setMatches(sortedMessages);
+          };
 
-    return () => {
-      unsubscribe();
-    };
-  }, [user, db, matches]);
+          await fetchMessageData();
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          setMatches([]);
+        }
+      };
+
+      fetchData();
+    }
+  }, [user, db, isFocused]);
 
   useEffect(() => {
     if (matches.length > 0) {
@@ -107,13 +147,59 @@ const ChatList = () => {
         ),
       ].filter(Boolean);
 
-      setSubCategories(uniqueSubCategories);
+      const fetchUnreadCounts = async () => {
+        const unreadCountsPromises = uniqueSubCategories.map(
+          async (subCategory) => {
+            const subCategoryMatches = matches.filter((match) =>
+              Object.values(match.users).some(
+                (user) => user.sub_categories === subCategory
+              )
+            );
 
-      if (uniqueSubCategories.length > 0 && !selectedSubCategory) {
-        handleSubCategorySelect(uniqueSubCategories[0]);
-      }
+            const unreadCountsPromises = subCategoryMatches.map(
+              async (match) => {
+                const messageSnapshot = await getDocs(
+                  query(
+                    collection(db, "matches", match.id, "messages"),
+                    where("read", "==", false)
+                  )
+                );
+
+                const unreadMessages = messageSnapshot.docs.filter(
+                  (doc) => doc.data().userId !== user.user_id
+                );
+                return unreadMessages.length;
+              }
+            );
+
+            const unreadCounts = await Promise.all(unreadCountsPromises);
+            const totalUnreadCount = unreadCounts.reduce(
+              (sum, count) => sum + count,
+              0
+            );
+
+            return {
+              name: subCategory,
+              readCount: totalUnreadCount,
+            };
+          }
+        );
+
+        const unreadCountsData = await Promise.all(unreadCountsPromises);
+        setSubCategories(unreadCountsData);
+
+        setLoadingChats(false);
+      };
+
+      fetchUnreadCounts();
     }
-  }, [matches, selectedSubCategory]);
+  }, [matches]);
+
+  useEffect(() => {
+    if (subCategories.length > 0 && !selectedSubCategory) {
+      handleSubCategorySelect(subCategories[0].name);
+    }
+  }, [subCategories, selectedSubCategory]);
 
   const handleSubCategorySelect = (subCategory) => {
     setSelectedSubCategory(subCategory);
@@ -125,7 +211,11 @@ const ChatList = () => {
       );
     });
 
-    setFilteredMatches(filtered);
+    const sortedFilteredMatches = sortMessagesByTimestamp(filtered);
+
+    console.log("a", filtered);
+    console.log("b", sortedFilteredMatches);
+    setFilteredMatches(sortedFilteredMatches);
   };
 
   return (
@@ -135,28 +225,50 @@ const ChatList = () => {
       ) : matches.length > 0 ? (
         <>
           <ScrollView
-            // style={{ flex: 1 }}
-            contentContainerStyle={{ flexGrow: 1 }}
+            contentContainerStyle={{ paddingHorizontal: 16 }}
             horizontal
             showsHorizontalScrollIndicator={false}
-            className="gap-2 mb-4"
           >
             {subCategories.map((subCategory) => (
               <TouchableOpacity
-                key={subCategory}
+                className="m-1 mb-4"
+                key={subCategory.name}
                 style={{
-                  width: 120,
+                  paddingHorizontal: 12,
+                  paddingVertical: 8,
+                  borderRadius: 16,
+                  marginRight: 8,
+                  // elevation: 2,
+                  backgroundColor:
+                    subCategory.name === selectedSubCategory
+                      ? "#34B7F1"
+                      : "#34B7F1AA",
+                  transform: [
+                    {
+                      scale: subCategory.name === selectedSubCategory ? 1.1 : 1,
+                    },
+                  ],
+                  transition: "transform 0.3s",
                 }}
-                onPress={() => handleSubCategorySelect(subCategory)}
-                className={`flex-1 h-10 items-center justify-center py-2 rounded-lg ${
-                  subCategory === selectedSubCategory
-                    ? "bg-green-900"
-                    : "bg-green-900 opacity-60"
-                }`}
+                onPress={() => handleSubCategorySelect(subCategory.name)}
               >
-                <Text className="text-white text-bold text-center text-base">
-                  {subCategory}
-                </Text>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Text
+                    style={{
+                      color: "#FFF",
+                      fontWeight: "bold",
+                      fontSize: 16,
+                      textAlign: "center",
+                    }}
+                  >
+                    {subCategory.name}
+                  </Text>
+                  {subCategory.readCount !== 0 && (
+                    <Text className="text-xs font-bold text-white bg-blue-500 rounded-full px-2 py-1 ml-2">
+                      {subCategory.readCount}
+                    </Text>
+                  )}
+                </View>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -169,9 +281,7 @@ const ChatList = () => {
         </>
       ) : (
         <View className="flex items-center justify-center">
-          <Text className="font-semibold text-base">
-            No messages at the moment
-          </Text>
+          <Text className="font-semibold text-base">No chats found</Text>
         </View>
       )}
     </View>

@@ -31,9 +31,37 @@ const data = [
 
 const CustomSPDrawerContent = () => {
   const navigation = useNavigation();
-  const { user, logout, switchAccount, isLoadingLogout, isSwitchingAcount } =
-    useAuth();
+  const {
+    user,
+    logout,
+    switchAccount,
+    isLoadingLogout,
+    setIsLoadingLogout,
+    isSwitchingAcount,
+    setIsSwitchingAcount,
+  } = useAuth();
 
+  const handleLogout = async () => {
+    setIsLoadingLogout(true);
+    try {
+      await logout();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoadingLogout(false);
+    }
+  };
+
+  const handleSwitchAccount = async () => {
+    setIsSwitchingAcount(true);
+    try {
+      await switchAccount();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsSwitchingAcount(false);
+    }
+  };
   const DrawerItem = ({ icon, title, screen }) => (
     <TouchableHighlight
       underlayColor="#DDDDDD"
@@ -104,7 +132,7 @@ const CustomSPDrawerContent = () => {
         <View className=" px-4">
           <TouchableOpacity
             className="flex flex-row space-x-6  mt-10 items-center justify-center rounded-lg bg-green-500 p-3 pl-4"
-            onPress={switchAccount}
+            onPress={() => handleSwitchAccount()}
           >
             <Text className="text-white text-center text-base">
               Switch to User
@@ -122,7 +150,7 @@ const CustomSPDrawerContent = () => {
           <TouchableOpacity
             activeOpacity={0.5}
             className="flex flex-row flex-1 space-x-6 mt-5 items-center rounded-lg bg-red-500 p-3 pl-4"
-            onPress={logout}
+            onPress={() => handleLogout()}
           >
             <Ionicons
               name="log-out"

@@ -17,6 +17,7 @@ import useAuth from "../../hooks/useAuth";
 import SenderMessage from "../../components/SenderMessage";
 import ReceiverMessage from "../../components/ReceiverMessage";
 import {
+  FieldValue,
   addDoc,
   getDoc,
   setDoc,
@@ -42,12 +43,10 @@ const ChatScreen = () => {
   const [messages, setMessages] = useState([]);
   const [textInputHeight, setTextInputHeight] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [isSending, setIsSending] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recording, setRecording] = useState(null);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const [recordingTimerInterval, setRecordingTimerInterval] = useState(null);
-  const [slidePosition, setSlidePosition] = useState(0);
   const [isBlinking, setIsBlinking] = useState(true);
   const maxLines = 6;
   const lineHeight = 20;
@@ -56,24 +55,6 @@ const ChatScreen = () => {
   const { matchDetails } = params;
 
   const pressTimer = useRef(null);
-  const slidePositionRef = useRef(0);
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onPanResponderMove: (_, gestureState) => {
-        slidePositionRef.current = gestureState.dx;
-        setSlidePosition(gestureState.dx);
-      },
-      onPanResponderRelease: () => {
-        if (slidePositionRef.current < -100) {
-          cancelRecording();
-        }
-        slidePositionRef.current = 0;
-        setSlidePosition(0);
-      },
-    })
-  ).current;
 
   useEffect(() => {
     const checkMatchDetails = async () => {
@@ -90,35 +71,45 @@ const ChatScreen = () => {
       }
     };
 
-    checkMatchDetails();
+    if (matchDetails) {
+      checkMatchDetails();
+    }
 
     const unsubscribe = onSnapshot(
       query(
         collection(db, "matches", matchDetails.id, "messages"),
         orderBy("timestamp", "desc")
       ),
-      (snapshot) => {
-        const updatedMessages = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+      async (snapshot) => {
+        try {
+          const updatedMessages = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
 
-        const unreadMessages = updatedMessages.filter(
-          (message) => !message.read && message.userId !== user.user_id
-        );
+          const unreadMessages = updatedMessages.filter(
+            (message) => !message.read && message.userId !== user.user_id
+          );
 
-        if (unreadMessages.length > 0) {
-          unreadMessages.forEach((message) => {
-            updateDoc(
-              doc(db, "matches", matchDetails.id, "messages", message.id),
-              {
-                read: true,
-              }
+          if (unreadMessages.length > 0) {
+            await Promise.all(
+              unreadMessages.map((message) =>
+                updateDoc(
+                  doc(db, "matches", matchDetails.id, "messages", message.id),
+                  {
+                    read: true,
+                  }
+                )
+              )
             );
-          });
+          }
+
+          setMessages(updatedMessages);
+        } catch (error) {
+          console.error("Error updating messages:", error);
+        } finally {
+          setLoading(false);
         }
-        setMessages(updatedMessages);
-        setLoading(false);
       }
     );
 
@@ -222,18 +213,19 @@ const ChatScreen = () => {
 
   const cancelRecording = async () => {
     if (recording) {
-      console.log("cancelled");
       try {
         await recording.stopAndUnloadAsync();
         setIsRecording(false);
         setRecording(null);
+        clearInterval(pressTimer.current);
+        resetRecordingTimer();
       } catch (error) {
         console.log("Error canceling recording:", error);
       }
     }
   };
 
-  const sendMessage = (messageType, messageContent) => {
+  const sendMessage = async (messageType, messageContent) => {
     const message = {
       timestamp: serverTimestamp(),
       userId: user.user_id,
@@ -252,9 +244,26 @@ const ChatScreen = () => {
       message.image = messageContent;
     }
 
-    addDoc(collection(db, "matches", matchDetails.id, "messages"), message);
-    // console.log(message);
+    const id = "qwerty12345";
+    const timestamp = new Date().toDateString();
+
+    const newMessage = { ...message, timestamp, id, isSending: true };
+
+    setMessages((prevMessages) => [newMessage, ...prevMessages]);
     setInput("");
+
+    try {
+      const docRef = await addDoc(
+        collection(db, "matches", matchDetails.id, "messages"),
+        message
+      );
+      newMessage.id = docRef.id;
+      newMessage.isSending = false;
+    } catch (error) {
+      console.log("Error sending message:", error);
+      newMessage.isSending = false;
+      newMessage.hasError = true;
+    }
   };
 
   const formatTime = (durationInSeconds) => {
@@ -271,6 +280,12 @@ const ChatScreen = () => {
     }
   };
 
+  const isInputNotEmpty = input.length > 0;
+
+  const handleInputChange = (text) => {
+    setInput(text);
+  };
+
   const matchedUserInfo = getMatchedUserInfo(matchDetails?.users, user.user_id);
   const matchedUserName =
     matchedUserInfo.first_name + " " + matchedUserInfo.last_name;
@@ -278,14 +293,34 @@ const ChatScreen = () => {
 
   const renderMessageItem = (message, index) => {
     if (!message.timestamp || message.timestamp === null) {
-      return null;
+      return (
+        <>
+          {message.userId === user.user_id ? (
+            <SenderMessage
+              key={message.id}
+              message={message}
+              isSending={message?.isSending || false}
+            />
+          ) : (
+            <ReceiverMessage key={message.id} message={message} />
+          )}
+        </>
+      );
     }
 
-    const messageDate = message.timestamp.toDate().toDateString();
+    let messageDate;
+
+    if (/^\w{3} \w{3} \d{2} \d{4}$/.test(message.timestamp)) {
+      messageDate = message.timestamp;
+    } else {
+      messageDate = message.timestamp.toDate().toDateString();
+    }
 
     const isFirstMessageOfDay =
       index === messages.length - 1 ||
-      messageDate !== messages[index + 1].timestamp.toDate().toDateString();
+      messageDate !==
+        (messages[index + 1].timestamp.toDate().toDateString() ||
+          messages[index + 1].timestamp);
 
     return (
       <>
@@ -293,7 +328,7 @@ const ChatScreen = () => {
           <SenderMessage
             key={message.id}
             message={message}
-            isSending={isSending}
+            isSending={message?.isSending || false}
           />
         ) : (
           <ReceiverMessage key={message.id} message={message} />
@@ -366,6 +401,17 @@ const ChatScreen = () => {
                 <Text className="text-base ml-2">
                   {formatTime(recordingDuration)}
                 </Text>
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: "flex-end",
+                    flexDirection: "row",
+                  }}
+                >
+                  <TouchableOpacity onPress={cancelRecording}>
+                    <Ionicons name="stop" size={24} color="red" />
+                  </TouchableOpacity>
+                </View>
               </TouchableOpacity>
             ) : (
               <>
@@ -373,7 +419,7 @@ const ChatScreen = () => {
                   style={{ maxHeight: maxTextInputHeight }}
                   className="flex-1 text-lg pr-2 bg-white rounded-3xl py-2 px-4"
                   placeholder="Send Message"
-                  onChangeText={setInput}
+                  onChangeText={handleInputChange}
                   value={input}
                   multiline={true}
                   numberOfLines={1}
@@ -386,29 +432,21 @@ const ChatScreen = () => {
             )}
           </View>
           <TouchableOpacity
-            style={{
-              transform: [{ translateX: slidePosition }],
-            }}
             className={`rounded-full py-2 px-3 self-center bg-green-500`}
-            onPressIn={() => {
-              if (input.length === 0) {
-                startRecording();
-              }
-            }}
-            onPressOut={() => {
-              if (input.length === 0) {
-                stopRecording();
-              }
-            }}
-            onPress={() => {
-              if (input.length !== 0) {
-                sendMessage("text", input);
-              }
-            }}
-            {...panResponder.panHandlers}
+            onPress={
+              isInputNotEmpty
+                ? () => sendMessage("text", input)
+                : isRecording
+                ? stopRecording
+                : startRecording
+            }
           >
-            {input.length === 0 ? (
-              <Ionicons name="mic" size={24} color="#FFFFFF" />
+            {!isInputNotEmpty ? (
+              !isRecording ? (
+                <Ionicons name="mic" size={24} color="#FFFFFF" />
+              ) : (
+                <Ionicons name="paper-plane" size={24} color="#FFFFFF" />
+              )
             ) : (
               <Ionicons name="paper-plane" size={24} color="#FFFFFF" />
             )}

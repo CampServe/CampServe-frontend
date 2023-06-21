@@ -118,7 +118,13 @@ const SenderMessage = ({ message, isSending }) => {
           style={{ maxWidth: "80%" }}
         >
           <Text className="text-gray-800 text-base">{message.message}</Text>
-          <Text className="text-gray-400 text-xs self-end">{time}</Text>
+          <Text className="text-gray-400 text-xs self-end">
+            {isSending || date == null ? (
+              <Ionicons name="time" size={12} color="gray" />
+            ) : (
+              time
+            )}
+          </Text>
         </View>
       ) : message.messageType === "audio" ? (
         <View
@@ -154,9 +160,16 @@ const SenderMessage = ({ message, isSending }) => {
           </View>
           <View className="flex-row justify-between">
             <Text className="text-gray-600 text-xs pl-7">
-              {isPlaying ? formatTime(position) : formatTime(duration)}
+              {!isSending &&
+                (isPlaying ? formatTime(position) : formatTime(duration))}
             </Text>
-            <Text className="text-gray-400 text-xs">{time}</Text>
+            <Text className="text-gray-400 text-xs">
+              {isSending || date == null ? (
+                <Ionicons name="time" size={12} color="gray" />
+              ) : (
+                time
+              )}
+            </Text>
           </View>
         </View>
       ) : (
@@ -178,7 +191,13 @@ const SenderMessage = ({ message, isSending }) => {
               style={{ width: 200, height: 200, marginTop: 4, marginRight: 8 }}
             />
             <View className="absolute bottom-1 right-5">
-              <Text className="text-white text-xs">{time}</Text>
+              <Text className="text-white text-xs">
+                {isSending || date == null ? (
+                  <Ionicons name="time" size={12} color="gray" />
+                ) : (
+                  time
+                )}
+              </Text>
             </View>
           </React.Fragment>
         </Lightbox>

@@ -43,8 +43,37 @@ const data = [
 
 const CustomDrawerContent = () => {
   const navigation = useNavigation();
-  const { user, logout, switchAccount, isLoadingLogout, isSwitchingAcount } =
-    useAuth();
+  const {
+    user,
+    logout,
+    switchAccount,
+    isLoadingLogout,
+    setIsLoadingLogout,
+    isSwitchingAcount,
+    setIsSwitchingAcount,
+  } = useAuth();
+
+  const handleLogout = async () => {
+    setIsLoadingLogout(true);
+    try {
+      await logout();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoadingLogout(false);
+    }
+  };
+
+  const handleSwitchAccount = async () => {
+    setIsSwitchingAcount(true);
+    try {
+      await switchAccount();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsSwitchingAcount(false);
+    }
+  };
 
   const DrawerItem = ({ icon, title, screen }) => (
     <TouchableHighlight
@@ -118,7 +147,7 @@ const CustomDrawerContent = () => {
             onPress={() =>
               user.is_service_provider == "true" ||
               user.is_service_provider === true
-                ? switchAccount()
+                ? handleSwitchAccount()
                 : navigation.navigate("SPOnboarding")
             }
           >
@@ -141,7 +170,7 @@ const CustomDrawerContent = () => {
           <TouchableOpacity
             activeOpacity={0.5}
             className="flex flex-row flex-1 space-x-6 mt-5 items-center rounded-lg bg-red-500 p-3 pl-4"
-            onPress={logout}
+            onPress={() => handleLogout()}
           >
             <Ionicons
               name="log-out"

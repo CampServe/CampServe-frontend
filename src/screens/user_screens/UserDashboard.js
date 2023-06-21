@@ -23,25 +23,23 @@ const UserDashboard = () => {
     return <Loader />;
   }
 
-  useFocusEffect(
-    React.useCallback(() => {
-      const fetchData = async () => {
-        try {
-          const data = await getServiceProviders();
-          const filteredData = data.filter(
-            (provider) => provider.user_id !== user.user_id
-          );
-          setServiceProviders(filteredData);
-        } catch (error) {
-          console.log(error);
-        } finally {
-          setLoadingCategory(false);
-        }
-      };
-      setAverageRate(0);
-      fetchData();
-    }, [])
-  );
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getServiceProviders();
+        const filteredData = data.filter(
+          (provider) => provider.user_id !== user.user_id
+        );
+        setServiceProviders(filteredData);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoadingCategory(false);
+      }
+    };
+    setAverageRate(0);
+    fetchData();
+  }, []);
 
   useEffect(() => {
     if (serviceProviders.length > 0) {
@@ -162,9 +160,13 @@ const UserDashboard = () => {
                   key={category}
                   style={{
                     width: 120,
+                    transform: [
+                      { scale: category === selectedCategory ? 1.05 : 1 },
+                    ],
+                    transition: "transform 0.2s",
                   }}
                   onPress={() => filterProvidersByCategory(category)}
-                  className={`flex-1 items-center justify-center py-2 rounded-lg ${
+                  className={`flex-1 items-center justify-center py-2 mb-3 rounded-lg ${
                     category === selectedCategory
                       ? "bg-green-900"
                       : "bg-green-900 opacity-60"

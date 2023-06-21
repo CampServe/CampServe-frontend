@@ -8,7 +8,7 @@ import React, {
 import axios from "../utils/axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import jwtDecode from "jwt-decode";
-import { collection, deleteDoc, getDocs, doc } from "firebase/firestore";
+import { collection, deleteDoc, getDocs } from "firebase/firestore";
 import { db } from "../utils/firebase";
 
 const AuthContext = createContext({});
@@ -197,7 +197,6 @@ export function AuthProvider({ children }) {
   };
 
   const switchAccount = async () => {
-    // setIsSwitchingAcount(true);
     const route =
       user.account_type == "regular user"
         ? "/switch_to_provider"
@@ -226,13 +225,10 @@ export function AuthProvider({ children }) {
     } catch (error) {
       console.log(error);
       setError("An error occurred");
-    } finally {
-      // setIsSwitchingAcount(false);
     }
   };
 
   const logout = async () => {
-    setIsLoadingLogout(true);
     const route =
       user.account_type == "regular user" ? "/logout" : "/provider_logout";
     try {
@@ -247,8 +243,6 @@ export function AuthProvider({ children }) {
     } catch (error) {
       console.log(error);
       setError("An error occurred");
-    } finally {
-      setIsLoadingLogout(false);
     }
   };
 
@@ -260,6 +254,8 @@ export function AuthProvider({ children }) {
       isLoadingVerify,
       isLoadingLogout,
       isSwitchingAcount,
+      setIsLoadingLogout,
+      setIsSwitchingAcount,
       error,
       login,
       logout,
@@ -275,8 +271,17 @@ export function AuthProvider({ children }) {
       isLoadingLogin,
       isLoadingSignup,
       isLoadingVerify,
-      isLoadingToken,
+      isLoadingLogout,
+      isSwitchingAcount,
       error,
+      login,
+      logout,
+      userSignup,
+      studentVerification,
+      studentEmailVerification,
+      signupAsProvider,
+      switchAccount,
+      isLoadingToken,
     ]
   );
 
