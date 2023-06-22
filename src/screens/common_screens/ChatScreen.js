@@ -7,7 +7,7 @@ import {
   Platform,
   FlatList,
   TouchableOpacity,
-  PanResponder,
+  Animated,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ChatHeader from "../../components/ChatHeader";
@@ -17,7 +17,6 @@ import useAuth from "../../hooks/useAuth";
 import SenderMessage from "../../components/SenderMessage";
 import ReceiverMessage from "../../components/ReceiverMessage";
 import {
-  FieldValue,
   addDoc,
   getDoc,
   setDoc,
@@ -51,10 +50,13 @@ const ChatScreen = () => {
   const maxLines = 6;
   const lineHeight = 20;
   const maxTextInputHeight = maxLines * lineHeight;
+  const sendButtonOpacity = useRef(new Animated.Value(0)).current;
+  const micButtonOpacity = useRef(new Animated.Value(1)).current;
 
   const { matchDetails } = params;
 
   const pressTimer = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     const checkMatchDetails = async () => {
@@ -231,6 +233,7 @@ const ChatScreen = () => {
       userId: user.user_id,
       displayName: user.first_name + " " + user.last_name,
       read: false,
+      date: new Date().toDateString(),
     };
 
     if (messageType === "text") {
@@ -257,12 +260,11 @@ const ChatScreen = () => {
         collection(db, "matches", matchDetails.id, "messages"),
         message
       );
-      newMessage.id = docRef.id;
-      newMessage.isSending = false;
     } catch (error) {
       console.log("Error sending message:", error);
-      newMessage.isSending = false;
-      newMessage.hasError = true;
+      setMessages((prevMessages) =>
+        prevMessages.filter((msg) => msg.id !== newMessage.id)
+      );
     }
   };
 
@@ -280,11 +282,41 @@ const ChatScreen = () => {
     }
   };
 
-  const isInputNotEmpty = input.length > 0;
+  let isInputNotEmpty = input.length > 0;
 
   const handleInputChange = (text) => {
     setInput(text);
   };
+
+  useEffect(() => {
+    if (input.length > 0) {
+      Animated.parallel([
+        Animated.timing(sendButtonOpacity, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(micButtonOpacity, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(sendButtonOpacity, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(micButtonOpacity, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [input]);
 
   const matchedUserInfo = getMatchedUserInfo(matchDetails?.users, user.user_id);
   const matchedUserName =
@@ -292,26 +324,10 @@ const ChatScreen = () => {
   const matchedBusinessName = matchedUserInfo.business_name;
 
   const renderMessageItem = (message, index) => {
-    if (!message.timestamp || message.timestamp === null) {
-      return (
-        <>
-          {message.userId === user.user_id ? (
-            <SenderMessage
-              key={message.id}
-              message={message}
-              isSending={message?.isSending || false}
-            />
-          ) : (
-            <ReceiverMessage key={message.id} message={message} />
-          )}
-        </>
-      );
-    }
-
     let messageDate;
 
-    if (/^\w{3} \w{3} \d{2} \d{4}$/.test(message.timestamp)) {
-      messageDate = message.timestamp;
+    if (/^\w{3} \w{3} \d{2} \d{4}$/.test(message.date)) {
+      messageDate = message.date;
     } else {
       messageDate = message.timestamp.toDate().toDateString();
     }
@@ -320,7 +336,7 @@ const ChatScreen = () => {
       index === messages.length - 1 ||
       messageDate !==
         (messages[index + 1].timestamp.toDate().toDateString() ||
-          messages[index + 1].timestamp);
+          messages[index + 1].date);
 
     return (
       <>
@@ -416,6 +432,7 @@ const ChatScreen = () => {
             ) : (
               <>
                 <TextInput
+                  ref={inputRef}
                   style={{ maxHeight: maxTextInputHeight }}
                   className="flex-1 text-lg pr-2 bg-white rounded-3xl py-2 px-4"
                   placeholder="Send Message"
@@ -443,12 +460,16 @@ const ChatScreen = () => {
           >
             {!isInputNotEmpty ? (
               !isRecording ? (
-                <Ionicons name="mic" size={24} color="#FFFFFF" />
+                <Animated.View style={{ opacity: micButtonOpacity }}>
+                  <Ionicons name="mic" size={24} color="#FFFFFF" />
+                </Animated.View>
               ) : (
                 <Ionicons name="paper-plane" size={24} color="#FFFFFF" />
               )
             ) : (
-              <Ionicons name="paper-plane" size={24} color="#FFFFFF" />
+              <Animated.View style={{ opacity: sendButtonOpacity }}>
+                <Ionicons name="paper-plane" size={24} color="#FFFFFF" />
+              </Animated.View>
             )}
           </TouchableOpacity>
         </View>

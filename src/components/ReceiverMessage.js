@@ -1,26 +1,25 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Text, View, TouchableOpacity, Image } from "react-native";
 import { Audio } from "expo-av";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Lightbox from "react-native-lightbox-v2";
-import { CameraRoll } from "@react-native-community/cameraroll";
+import Slider from "@react-native-community/slider";
 
 const ReceiverMessage = ({ message }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [sound, setSound] = useState(null);
-  const [duration, setDuration] = useState(0);
+  const [duration, setDuration] = useState(1);
   const [position, setPosition] = useState(0);
 
-  const longPress = async (uri) => {
-    try {
-      const result = await CameraRoll.save(uri);
-      console.log("Image saved to gallery:", result);
-    } catch (error) {
-      console.log("Failed to save image to gallery:", error);
-    }
-  };
+  const formatTime = useMemo(() => {
+    return (time) => {
+      const minutes = Math.floor(time / 60000);
+      const seconds = ((time % 60000) / 1000).toFixed(0);
+      return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+    };
+  }, []);
 
-  const playAudio = async () => {
+  const playAudio = useCallback(async () => {
     try {
       const soundObject = new Audio.Sound();
       await soundObject.loadAsync({ uri: message.audio });
@@ -32,17 +31,17 @@ const ReceiverMessage = ({ message }) => {
     } catch (error) {
       console.log("Error playing audio:", error);
     }
-  };
+  }, [message?.audio]);
 
-  const stopAudio = async () => {
+  const stopAudio = useCallback(async () => {
     if (sound) {
       await sound.stopAsync();
       setIsPlaying(false);
       setPosition(0);
     }
-  };
+  }, [sound]);
 
-  const onPlaybackStatusUpdate = (status) => {
+  const onPlaybackStatusUpdate = useCallback((status) => {
     if (status.isLoaded) {
       setDuration(status.durationMillis);
       setPosition(status.positionMillis);
@@ -52,7 +51,7 @@ const ReceiverMessage = ({ message }) => {
         setPosition(0);
       }
     }
-  };
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -60,7 +59,7 @@ const ReceiverMessage = ({ message }) => {
         sound.unloadAsync();
       }
     };
-  }, []);
+  }, [sound]);
 
   useEffect(() => {
     if (message && message.audio) {
@@ -80,35 +79,38 @@ const ReceiverMessage = ({ message }) => {
 
       loadAudio();
     }
-  }, [message?.audio]);
+  }, [message?.audio, onPlaybackStatusUpdate]);
 
-  const formatTime = (time) => {
-    const minutes = Math.floor(time / 60000);
-    const seconds = ((time % 60000) / 1000).toFixed(0);
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-  };
+  const handleSliderValueChange = useCallback(
+    (value) => {
+      const newPosition = value * duration;
+      setPosition(newPosition);
+      if (sound) {
+        sound.setPositionAsync(newPosition);
+      }
+    },
+    [duration, sound]
+  );
 
-  const handleSliderPress = (e) => {
-    const sliderWidth = e.nativeEvent.layout.width;
-    const newPosition = (e.nativeEvent.locationX / sliderWidth) * duration;
-    setPosition(newPosition);
-    sound.setPositionAsync(newPosition);
-  };
-
-  const date = message.timestamp
-    ? new Date(
+  const date = useMemo(() => {
+    if (message && message.timestamp) {
+      return new Date(
         message.timestamp.seconds * 1000 +
           message.timestamp.nanoseconds / 1000000
-      )
-    : null;
+      );
+    }
+    return null;
+  }, [message?.timestamp]);
 
-  const time =
-    date !== null
-      ? date.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      : "";
+  const time = useMemo(() => {
+    if (date !== null) {
+      return date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+    return "";
+  }, [date]);
 
   return (
     <View className="flex-row justify-start">
@@ -133,24 +135,15 @@ const ReceiverMessage = ({ message }) => {
                 color="gray"
               />
             </TouchableOpacity>
-            <TouchableOpacity
-              className="bg-gray-500 h-2 rounded-lg ml-1"
+            <Slider
               style={{
-                width: "85%",
-                height: 8,
-                position: "relative",
-                overflow: "hidden",
+                flex: 1,
               }}
-              onPress={handleSliderPress}
-            >
-              <View
-                className="bg-gray-300 h-full"
-                style={{
-                  width: `${(position / duration) * 100}%`,
-                  position: "absolute",
-                }}
-              ></View>
-            </TouchableOpacity>
+              minimumValue={0}
+              maximumValue={1}
+              value={position / duration}
+              onValueChange={handleSliderValueChange}
+            />
           </View>
           <View className="flex-row justify-between">
             <Text className="text-gray-600 text-xs pl-7">
@@ -161,7 +154,6 @@ const ReceiverMessage = ({ message }) => {
         </View>
       ) : (
         <Lightbox
-          longPressCallback={() => longPress(message.image)}
           underlayColor="white"
           swipeToDismiss={true}
           renderContent={() => (

@@ -31,10 +31,10 @@ const ChatList = () => {
   const isFocused = useIsFocused();
 
   const sortMessagesByTimestamp = (matches) => {
-    return matches.sort((a, b) => {
-      const aTimestamp = a.lastMessage?.timestamp || 0;
-      const bTimestamp = b.lastMessage?.timestamp || 0;
-      return aTimestamp - bTimestamp;
+    return matches.sort((b, a) => {
+      const aTimestamp = a.lastMessage?.timestamp.toDate() || 0;
+      const bTimestamp = b.lastMessage?.timestamp.toDate() || 0;
+      return aTimestamp.valueOf() - bTimestamp.valueOf();
     });
   };
 
@@ -72,8 +72,6 @@ const ChatList = () => {
               const firstMessage = messageSnapshot.docs[0];
               const lastMessage =
                 messageSnapshot.docs[messageSnapshot.docs.length - 1];
-              // console.log("first:", firstMessage.data());
-              // console.log("last:", lastMessage.data());
               let firstMessageData = null;
               if (firstMessage) {
                 firstMessageData = firstMessage.data();
@@ -120,16 +118,18 @@ const ChatList = () => {
               filteredMessages
             );
 
-            // console.log(filteredMessages);
-            // console.log(sortedMessages);
+            setMatches(filteredMessages);
 
-            setMatches(sortedMessages);
+            if (filteredMessages.length === 0) {
+              setLoadingChats(false);
+            }
           };
 
           await fetchMessageData();
         } catch (error) {
           console.error("Error fetching data:", error);
           setMatches([]);
+          setLoadingChats(false);
         }
       };
 
@@ -196,10 +196,10 @@ const ChatList = () => {
   }, [matches]);
 
   useEffect(() => {
-    if (subCategories.length > 0 && !selectedSubCategory) {
+    if (subCategories.length > 0) {
       handleSubCategorySelect(subCategories[0].name);
     }
-  }, [subCategories, selectedSubCategory]);
+  }, [subCategories]);
 
   const handleSubCategorySelect = (subCategory) => {
     setSelectedSubCategory(subCategory);
@@ -213,8 +213,6 @@ const ChatList = () => {
 
     const sortedFilteredMatches = sortMessagesByTimestamp(filtered);
 
-    console.log("a", filtered);
-    console.log("b", sortedFilteredMatches);
     setFilteredMatches(sortedFilteredMatches);
   };
 

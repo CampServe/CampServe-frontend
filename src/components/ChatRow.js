@@ -20,10 +20,9 @@ const ChatRow = ({ matchDetails }) => {
   const { user } = useAuth();
   const [matchedUserInfo, setMatchedUserInfo] = useState(null);
   const [lastMessage, setLastMessage] = useState("");
-  const [lastTime, setlastTime] = useState("");
+  const [lastTime, setLastTime] = useState("");
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
   const [loadingChats, setLoadingChats] = useState(false);
-  // console.log(matchDetails.lastMessage);
 
   useEffect(() => {
     setMatchedUserInfo(getMatchedUserInfo(matchDetails.users, user.user_id));
@@ -67,6 +66,8 @@ const ChatRow = ({ matchDetails }) => {
               setLastMessage(lastMessage);
             }
 
+            const now = new Date();
+
             const date = lastMessage?.timestamp
               ? new Date(
                   lastMessage?.timestamp.seconds * 1000 +
@@ -74,14 +75,30 @@ const ChatRow = ({ matchDetails }) => {
                 )
               : null;
 
-            const time =
-              date !== null
-                ? date.toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : "";
-            setlastTime(time);
+            let lastTime = "";
+
+            if (date !== null) {
+              const diffInDays = Math.floor(
+                (now - date) / (1000 * 60 * 60 * 24)
+              );
+
+              if (diffInDays === 0) {
+                lastTime = date.toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                });
+              } else if (diffInDays === 1) {
+                lastTime = "Yesterday";
+              } else {
+                const day = date.getDate();
+                const month = date.getMonth() + 1;
+                const year = date.getFullYear() % 100;
+
+                lastTime = `${day}/${month}/${year}`;
+              }
+            }
+
+            setLastTime(lastTime);
 
             const unreadMessages = messages.filter(
               (message) => message.userId !== user.user_id && !message.read
@@ -99,7 +116,7 @@ const ChatRow = ({ matchDetails }) => {
       );
 
       return () => {
-        unsubscribe(); // Unsubscribe from the snapshot listener when the component unmounts
+        unsubscribe();
       };
     };
 
