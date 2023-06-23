@@ -9,6 +9,7 @@ import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import useAuth from "../../hooks/useAuth";
 import { useNavigation } from "@react-navigation/native";
+import Backbutton from "../../components/Backbutton";
 
 const SProfileSetup = () => {
   const navigation = useNavigation();
@@ -81,6 +82,7 @@ const SProfileSetup = () => {
 
   return (
     <SafeAreaView className="flex-1 items-center p-6 bg-white">
+      <Backbutton />
       <View className=" flex-1 items-center justify-center w-full">
         <Text className="text-2xl font-bold mb-6">Profile Setup</Text>
         <View className="w-full mb-4">

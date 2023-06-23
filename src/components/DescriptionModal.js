@@ -105,18 +105,19 @@ const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
       const extension = filename.split(".").pop();
 
       const updatedImageInfo = [...imageInfo];
-      updatedImageInfo[subcategoryIndex] = {
+      updatedImageInfo.push({
         category,
+        subcategoryIndex,
         filename,
         extension,
-      };
-
+      });
       setImageInfo(updatedImageInfo);
 
       setImages((prevImages) => [
         ...prevImages,
         { category, subcategoryIndex, uri },
       ]);
+      console.log(imageInfo);
     }
   };
 
@@ -157,9 +158,7 @@ const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
                   </Text>
                 )}
                 {subcategoryGroup.subcategory.map((subcategory, index) => (
-                  <React.Fragment
-                  // key={`${subcategoryGroup.category}-${index}-${counter}`}
-                  >
+                  <React.Fragment>
                     <View className="pt-4">
                       <Text className="text-base font-semibold mb-1">
                         {subcategory}
@@ -210,17 +209,41 @@ const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
                           color="green"
                         />
                       </TouchableOpacity>
-                      {imageInfo[index] && imageInfo[index].filename ? (
+                      {imageInfo.find(
+                        (info) =>
+                          info.category === subcategoryGroup.category &&
+                          info.subcategoryIndex === index
+                      ) ? (
                         <Text className="text-sm">
-                          {imageInfo[index].filename.length > 20
-                            ? imageInfo[index].filename.slice(0, 17) + "..."
-                            : imageInfo[index].filename}
-                          .{imageInfo[index].extension}
+                          {imageInfo.find(
+                            (info) =>
+                              info.category === subcategoryGroup.category &&
+                              info.subcategoryIndex === index
+                          ).filename.length > 20
+                            ? imageInfo
+                                .find(
+                                  (info) =>
+                                    info.category ===
+                                      subcategoryGroup.category &&
+                                    info.subcategoryIndex === index
+                                )
+                                .filename.slice(0, 17) + "..."
+                            : imageInfo.find(
+                                (info) =>
+                                  info.category === subcategoryGroup.category &&
+                                  info.subcategoryIndex === index
+                              ).filename}
+                          .
+                          {
+                            imageInfo.find(
+                              (info) =>
+                                info.category === subcategoryGroup.category &&
+                                info.subcategoryIndex === index
+                            ).extension
+                          }
                         </Text>
                       ) : (
-                        <Text className="text-sm ">
-                          Upload Image (optional)
-                        </Text>
+                        <Text className="text-sm">Upload Image (optional)</Text>
                       )}
                     </View>
                   </React.Fragment>
