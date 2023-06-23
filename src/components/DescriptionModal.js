@@ -56,9 +56,9 @@ const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
         })
       );
 
-      console.log(JSON.stringify(updatedSubcategories, null, 2));
-      // onSave(updatedSubcategories);
-      // onClose();
+      // console.log(JSON.stringify(updatedSubcategories, null, 2));
+      onSave(updatedSubcategories);
+      onClose();
     }
   };
 
