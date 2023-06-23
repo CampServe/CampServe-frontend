@@ -8,13 +8,18 @@ import {
   TextInput,
 } from "react-native";
 import Modal from "react-native-modal";
+import * as ImagePicker from "expo-image-picker";
 
 const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
   const [descriptions, setDescriptions] = useState([]);
+  const [images, setImages] = useState([]);
+  const [imageInfo, setImageInfo] = useState([]);
 
   useEffect(() => {
     if (visible) {
-      setDescriptions({});
+      setDescriptions([]);
+      setImageInfo([]);
+      setImages([]);
     }
   }, [visible]);
 
@@ -37,15 +42,23 @@ const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
           category: category,
           subcategories: subcategories
             .find((subcat) => subcat.category === category)
-            .subcategory.map((name, index) => ({
-              name,
-              description: descriptions[category][index],
-            })),
+            .subcategory.map((name, index) => {
+              const image = images.find(
+                (img) =>
+                  img.category === category && img.subcategoryIndex === index
+              );
+              return {
+                name,
+                description: descriptions[category][index],
+                image: image ? image.uri : "",
+              };
+            }),
         })
       );
-      //   console.log(JSON.stringify(updatedSubcategories, null, 2));
-      onSave(updatedSubcategories);
-      onClose();
+
+      console.log(JSON.stringify(updatedSubcategories, null, 2));
+      // onSave(updatedSubcategories);
+      // onClose();
     }
   };
 
@@ -70,6 +83,41 @@ const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
       }
       return updatedDescriptions;
     });
+  };
+
+  const pickImage = async (category, subcategoryIndex) => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      console.log("Permission denied");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: false,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      const { uri } = result.assets[0];
+      const filename = uri.split("/").pop();
+      const extension = filename.split(".").pop();
+
+      const updatedImageInfo = [...imageInfo];
+      updatedImageInfo[subcategoryIndex] = {
+        category,
+        filename,
+        extension,
+      };
+
+      setImageInfo(updatedImageInfo);
+
+      setImages((prevImages) => [
+        ...prevImages,
+        { category, subcategoryIndex, uri },
+      ]);
+    }
   };
 
   return (
@@ -109,44 +157,73 @@ const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
                   </Text>
                 )}
                 {subcategoryGroup.subcategory.map((subcategory, index) => (
-                  <View key={index} className="pt-4">
-                    <Text className="text-base font-semibold mb-1">
-                      {subcategory}
-                    </Text>
-                    <TextInput
-                      multiline={true}
-                      numberOfLines={3}
-                      textAlignVertical="top"
-                      placeholder="Enter description"
-                      onChangeText={(text) =>
-                        handleInputChange(
-                          subcategoryGroup.category,
-                          index,
-                          text
-                        )
-                      }
-                      onBlur={() =>
-                        handleBlur(subcategoryGroup.category, index)
-                      }
-                      className={`border focus:border-2 ${
-                        descriptions[subcategoryGroup.category]?.[index]
-                          ?.length < 10
-                          ? "border-red-500"
-                          : "border-green-500"
-                      } rounded-lg px-4 py-2 ${
-                        descriptions[subcategoryGroup.category]?.[index]
-                          ?.length < 10
-                          ? "focus:border-red-700"
-                          : "focus:border-green-700"
-                      } focus:outline-none`}
-                    />
-                    {descriptions[subcategoryGroup.category]?.[index]?.length <
-                      10 && (
-                      <Text className="text-red-500 text-xs">
-                        Description should be at least 10 characters
+                  <React.Fragment
+                  // key={`${subcategoryGroup.category}-${index}-${counter}`}
+                  >
+                    <View className="pt-4">
+                      <Text className="text-base font-semibold mb-1">
+                        {subcategory}
                       </Text>
-                    )}
-                  </View>
+                      <TextInput
+                        multiline={true}
+                        numberOfLines={3}
+                        textAlignVertical="top"
+                        placeholder="Enter description"
+                        onChangeText={(text) =>
+                          handleInputChange(
+                            subcategoryGroup.category,
+                            index,
+                            text
+                          )
+                        }
+                        onBlur={() =>
+                          handleBlur(subcategoryGroup.category, index)
+                        }
+                        className={`border focus:border-2 ${
+                          descriptions[subcategoryGroup.category]?.[index]
+                            ?.length < 10
+                            ? "border-red-500"
+                            : "border-green-500"
+                        } rounded-lg px-4 py-2 ${
+                          descriptions[subcategoryGroup.category]?.[index]
+                            ?.length < 10
+                            ? "focus:border-red-700"
+                            : "focus:border-green-700"
+                        } focus:outline-none`}
+                      />
+                      {descriptions[subcategoryGroup.category]?.[index]
+                        ?.length < 10 && (
+                        <Text className="text-red-500 text-xs">
+                          Description should be at least 10 characters
+                        </Text>
+                      )}
+                    </View>
+                    <View className="flex-row items-center gap-2 py-2 justify-center">
+                      <TouchableOpacity
+                        onPress={() =>
+                          pickImage(subcategoryGroup.category, index)
+                        }
+                      >
+                        <Ionicons
+                          name="cloud-upload-outline"
+                          size={20}
+                          color="green"
+                        />
+                      </TouchableOpacity>
+                      {imageInfo[index] && imageInfo[index].filename ? (
+                        <Text className="text-sm">
+                          {imageInfo[index].filename.length > 20
+                            ? imageInfo[index].filename.slice(0, 17) + "..."
+                            : imageInfo[index].filename}
+                          .{imageInfo[index].extension}
+                        </Text>
+                      ) : (
+                        <Text className="text-sm ">
+                          Upload Image (optional)
+                        </Text>
+                      )}
+                    </View>
+                  </React.Fragment>
                 ))}
               </View>
             ))}

@@ -155,27 +155,27 @@ const SelectCategoriesScreen = () => {
       ...trimObjectValues(params.formData),
       selectedSubcategories: selectedDescriptions,
     };
-    // console.log(JSON.stringify(providerData, null, 2));
-    try {
-      setIsConfirming(true);
-      const success = await signupAsProvider(user.user_id, providerData);
-      setIsConfirming(false);
+    console.log(JSON.stringify(providerData, null, 2));
+    // try {
+    //   setIsConfirming(true);
+    //   const success = await signupAsProvider(user.user_id, providerData);
+    //   setIsConfirming(false);
 
-      setIsConfirmationModalVisible(false);
-      setIsSuccess(success);
-      setModalMessage(success ? "SignUp successful" : "SignUp failed");
-      setIsModalVisible(true);
-    } catch (error) {
-      console.log(error);
-      setIsConfirming(false);
-      setIsSuccess(false);
-      setIsModalVisible(true);
-      setModalMessage("An error occurred while signing up as a provider");
-    } finally {
-      setSelectedCategories([]);
-      setSelectedCategories([]);
-      setIsConfirmationModalVisible(false);
-    }
+    //   setIsConfirmationModalVisible(false);
+    //   setIsSuccess(success);
+    //   setModalMessage(success ? "SignUp successful" : "SignUp failed");
+    //   setIsModalVisible(true);
+    // } catch (error) {
+    //   console.log(error);
+    //   setIsConfirming(false);
+    //   setIsSuccess(false);
+    //   setIsModalVisible(true);
+    //   setModalMessage("An error occurred while signing up as a provider");
+    // } finally {
+    //   setSelectedCategories([]);
+    //   setSelectedCategories([]);
+    //   setIsConfirmationModalVisible(false);
+    // }
   };
 
   const handleModalClose = () => {

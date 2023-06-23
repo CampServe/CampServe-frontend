@@ -102,6 +102,8 @@ const CustomDrawerContent = () => {
     </TouchableHighlight>
   );
 
+  // console.log(user.is_service_provider);
+
   return (
     <Animated.View style={styles.drawerContainer}>
       <View className="flex-1 flex-col h-full px-2 pt-4">

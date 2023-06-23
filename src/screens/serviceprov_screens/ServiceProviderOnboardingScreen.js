@@ -47,7 +47,7 @@ const ServiceProviderOnboardingScreen = ({ onComplete }) => {
 
       <View className="h-1/2 p-6">
         <View className="items-center justify-center h-1/2">
-          <Text className="text-2xl text-center font-bold mb-2">
+          <Text className="text-2xl text-center capitalize font-bold mb-2">
             {currentScreen.title}
           </Text>
           <Text className="text-lg mb-6 text-center ">
