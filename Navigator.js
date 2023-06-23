@@ -3,7 +3,7 @@ import { View, Text } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import useAuth from "./src/hooks/useAuth";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -42,7 +42,7 @@ import CustomSPDrawerContent from "./src/components/CustomSPDrawerContent";
 import SProfileSetup from "./src/screens/serviceprov_screens/SProfileSetup";
 import SelectCategoriesScreen from "./src/screens/serviceprov_screens/SelectCategoriesScreen";
 import ServiceDetailsScreen from "./src/screens/user_screens/ServiceDetailsScreen";
-import { RatingProvider } from "./src/hooks/useProvider";
+import useProvider from "./src/hooks/useProvider";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -51,10 +51,10 @@ const Drawer = createDrawerNavigator();
 const UserTabNavigator = () => {
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const { user } = useAuth();
-  const isFocused = useIsFocused();
+  const { newMessageTrigger } = useProvider();
 
   useEffect(() => {
-    if (user && user !== null && isFocused) {
+    if (user && user !== null) {
       const unsubscribe = onSnapshot(
         query(collection(db, "matches")),
         async (snapshot) => {
@@ -118,7 +118,7 @@ const UserTabNavigator = () => {
         unsubscribe();
       };
     }
-  }, [user, isFocused]);
+  }, [user, newMessageTrigger]);
 
   return (
     <Tab.Navigator
@@ -221,11 +221,10 @@ const UserDrawerNavigator = () => {
 const ServiceProviderTabNavigator = () => {
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const { user } = useAuth();
-  const navigation = useNavigation();
-  const isFocused = useIsFocused();
+  const { newMessageTrigger } = useProvider();
 
   useEffect(() => {
-    if (user && user !== null && isFocused) {
+    if (user && user !== null) {
       const unsubscribe = onSnapshot(
         query(collection(db, "matches")),
         async (snapshot) => {
@@ -289,7 +288,7 @@ const ServiceProviderTabNavigator = () => {
         unsubscribe();
       };
     }
-  }, [user, isFocused]);
+  }, [user, newMessageTrigger]);
 
   return (
     <Tab.Navigator
@@ -397,64 +396,62 @@ export const StackNavigator = () => {
 
   return (
     <AppWrapper>
-      <RatingProvider>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          {!user ? (
-            <Stack.Group>
-              <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-              <Stack.Screen name="Login" component={LoginScreen} />
-              <Stack.Screen
-                name="StudentVerification"
-                component={StudentVerificationScreen}
-              />
-              <Stack.Screen
-                name="OTPVerification"
-                component={OTPVerificationScreen}
-                options={{ presentation: "transparentModal" }}
-              />
-              <Stack.Screen name="UserSignup" component={UserSignupScreen} />
-            </Stack.Group>
-          ) : (
-            <>
-              {user.account_type === "regular user" && (
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {!user ? (
+          <Stack.Group>
+            <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen
+              name="StudentVerification"
+              component={StudentVerificationScreen}
+            />
+            <Stack.Screen
+              name="OTPVerification"
+              component={OTPVerificationScreen}
+              options={{ presentation: "transparentModal" }}
+            />
+            <Stack.Screen name="UserSignup" component={UserSignupScreen} />
+          </Stack.Group>
+        ) : (
+          <>
+            {user.account_type === "regular user" && (
+              <Stack.Group>
+                <Stack.Screen name="User" component={UserDrawerNavigator} />
+              </Stack.Group>
+            )}
+
+            {user.account_type === "regular user" &&
+              (user.is_service_provider !== true ||
+                user.is_service_provider !== "true") && (
                 <Stack.Group>
-                  <Stack.Screen name="User" component={UserDrawerNavigator} />
+                  <Stack.Screen
+                    name="SPOnboarding"
+                    component={ServiceProviderOnboardingScreen}
+                  />
+                  <Stack.Screen
+                    name="SProfileSetup"
+                    component={SProfileSetup}
+                  />
+                  <Stack.Screen
+                    name="SelectCategories"
+                    component={SelectCategoriesScreen}
+                  />
                 </Stack.Group>
               )}
 
-              {user.account_type === "regular user" &&
-                (user.is_service_provider !== true ||
-                  user.is_service_provider !== "true") && (
-                  <Stack.Group>
-                    <Stack.Screen
-                      name="SPOnboarding"
-                      component={ServiceProviderOnboardingScreen}
-                    />
-                    <Stack.Screen
-                      name="SProfileSetup"
-                      component={SProfileSetup}
-                    />
-                    <Stack.Screen
-                      name="SelectCategories"
-                      component={SelectCategoriesScreen}
-                    />
-                  </Stack.Group>
-                )}
-
-              {user.account_type == "provider" &&
-                (user.is_service_provider !== false ||
-                  user.is_service_provider !== "false") && (
-                  <Stack.Group>
-                    <Stack.Screen
-                      name="Service Provider"
-                      component={SPDrawerNavigator}
-                    />
-                  </Stack.Group>
-                )}
-            </>
-          )}
-        </Stack.Navigator>
-      </RatingProvider>
+            {user.account_type == "provider" &&
+              (user.is_service_provider !== false ||
+                user.is_service_provider !== "false") && (
+                <Stack.Group>
+                  <Stack.Screen
+                    name="Service Provider"
+                    component={SPDrawerNavigator}
+                  />
+                </Stack.Group>
+              )}
+          </>
+        )}
+      </Stack.Navigator>
     </AppWrapper>
   );
 };

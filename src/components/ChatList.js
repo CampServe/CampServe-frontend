@@ -19,16 +19,16 @@ import { db } from "../utils/firebase";
 import useAuth from "../hooks/useAuth";
 import ChatRow from "./ChatRow";
 import Loader from "./Loader";
-import { useIsFocused } from "@react-navigation/native";
+import useProvider from "../hooks/useProvider";
 
 const ChatList = () => {
-  const [matches, setMatches] = useState([]);
   const { user } = useAuth();
+  const { newMessageTrigger } = useProvider();
+  const [matches, setMatches] = useState([]);
   const [loadingChats, setLoadingChats] = useState(true);
   const [filteredMatches, setFilteredMatches] = useState([]);
   const [selectedSubCategory, setSelectedSubCategory] = useState(null);
   const [subCategories, setSubCategories] = useState([]);
-  const isFocused = useIsFocused();
 
   const sortMessagesByTimestamp = (matches) => {
     return matches.sort((b, a) => {
@@ -39,103 +39,109 @@ const ChatList = () => {
   };
 
   useEffect(() => {
-    if (isFocused) {
-      setLoadingChats(true);
+    setLoadingChats(true);
 
-      const fetchData = async () => {
-        try {
-          const snapshot = await new Promise((resolve, reject) => {
-            const unsubscribe = onSnapshot(
-              query(collection(db, "matches")),
-              resolve,
-              reject
+    const fetchData = async () => {
+      try {
+        const matchesSnapshot = await new Promise((resolve, reject) => {
+          const unsubscribeMatches = onSnapshot(
+            query(collection(db, "matches")),
+            resolve,
+            reject
+          );
+
+          return unsubscribeMatches;
+        });
+
+        const matchesData = matchesSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        const fetchMessageData = async () => {
+          const messagePromises = matchesData.map(async (match) => {
+            const messagesQuery = query(
+              collection(db, "matches", match.id, "messages"),
+              orderBy("timestamp", "asc")
             );
 
-            return unsubscribe;
-          });
-
-          const matchesData = snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-
-          const fetchMessageData = async () => {
-            const messagePromises = matchesData.map(async (match) => {
-              const messageSnapshot = await getDocs(
-                query(
-                  collection(db, "matches", match.id, "messages"),
-                  orderBy("timestamp", "asc")
-                  // limit(1)
-                )
+            const messagesSnapshot = await new Promise((resolve, reject) => {
+              const unsubscribeMessages = onSnapshot(
+                messagesQuery,
+                resolve,
+                reject
               );
 
-              const firstMessage = messageSnapshot.docs[0];
-              const lastMessage =
-                messageSnapshot.docs[messageSnapshot.docs.length - 1];
-              let firstMessageData = null;
-              if (firstMessage) {
-                firstMessageData = firstMessage.data();
-              }
-
-              let lastMessageData = null;
-              if (lastMessage) {
-                lastMessageData = lastMessage.data();
-              }
-
-              return {
-                ...match,
-                firstMessage: firstMessageData,
-                lastMessage: lastMessageData,
-              };
+              return unsubscribeMessages;
             });
 
-            const messagesData = await Promise.all(messagePromises);
-            const filteredMessages = messagesData.filter((match) => {
-              const { firstMessage, lastMessage } = match;
+            const firstMessage = messagesSnapshot.docs[0];
+            const lastMessage =
+              messagesSnapshot.docs[messagesSnapshot.docs.length - 1];
 
-              if (!firstMessage || !lastMessage) {
-                return false;
-              }
-
-              const userId = firstMessage.userId;
-
-              if (user.account_type === "provider") {
-                return (
-                  match.lastMessageTimestamp !== null &&
-                  match.users[user.user_id] &&
-                  userId !== user.user_id
-                );
-              } else {
-                return (
-                  match.lastMessageTimestamp !== null &&
-                  match.users[user.user_id] &&
-                  userId === user.user_id
-                );
-              }
-            });
-
-            const sortedMessages = await sortMessagesByTimestamp(
-              filteredMessages
-            );
-
-            setMatches(filteredMessages);
-
-            if (filteredMessages.length === 0) {
-              setLoadingChats(false);
+            let firstMessageData = null;
+            if (firstMessage) {
+              firstMessageData = firstMessage.data();
             }
-          };
 
-          await fetchMessageData();
-        } catch (error) {
-          console.error("Error fetching data:", error);
-          setMatches([]);
-          setLoadingChats(false);
-        }
-      };
+            let lastMessageData = null;
+            if (lastMessage) {
+              lastMessageData = lastMessage.data();
+            }
 
-      fetchData();
-    }
-  }, [user, db, isFocused]);
+            return {
+              ...match,
+              firstMessage: firstMessageData,
+              lastMessage: lastMessageData,
+            };
+          });
+
+          const messagesData = await Promise.all(messagePromises);
+          const filteredMessages = messagesData.filter((match) => {
+            const { firstMessage, lastMessage } = match;
+
+            if (!firstMessage || !lastMessage) {
+              return false;
+            }
+
+            const userId = firstMessage.userId;
+
+            if (user.account_type === "provider") {
+              return (
+                match.lastMessageTimestamp !== null &&
+                match.users[user.user_id] &&
+                userId !== user.user_id
+              );
+            } else {
+              return (
+                match.lastMessageTimestamp !== null &&
+                match.users[user.user_id] &&
+                userId === user.user_id
+              );
+            }
+          });
+
+          const sortedMessages = await sortMessagesByTimestamp(
+            filteredMessages
+          );
+
+          setMatches(filteredMessages);
+
+          if (filteredMessages.length === 0) {
+            setLoadingChats(false);
+          }
+        };
+
+        await fetchMessageData();
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setMatches([]);
+        setLoadingChats(false);
+      }
+    };
+
+    fetchData();
+  }, [user, newMessageTrigger]);
 
   useEffect(() => {
     if (matches.length > 0) {

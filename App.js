@@ -3,6 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { StackNavigator } from "./Navigator";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthProvider } from "./src/hooks/useAuth";
+import { RatingProvider } from "./src/hooks/useProvider";
 
 const clearAsyncStorage = async () => {
   try {
@@ -18,9 +19,11 @@ const clearAsyncStorage = async () => {
 export default function App() {
   return (
     <NavigationContainer>
-      <AuthProvider>
-        <StackNavigator />
-      </AuthProvider>
+      <RatingProvider>
+        <AuthProvider>
+          <StackNavigator />
+        </AuthProvider>
+      </RatingProvider>
     </NavigationContainer>
   );
 }

@@ -156,10 +156,11 @@ const ReceiverMessage = ({ message }) => {
         <Lightbox
           underlayColor="white"
           swipeToDismiss={true}
+          springConfig={{ tension: 100, friction: 10 }}
           renderContent={() => (
             <Image
               source={{ uri: message.image }}
-              style={{ flex: 1, resizeMode: "cover" }}
+              style={{ flex: 1, resizeMode: "contain" }}
             />
           )}
         >
@@ -174,9 +175,10 @@ const ReceiverMessage = ({ message }) => {
                   marginTop: 4,
                   marginRight: 8,
                 }}
+                resizeMode="contain"
               />
               <View className="absolute bottom-1 right-5">
-                <Text className="text-white text-xs">{time}</Text>
+                <Text className="text-black text-xs">{time}</Text>
               </View>
             </View>
           </React.Fragment>

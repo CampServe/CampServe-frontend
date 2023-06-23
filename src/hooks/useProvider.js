@@ -7,17 +7,9 @@ export const RatingProvider = ({ children }) => {
   const [newMessageTrigger, setNewMessageTrigger] = useState(false);
 
   useEffect(() => {
-    const simulateNewMessage = () => {
-      if (!newMessageTrigger) {
-        setNewMessageTrigger(true);
-
-        setTimeout(() => {
-          setNewMessageTrigger(false);
-        }, 2000);
-      }
-    };
-
-    simulateNewMessage();
+    if (newMessageTrigger) {
+      setNewMessageTrigger(false);
+    }
   }, [newMessageTrigger]);
 
   return (

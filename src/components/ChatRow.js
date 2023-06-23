@@ -14,10 +14,12 @@ import {
 import Loader from "./Loader";
 import { Ionicons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
+import useProvider from "../hooks/useProvider";
 
 const ChatRow = ({ matchDetails }) => {
   const navigation = useNavigation();
   const { user } = useAuth();
+  const { setNewMessageTrigger } = useProvider();
   const [matchedUserInfo, setMatchedUserInfo] = useState(null);
   const [lastMessage, setLastMessage] = useState("");
   const [lastTime, setLastTime] = useState("");
@@ -67,6 +69,7 @@ const ChatRow = ({ matchDetails }) => {
             }
 
             const now = new Date();
+            now.setHours(0, 0, 0, 0);
 
             const date = lastMessage?.timestamp
               ? new Date(
@@ -78,8 +81,19 @@ const ChatRow = ({ matchDetails }) => {
             let lastTime = "";
 
             if (date !== null) {
+              const dateOnlyNow = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate()
+              );
+              const dateOnly = new Date(
+                date.getFullYear(),
+                date.getMonth(),
+                date.getDate()
+              );
+
               const diffInDays = Math.floor(
-                (now - date) / (1000 * 60 * 60 * 24)
+                (dateOnlyNow - dateOnly) / (1000 * 60 * 60 * 24)
               );
 
               if (diffInDays === 0) {
@@ -94,7 +108,9 @@ const ChatRow = ({ matchDetails }) => {
                 const month = date.getMonth() + 1;
                 const year = date.getFullYear() % 100;
 
-                lastTime = `${day}/${month}/${year}`;
+                lastTime = `${day}/${month}/${year
+                  .toString()
+                  .padStart(2, "0")}`;
               }
             }
 
@@ -138,6 +154,7 @@ const ChatRow = ({ matchDetails }) => {
 
   const navigateToMessages = () => {
     markMessagesAsRead();
+    setNewMessageTrigger(true);
     navigation.navigate("Chat", { matchDetails });
   };
 

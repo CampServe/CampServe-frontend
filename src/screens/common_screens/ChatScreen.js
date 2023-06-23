@@ -34,9 +34,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
 import * as Animatable from "react-native-animatable";
 import * as ImagePicker from "expo-image-picker";
+import useProvider from "../../hooks/useProvider";
 
 const ChatScreen = () => {
   const { user } = useAuth();
+  const { setNewMessageTrigger } = useProvider();
   const { params } = useRoute();
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
@@ -260,6 +262,7 @@ const ChatScreen = () => {
         collection(db, "matches", matchDetails.id, "messages"),
         message
       );
+      setNewMessageTrigger(true);
     } catch (error) {
       console.log("Error sending message:", error);
       setMessages((prevMessages) =>
@@ -443,7 +446,7 @@ const ChatScreen = () => {
                   onContentSizeChange={handleContentSizeChange}
                 />
                 <TouchableOpacity onPress={pickImage}>
-                  <Ionicons name="attach" size={24} />
+                  <Ionicons name="attach" size={28} />
                 </TouchableOpacity>
               </>
             )}

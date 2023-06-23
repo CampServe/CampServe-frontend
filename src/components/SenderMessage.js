@@ -169,10 +169,11 @@ const SenderMessage = ({ message, isSending }) => {
         <Lightbox
           underlayColor="white"
           swipeToDismiss={true}
+          springConfig={{ tension: 100, friction: 10 }}
           renderContent={() => (
             <Image
               source={{ uri: message.image }}
-              style={{ flex: 1, resizeMode: "cover" }}
+              style={{ flex: 1, resizeMode: "contain" }}
             />
           )}
         >
@@ -180,10 +181,16 @@ const SenderMessage = ({ message, isSending }) => {
             <Image
               className="rounded-lg"
               source={{ uri: message.image }}
-              style={{ width: 200, height: 200, marginTop: 4, marginRight: 8 }}
+              style={{
+                width: 200,
+                height: 200,
+                marginTop: 4,
+                marginRight: 8,
+              }}
+              resizeMode="contain"
             />
             <View className="absolute bottom-1 right-5">
-              <Text className="text-white text-xs">
+              <Text className="text-black text-xs">
                 {isSending || date == null ? (
                   <Ionicons name="time" size={12} color="gray" />
                 ) : (
