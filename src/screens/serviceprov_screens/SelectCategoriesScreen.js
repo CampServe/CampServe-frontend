@@ -155,7 +155,7 @@ const SelectCategoriesScreen = () => {
       ...trimObjectValues(params.formData),
       selectedSubcategories: selectedDescriptions,
     };
-    console.log(JSON.stringify(providerData, null, 2));
+    // console.log(JSON.stringify(providerData, null, 2));
     try {
       setIsConfirming(true);
       const success = await signupAsProvider(user.user_id, providerData);

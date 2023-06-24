@@ -28,12 +28,13 @@ import {
   updateDoc,
   doc,
 } from "firebase/firestore";
-import { db } from "../../utils/firebase";
+import { db, storage } from "../../utils/firebase";
 import Loader from "../../components/Loader";
 import { Ionicons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
 import * as Animatable from "react-native-animatable";
 import * as ImagePicker from "expo-image-picker";
+import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import useProvider from "../../hooks/useProvider";
 
 const ChatScreen = () => {
@@ -144,7 +145,20 @@ const ChatScreen = () => {
 
     if (!result.canceled && result.assets.length > 0) {
       const { uri } = result.assets[0];
-      sendMessage("image", uri);
+      const response = await fetch(uri);
+      const blob = await response.blob();
+
+      const imageName = `image_${Date.now()}`;
+      const imageRef = ref(storage, imageName);
+      const uploadTask = uploadBytes(imageRef, blob);
+
+      try {
+        await uploadTask;
+        const downloadURL = await getDownloadURL(imageRef);
+        sendMessage("image", downloadURL);
+      } catch (error) {
+        console.log("Upload failed:", error);
+      }
     }
   };
 

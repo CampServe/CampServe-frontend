@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import Modal from "react-native-modal";
 import * as ImagePicker from "expo-image-picker";
+import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
+import { storage } from "../utils/firebase";
 
 const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
   const [descriptions, setDescriptions] = useState([]);
@@ -50,7 +52,7 @@ const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
               return {
                 name,
                 description: descriptions[category][index],
-                image: image ? image.uri : "",
+                image: image ? image.downloadURL : "",
               };
             }),
         })
@@ -104,20 +106,33 @@ const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
       const filename = uri.split("/").pop();
       const extension = filename.split(".").pop();
 
-      const updatedImageInfo = [...imageInfo];
-      updatedImageInfo.push({
-        category,
-        subcategoryIndex,
-        filename,
-        extension,
-      });
-      setImageInfo(updatedImageInfo);
+      const response = await fetch(uri);
+      const blob = await response.blob();
 
-      setImages((prevImages) => [
-        ...prevImages,
-        { category, subcategoryIndex, uri },
-      ]);
-      console.log(imageInfo);
+      const imageName = `image_${Date.now()}`;
+      const imageRef = ref(storage, imageName);
+      const uploadTask = uploadBytes(imageRef, blob);
+
+      try {
+        await uploadTask;
+        const downloadURL = await getDownloadURL(imageRef);
+
+        setImages((prevImages) => [
+          ...prevImages,
+          { category, subcategoryIndex, downloadURL },
+        ]);
+
+        const updatedImageInfo = [...imageInfo];
+        updatedImageInfo.push({
+          category,
+          subcategoryIndex,
+          filename,
+          extension,
+        });
+        setImageInfo(updatedImageInfo);
+      } catch (error) {
+        console.log("Upload failed:", error);
+      }
     }
   };
 
