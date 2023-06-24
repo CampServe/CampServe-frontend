@@ -93,7 +93,10 @@ const UserDashboard = () => {
   };
 
   const handleCardPress = (provider) => {
-    const image = getImageBySubCategory(provider.sub_categories);
+    const image =
+      provider.subcategory_image !== null
+        ? provider.subcategory_image
+        : getImageBySubCategory(provider.sub_categories);
     navigation.navigate("ServiceDetails", {
       provider: {
         image: image,
@@ -197,9 +200,13 @@ const UserDashboard = () => {
                       .map((filteredProvider) => (
                         <CustomCard
                           key={filteredProvider.user_id}
-                          image={getImageBySubCategory(
-                            filteredProvider.sub_categories
-                          )}
+                          image={
+                            filteredProvider.subcategory_image !== null
+                              ? filteredProvider.subcategory_image
+                              : getImageBySubCategory(
+                                  filteredProvider.sub_categories
+                                )
+                          }
                           businessName={filteredProvider.business_name}
                           bio={filteredProvider.bio}
                           contactNumber={filteredProvider.provider_contact}

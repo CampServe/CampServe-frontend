@@ -242,11 +242,10 @@ const ChatList = () => {
                   paddingVertical: 8,
                   borderRadius: 16,
                   marginRight: 8,
-                  // elevation: 2,
                   backgroundColor:
                     subCategory.name === selectedSubCategory
-                      ? "#34B7F1"
-                      : "#34B7F1AA",
+                      ? "#22543D"
+                      : "rgba(71, 184, 129, 0.6)",
                   transform: [
                     {
                       scale: subCategory.name === selectedSubCategory ? 1.1 : 1,
@@ -268,7 +267,7 @@ const ChatList = () => {
                     {subCategory.name}
                   </Text>
                   {subCategory.readCount !== 0 && (
-                    <Text className="text-xs font-bold text-white bg-blue-500 rounded-full px-2 py-1 ml-2">
+                    <Text className="text-xs font-bold text-white bg-green-500 rounded-full px-2 py-1 ml-2">
                       {subCategory.readCount}
                     </Text>
                   )}

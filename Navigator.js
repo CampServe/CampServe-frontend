@@ -14,6 +14,7 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "./src/utils/firebase";
+import useProvider from "./src/hooks/useProvider";
 
 import AppWrapper from "./AppWrapper";
 import OnboardingScreen from "./src/screens/common_screens/OnboardingScreen";
@@ -33,6 +34,7 @@ import AboutUsScreen from "./src/screens/user_screens/AboutUsScreen";
 import CustomDrawerContent from "./src/components/CustomDrawerContent";
 import SearchScreen from "./src/screens/user_screens/SearchScreen";
 import ProfileScreen from "./src/screens/user_screens/ProfileScreen";
+import BookServiceScreen from "./src/screens/user_screens/BookServiceScreen";
 
 import ServiceProviderOnboardingScreen from "./src/screens/serviceprov_screens/ServiceProviderOnboardingScreen";
 import ServiceProviderDashboard from "./src/screens/serviceprov_screens/ServiceProviderDashboard";
@@ -42,7 +44,6 @@ import CustomSPDrawerContent from "./src/components/CustomSPDrawerContent";
 import SProfileSetup from "./src/screens/serviceprov_screens/SProfileSetup";
 import SelectCategoriesScreen from "./src/screens/serviceprov_screens/SelectCategoriesScreen";
 import ServiceDetailsScreen from "./src/screens/user_screens/ServiceDetailsScreen";
-import useProvider from "./src/hooks/useProvider";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -193,6 +194,7 @@ const UserDrawerStackNavigator = () => {
       <Stack.Screen name="UDrawerTabs" component={UserTabNavigator} />
       <Stack.Screen name="ServiceDetails" component={ServiceDetailsScreen} />
       <Stack.Screen name="Chat" component={ChatScreen} />
+      <Stack.Screen name="Book" component={BookServiceScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
       <Stack.Screen name="Help" component={HelpsAndFaqsScreen} />

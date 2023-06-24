@@ -20,6 +20,9 @@ const CustomCard = ({
       ? `${bio.slice(0, MAX_BIO_LENGTH)}...`
       : businessName;
 
+  const isNumber = typeof image === "number";
+  const imageSource = isNumber ? image : { uri: `${image}` };
+
   return (
     <TouchableOpacity
       className="flex flex-1 ml-[2px]"
@@ -40,12 +43,11 @@ const CustomCard = ({
     >
       <View className="flex-1 h-1/2">
         <Image
-          source={image}
+          source={imageSource}
           style={{
             flex: 1,
             width: "100%",
             height: undefined,
-            // aspectRatio: 2,
             borderTopLeftRadius: 8,
             borderTopRightRadius: 8,
           }}

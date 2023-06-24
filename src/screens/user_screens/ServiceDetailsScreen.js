@@ -10,16 +10,6 @@ import { getRatings } from "../../hooks/useApi";
 import Loader from "../../components/Loader";
 import useProvider from "../../hooks/useProvider";
 import useAuth from "../../hooks/useAuth";
-import {
-  collection,
-  doc,
-  setDoc,
-  getDoc,
-  onSnapshot,
-  getDocs,
-  deleteDoc,
-} from "firebase/firestore";
-import { db } from "../../utils/firebase";
 
 const ServiceDetailsScreen = () => {
   const navigation = useNavigation();
@@ -29,6 +19,11 @@ const ServiceDetailsScreen = () => {
   const { provider } = route.params;
   const { averageRate } = useProvider();
   const { user } = useAuth();
+
+  // console.log(provider);
+
+  const isNumber = typeof provider.image === "number";
+  const imageSource = isNumber ? provider.image : { uri: `${provider.image}` };
 
   const handleGoBack = () => {
     navigation.goBack();
@@ -82,7 +77,7 @@ const ServiceDetailsScreen = () => {
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView>
         <View className="relative">
-          <Image source={provider.image} className="h-56 w-full bg-gray-300" />
+          <Image source={imageSource} className="h-56 w-full bg-gray-300" />
           <TouchableOpacity
             className="absolute top-4 left-5 p-2"
             onPress={handleGoBack}
@@ -136,7 +131,10 @@ const ServiceDetailsScreen = () => {
       </ScrollView>
 
       <View className="flex-row justify-around items-center p-4 border-t border-gray-300">
-        <TouchableOpacity className="flex-row items-center bg-green-500 py-2 px-4 rounded-xl">
+        <TouchableOpacity
+          className="flex-row items-center bg-green-500 py-2 px-4 rounded-xl"
+          onPress={() => navigation.navigate("Book", { provider })}
+        >
           <MaterialIcons name="book-online" size={24} color="white" />
           <Text className="text-white font-bold ml-2">Book Services</Text>
         </TouchableOpacity>

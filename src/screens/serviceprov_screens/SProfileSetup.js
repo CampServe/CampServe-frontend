@@ -31,8 +31,8 @@ const SProfileSetup = () => {
         }
         break;
       case "bio":
-        if (value.trim().length < 20) {
-          error = "Bio should be at least 20 characters long.";
+        if (value.trim().length < 10) {
+          error = "Bio should be at least 10 characters long.";
         }
         break;
       case "provider_contact":

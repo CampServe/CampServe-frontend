@@ -66,7 +66,7 @@ const LoginScreen = () => {
 
       <View className="items-center justify-center w-full">
         <View className="w-full mb-4">
-          <Text className="text-sm font-bold mb-1">Enter school username</Text>
+          <Text className="text-sm font-bold mb-1">Enter username</Text>
           <TextInput
             className="border focus:border-2 border-green-500 rounded-lg px-4 py-2 focus:border-green-700 focus:outline-none"
             placeholder="Username"
