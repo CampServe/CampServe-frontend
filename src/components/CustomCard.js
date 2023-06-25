@@ -1,6 +1,8 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { ActivityIndicator } from "react-native";
+import { useState } from "react";
 
 const CustomCard = ({
   image,
@@ -20,8 +22,13 @@ const CustomCard = ({
       ? `${bio.slice(0, MAX_BIO_LENGTH)}...`
       : businessName;
 
+  const [imageLoading, setImageLoading] = useState(false);
   const isNumber = typeof image === "number";
   const imageSource = isNumber ? image : { uri: `${image}` };
+
+  const onLoad = () => {
+    setImageLoading(false);
+  };
 
   return (
     <TouchableOpacity
@@ -42,17 +49,24 @@ const CustomCard = ({
       }}
     >
       <View className="flex-1 h-1/2">
-        <Image
-          source={imageSource}
-          style={{
-            flex: 1,
-            width: "100%",
-            height: undefined,
-            borderTopLeftRadius: 8,
-            borderTopRightRadius: 8,
-          }}
-          resizeMode="contain"
-        />
+        {imageLoading ? (
+          <View className="flex-1 items-center justify-center">
+            <ActivityIndicator size="small" color="green" />
+          </View>
+        ) : (
+          <Image
+            source={imageSource}
+            style={{
+              flex: 1,
+              width: "100%",
+              height: undefined,
+              borderTopLeftRadius: 8,
+              borderTopRightRadius: 8,
+            }}
+            resizeMode="contain"
+            onLoad={onLoad}
+          />
+        )}
       </View>
       <View className="flex-1 pb-4 px-4 h-1/2">
         <Text
