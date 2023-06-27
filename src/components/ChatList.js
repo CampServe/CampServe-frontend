@@ -235,20 +235,18 @@ const ChatList = () => {
           >
             {subCategories.map((subCategory) => (
               <TouchableOpacity
-                className="m-1 mb-4"
+                className="mt-2 mb-4 rounded-3xl"
                 key={subCategory.name}
                 style={{
                   paddingHorizontal: 12,
-                  paddingVertical: 8,
-                  borderRadius: 16,
-                  marginRight: 8,
+                  paddingVertical: 12,
                   backgroundColor:
                     subCategory.name === selectedSubCategory
                       ? "#22543D"
-                      : "rgba(71, 184, 129, 0.6)",
+                      : "#CED4DA",
                   transform: [
                     {
-                      scale: subCategory.name === selectedSubCategory ? 1.1 : 1,
+                      scale: subCategory.name === selectedSubCategory ? 1 : 1,
                     },
                   ],
                   transition: "transform 0.3s",
@@ -257,17 +255,30 @@ const ChatList = () => {
               >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <Text
+                    className="text-base"
                     style={{
-                      color: "#FFF",
+                      color:
+                        subCategory.name === selectedSubCategory
+                          ? "#FFF"
+                          : "#000",
                       fontWeight: "bold",
-                      fontSize: 16,
                       textAlign: "center",
                     }}
                   >
                     {subCategory.name}
                   </Text>
                   {subCategory.readCount !== 0 && (
-                    <Text className="text-xs font-bold text-white bg-green-500 rounded-full px-2 py-1 ml-2">
+                    <Text
+                      className={`text-xs font-bold ${
+                        subCategory.name === selectedSubCategory
+                          ? "text-black"
+                          : "text-white"
+                      }  ${
+                        subCategory.name === selectedSubCategory
+                          ? "bg-gray-500"
+                          : "bg-green-500"
+                      } rounded-full px-2 py-1 ml-2`}
+                    >
                       {subCategory.readCount}
                     </Text>
                   )}

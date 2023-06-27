@@ -164,7 +164,7 @@ const ChatRow = ({ matchDetails }) => {
         <Loader />
       ) : (
         <TouchableOpacity
-          className="flex-row justify-between items-center"
+          className="flex-row justify-between items-center border-b border-gray-200 rounded-md"
           style={{
             height: 80,
             position: "relative",
@@ -173,15 +173,15 @@ const ChatRow = ({ matchDetails }) => {
             backgroundColor: "#FFFFFF",
             marginHorizontal: 12,
             marginBottom: 8,
-            borderRadius: 10,
-            shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 1,
-            },
-            shadowOpacity: 0.2,
-            shadowRadius: 1.41,
-            elevation: 2,
+            // borderRadius: 10,
+            // shadowColor: "#000",
+            // shadowOffset: {
+            //   width: 0,
+            //   height: 1,
+            // },
+            // shadowOpacity: 0.2,
+            // shadowRadius: 1.41,
+            // elevation: 2,
           }}
           onPress={navigateToMessages}
         >

@@ -1,6 +1,6 @@
 const axios = require("axios").default;
 
 export default axios.create({
-  baseURL: "http://192.168.157.84:5000",
+  baseURL: "http://100.66.1.249:5000",
   withCredentials: true,
 });
