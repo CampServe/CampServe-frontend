@@ -179,9 +179,9 @@ const BookServiceScreen = () => {
 
       <View className="relative flex-1 flex items-center">
         <FlatList
+          keyboardShouldPersistTaps="handled"
           style={{ flexGrow: 0, maxHeight: 500 }}
           contentContainerStyle={{
-            // justifyContent: "center",
             paddingHorizontal: 16,
           }}
           showsVerticalScrollIndicator={false}
@@ -252,7 +252,6 @@ const BookServiceScreen = () => {
                 <View style={{ position: "relative" }}>
                   <GooglePlacesAutocomplete
                     ref={googlePlacesAutocompleteRef}
-                    keyboardShouldPersistTaps="handled"
                     placeholder="Location"
                     onPress={(data, details = null) => {
                       const selectedLocation =
@@ -281,6 +280,7 @@ const BookServiceScreen = () => {
                         paddingHorizontal: 10,
                         flexDirection: "row",
                         alignItems: "center",
+                        paddingRight: 16,
                       },
                       textInput: {
                         fontSize: 16,
@@ -299,9 +299,6 @@ const BookServiceScreen = () => {
                         }
                       },
                     }}
-                    onNotFound={() => {
-                      setIsLocationUnavailable(true);
-                    }}
                   />
                   {!isLocationEmpty && (
                     <TouchableOpacity
@@ -313,7 +310,7 @@ const BookServiceScreen = () => {
                           location: "",
                         }));
                       }}
-                      style={{ position: "absolute", top: 18, right: 10 }}
+                      style={{ position: "absolute", top: 16, right: 10 }}
                     >
                       <Ionicons name="close" size={16} color="gray" />
                     </TouchableOpacity>
