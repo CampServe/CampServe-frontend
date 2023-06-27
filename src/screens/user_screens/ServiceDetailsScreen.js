@@ -6,7 +6,7 @@ import { FontAwesome, Feather, MaterialIcons } from "@expo/vector-icons";
 import RatingsandReviews, {
   calculateAverageRating,
 } from "../../components/RatingsandReviews";
-import { getRatings } from "../../hooks/useApi";
+import { getRatings, getServiceStatus } from "../../hooks/useApi";
 import Loader from "../../components/Loader";
 import useProvider from "../../hooks/useProvider";
 import useAuth from "../../hooks/useAuth";
@@ -20,8 +20,6 @@ const ServiceDetailsScreen = () => {
   const { averageRate } = useProvider();
   const { user } = useAuth();
 
-  // console.log(provider);
-
   const isNumber = typeof provider.image === "number";
   const imageSource = isNumber ? provider.image : { uri: `${provider.image}` };
 
@@ -32,7 +30,6 @@ const ServiceDetailsScreen = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setIsRatingsLoading(true);
         const response = await getRatings(provider.provider_id);
         if (response.error === "could not retrieve the information") {
           setRatings([]);
@@ -43,12 +40,29 @@ const ServiceDetailsScreen = () => {
         }
       } catch (error) {
         console.log(error);
-      } finally {
-        setIsRatingsLoading(false);
       }
     };
 
-    fetchData();
+    const statusData = async () => {
+      const data = {
+        user_id: user.user_id,
+        subcategory: provider.sub_categories,
+        provider_id: provider.provider_id,
+      };
+      console.log(data);
+      try {
+        const response = await getServiceStatus(data);
+        // console.log(response);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    setIsRatingsLoading(true);
+
+    Promise.all([fetchData(), statusData()]).then(() => {
+      setIsRatingsLoading(false);
+    });
   }, []);
 
   const averageRating =

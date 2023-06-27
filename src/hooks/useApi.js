@@ -45,3 +45,13 @@ export const bookService = async (bookingData) => {
     }
   } catch (error) {}
 };
+
+export const getServiceStatus = async (data) => {
+  try {
+    const response = await axios.get("/get_service_status", data);
+    // console.log(response);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
