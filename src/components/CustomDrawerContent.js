@@ -139,7 +139,7 @@ const CustomDrawerContent = () => {
       </View>
       <View className="border border-t-1 border-gray-200 " />
       {isSwitchingAcount ? (
-        <View className="flex justify-center items-center h-10 mt-5 p-3 pl-4">
+        <View className="flex justify-center items-center space-x-6 h-10 mt-5 p-3 pl-4">
           <DotIndicator color="green" count={3} size={10} />
         </View>
       ) : (
@@ -164,7 +164,7 @@ const CustomDrawerContent = () => {
       )}
 
       {isLoadingLogout ? (
-        <View className="flex justify-center items-center h-10 mt-5 p-3 pl-4">
+        <View className="flex justify-center items-center space-x-6 h-10 mt-5 p-3 pl-4">
           <DotIndicator color="red" count={3} size={10} />
         </View>
       ) : (
