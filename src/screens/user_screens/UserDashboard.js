@@ -184,7 +184,7 @@ const UserDashboard = () => {
 
             <ScrollView>
               {uniqueSubCategories.map((subCategory) => (
-                <View key={subCategory}>
+                <View key={subCategory} className="pb-6">
                   <Text className="font-bold text-[#0A4014] uppercase text-lg">
                     {subCategory !== "Featured" && subCategory}
                   </Text>

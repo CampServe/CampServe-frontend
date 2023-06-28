@@ -12,13 +12,13 @@ const CustomHeader = ({
   const renderLeftIcon = () => {
     if (showMenuIcon) {
       return (
-        <TouchableOpacity className="mr-4 mt-2 " onPress={OpenDrawer}>
+        <TouchableOpacity className="mr-4 " onPress={OpenDrawer}>
           <Feather name="menu" size={24} />
         </TouchableOpacity>
       );
     } else if (showBackIcon) {
       return (
-        <TouchableOpacity className="mr-4 mt-2 " onPress={GoBack}>
+        <TouchableOpacity className="mr-4 " onPress={GoBack}>
           <Feather name="arrow-left" size={24} />
         </TouchableOpacity>
       );
@@ -33,17 +33,13 @@ const CustomHeader = ({
   return (
     <View className="flex-row items-center justify-between py-2 bg-white">
       {renderLeftIcon()}
-      {/* {logo && (
+
+      <View className="flex-grow justify-center items-center pr-10">
         <Image
-          source={require("../../assets/favicon.png")}
-          className="w-10 h-10 object-contain"
+          source={require("../../assets/lg.png")}
+          className="w-7 h-7 object-contain rounded-full"
         />
-      )} */}
-      {notification && (
-        <TouchableOpacity activeOpacity={0.3}>
-          <Ionicons name="notifications-outline" size={24} />
-        </TouchableOpacity>
-      )}
+      </View>
     </View>
   );
 };

@@ -11,6 +11,8 @@ import Backbutton from "../../components/Backbutton";
 import { DotIndicator } from "react-native-indicators";
 import { useNavigation } from "@react-navigation/native";
 import useAuth from "../../hooks/useAuth";
+import ScreenWithBackground from "../../components/ScreenWithBackground";
+import { Image } from "react-native";
 
 const StudentVerificationScreen = () => {
   const [email, setEmail] = useState("");
@@ -41,10 +43,17 @@ const StudentVerificationScreen = () => {
   };
 
   return (
-    <>
-      <SafeAreaView className="flex-1 items-center justify-center p-6 bg-white">
+    <ScreenWithBackground>
+      <SafeAreaView className="flex-1 items-center justify-center p-6 ">
         <Backbutton />
-        <Text className="text-2xl font-bold mb-6">Student Verification</Text>
+        <Image
+          source={require("../../../assets/CampServe.png")}
+          style={{ width: 150, height: 50 }}
+          resizeMode="contain"
+        />
+        <Text className="text-2xl font-bold mt-6 mb-6">
+          Student Verification
+        </Text>
 
         <View className="items-center justify-center w-full">
           <View className="w-full mb-4">
@@ -89,7 +98,7 @@ const StudentVerificationScreen = () => {
           )}
         </View>
       </SafeAreaView>
-    </>
+    </ScreenWithBackground>
   );
 };
 

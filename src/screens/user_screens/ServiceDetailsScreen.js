@@ -10,11 +10,14 @@ import { getRatings, getServiceStatus } from "../../hooks/useApi";
 import Loader from "../../components/Loader";
 import useProvider from "../../hooks/useProvider";
 import useAuth from "../../hooks/useAuth";
+import BookingModal from "../../components/BookingModal";
 
 const ServiceDetailsScreen = () => {
   const navigation = useNavigation();
   const [ratings, setRatings] = useState([]);
   const [isRatingsLoading, setIsRatingsLoading] = useState(false);
+  const [isBookingModalVisible, setIsBookingModalVisible] = useState(false);
+  const [serviceStatus, setServiceStatus] = useState("");
   const route = useRoute();
   const { provider } = route.params;
   const { averageRate } = useProvider();
@@ -49,10 +52,9 @@ const ServiceDetailsScreen = () => {
         subcategory: provider.sub_categories,
         provider_id: provider.provider_id,
       };
-      console.log(data);
       try {
         const response = await getServiceStatus(data);
-        // console.log(response);
+        setServiceStatus(response.status);
       } catch (error) {
         console.log(error);
       }
@@ -85,6 +87,17 @@ const ServiceDetailsScreen = () => {
 
   const initiateChat = async () => {
     navigation.navigate("Chat", { matchDetails });
+  };
+
+  const initiateBooking = () => {
+    if (
+      serviceStatus === "request pending" ||
+      serviceStatus === "accepted and incomplete"
+    ) {
+      setIsBookingModalVisible(true);
+    } else {
+      navigation.navigate("Book", { provider });
+    }
   };
 
   return (
@@ -143,22 +156,29 @@ const ServiceDetailsScreen = () => {
           </>
         )}
       </ScrollView>
+      {!isRatingsLoading && (
+        <View className="flex-row justify-around items-center p-4 border-t border-gray-300">
+          <TouchableOpacity
+            className="flex-row items-center bg-green-500 py-2 px-4 rounded-xl"
+            onPress={initiateBooking}
+          >
+            <MaterialIcons name="book-online" size={24} color="white" />
+            <Text className="text-white font-bold ml-2">Book Services</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={initiateChat}
+            className="bg-green-500 p-2 rounded-full"
+          >
+            <FontAwesome name="comments" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+      )}
 
-      <View className="flex-row justify-around items-center p-4 border-t border-gray-300">
-        <TouchableOpacity
-          className="flex-row items-center bg-green-500 py-2 px-4 rounded-xl"
-          onPress={() => navigation.navigate("Book", { provider })}
-        >
-          <MaterialIcons name="book-online" size={24} color="white" />
-          <Text className="text-white font-bold ml-2">Book Services</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={initiateChat}
-          className="bg-green-500 p-2 rounded-full"
-        >
-          <FontAwesome name="comments" size={24} color="white" />
-        </TouchableOpacity>
-      </View>
+      <BookingModal
+        visible={isBookingModalVisible}
+        onClose={() => setIsBookingModalVisible(false)}
+        status={serviceStatus}
+      />
     </SafeAreaView>
   );
 };

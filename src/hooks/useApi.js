@@ -12,7 +12,7 @@ export const getServiceProviders = async () => {
 
 export const storeRatings = async (commentData) => {
   try {
-    const response = await axios.post("./store_ratings", commentData);
+    const response = await axios.post("/store_ratings", commentData);
     if (response.data.message == "Ratings stored successfully.") {
       return true;
     } else {
@@ -25,11 +25,10 @@ export const storeRatings = async (commentData) => {
 
 export const getRatings = async (provider_id) => {
   try {
-    const response = await axios.post("./get_ratings", {
+    const response = await axios.post("/get_ratings", {
       provider_id: provider_id,
     });
     return response.data;
-    // console.log(response.data);
   } catch (error) {
     console.log(error);
   }
@@ -37,7 +36,7 @@ export const getRatings = async (provider_id) => {
 
 export const bookService = async (bookingData) => {
   try {
-    const response = await axios.post("./book_services", bookingData);
+    const response = await axios.post("/book_services", bookingData);
     if (response.data.message == "Request added successfully") {
       return true;
     } else {
@@ -48,7 +47,7 @@ export const bookService = async (bookingData) => {
 
 export const getServiceStatus = async (data) => {
   try {
-    const response = await axios.get("/get_service_status", data);
+    const response = await axios.post("/get_service_status", data);
     // console.log(response);
     return response.data;
   } catch (error) {
