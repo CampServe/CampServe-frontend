@@ -36,8 +36,9 @@ const CustomHeader = ({
 
       <View className="flex-grow justify-center items-center pr-10">
         <Image
-          source={require("../../assets/lg.png")}
-          className="w-7 h-7 object-contain rounded-full"
+          source={require("../../assets/CampServe.png")}
+          className="w-24 h-7 rounded-full"
+          resizeMode="contain"
         />
       </View>
     </View>

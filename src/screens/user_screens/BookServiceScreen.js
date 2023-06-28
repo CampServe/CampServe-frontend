@@ -84,7 +84,7 @@ const BookServiceScreen = () => {
 
     if (isSuccessModalVisible) {
       timeout = setTimeout(() => {
-        navigation.goBack();
+        navigation.replace("ServiceDetails");
       }, 3000);
     }
 
