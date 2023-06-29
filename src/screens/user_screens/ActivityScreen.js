@@ -165,12 +165,12 @@ const ActivityScreen = () => {
                 color="green"
                 className="mr-2"
               />
-              <View className="flex-row">
+              <View className="flex-col-reverse">
                 <Text className="text-xl capitalize font-bold">
                   {item.business_name}
                 </Text>
-                <Text className="text-[10px] font-semibold">
-                  ({item.subcategory})
+                <Text className="text-[11px] font-semibold">
+                  {item.subcategory}
                 </Text>
               </View>
             </View>
