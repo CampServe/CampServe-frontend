@@ -57,6 +57,7 @@ export const getServiceStatus = async (data) => {
 export const getAllUserRequests = async (data) => {
   try {
     const response = await axios.post("/get_all_user_requests", data);
+    // console.log(response);
     return response.data;
   } catch (error) {
     console.log(error);

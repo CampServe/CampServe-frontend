@@ -7,7 +7,7 @@ import { TouchableOpacity } from "react-native";
 const BookingModal = ({ visible, status, onClose }) => {
   let modalContent;
 
-  if (status === "request pending") {
+  if (status == "request pending") {
     modalContent = (
       <View className="flex justify-center items-center">
         <Animatable.Image
@@ -23,7 +23,7 @@ const BookingModal = ({ visible, status, onClose }) => {
         </Text>
       </View>
     );
-  } else if (status === "accepted but incomplete") {
+  } else if (status == "request in progress") {
     modalContent = (
       <View className="flex justify-center items-center">
         <Animatable.Image

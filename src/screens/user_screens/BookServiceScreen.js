@@ -57,6 +57,7 @@ const BookServiceScreen = () => {
   };
 
   const handleConfirm = async () => {
+    setIsConfirmationModalVisible(false);
     try {
       setIsConfirming(true);
       const success = await bookService(bookingData);
@@ -84,7 +85,10 @@ const BookServiceScreen = () => {
 
     if (isSuccessModalVisible) {
       timeout = setTimeout(() => {
-        navigation.navigate("ServiceDetails", { provider });
+        navigation.navigate("ServiceDetails", {
+          provider,
+          bookingData: bookingData.user_id,
+        });
       }, 3000);
     }
 
@@ -175,7 +179,9 @@ const BookServiceScreen = () => {
     <SafeAreaView className="bg-white p-6 flex-1 items-center justify-center">
       <Backbutton />
       <Text className="text-2xl font-bold mb-2">Book Service</Text>
-      <Text className="text-xl font-semibold">{provider.business_name}</Text>
+      <Text className="text-xl font-semibold capitalize">
+        {provider.business_name}
+      </Text>
 
       <View className="relative flex-1 flex items-center">
         <FlatList

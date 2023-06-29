@@ -114,32 +114,37 @@ const ActivityScreen = () => {
       item.status_acc_dec == "no action" &&
       item.status_comp_inco == "no action"
     ) {
-      statusColor = "blue";
+      statusColor = "#B2CCFF";
       statusText = "Pending";
+      textColor = "#084B8A";
     } else if (
       item.status_acc_dec == "accepted" &&
       item.status_comp_inco == "complete"
     ) {
-      statusColor = "green";
+      statusColor = "#A2D9A1";
       statusText = "Completed";
+      textColor = "#007F00";
     } else if (
       item.status_acc_dec == "declined" &&
       item.status_comp_inco == "no action"
     ) {
-      statusColor = "red";
+      statusColor = "#FFB2B2";
       statusText = "Declined";
+      textColor = "#B30000";
     } else if (
       item.status_acc_dec == "accepted" &&
       item.status_comp_inco == "incomplete"
     ) {
-      statusColor = "yellow";
+      statusColor = "#FFF7AA";
       statusText = "In Progress";
+      textColor = "#D1A800";
     }
     // }
     return (
       <TouchableOpacity
         className="flex ml-[2px]"
         activeOpacity={0.7}
+        // onPress={() => console.log(item)}
         style={{
           backgroundColor: "white",
           borderRadius: 8,
@@ -152,7 +157,7 @@ const ActivityScreen = () => {
         }}
       >
         <View className="flex-row flex-1">
-          <View className="pl-4 py-2 w-[70%] flex ">
+          <View className="pl-4 py-2 w-[70%] flex flex-1 ">
             <View className="flex flex-row gap-4 mb-[2px] items-center">
               <Ionicons
                 name="business"
@@ -160,9 +165,14 @@ const ActivityScreen = () => {
                 color="green"
                 className="mr-2"
               />
-              <Text className="text-xl capitalize font-bold">
-                {item.business_name}
-              </Text>
+              <View className="flex-row">
+                <Text className="text-xl capitalize font-bold">
+                  {item.business_name}
+                </Text>
+                <Text className="text-[10px] font-semibold">
+                  ({item.subcategory})
+                </Text>
+              </View>
             </View>
             <View className="flex flex-row gap-4 mb-[2px] items-center">
               <Ionicons
@@ -189,7 +199,7 @@ const ActivityScreen = () => {
               <Text className="text-base">{formatDateTime(item.datetime)}</Text>
             </View>
           </View>
-          <View className="w-[30%] justify-center items-center">
+          <View className="w-[30%] flex-[0.5] justify-center items-center">
             {/* {activeFilter === "All" && ( */}
             <Animatable.View
               className="p-2 rounded-xl mr-3"
@@ -200,11 +210,11 @@ const ActivityScreen = () => {
                 backgroundColor: statusColor,
               }}
             >
-              <Text style={{ color: "white" }}>{statusText}</Text>
+              <Text style={{ color: textColor }}>{statusText}</Text>
             </Animatable.View>
             {statusText === "Pending" && (
               <TouchableOpacity
-                className="p-2 mt-6 rounded-xl mr-3"
+                className="p-2 mt-4 rounded-xl mr-3"
                 style={{ backgroundColor: "red" }}
               >
                 <Text style={{ color: "white" }}>Cancel</Text>

@@ -19,7 +19,7 @@ const ServiceDetailsScreen = () => {
   const [isBookingModalVisible, setIsBookingModalVisible] = useState(false);
   const [serviceStatus, setServiceStatus] = useState("");
   const route = useRoute();
-  const { provider } = route.params;
+  const { provider, bookingData } = route.params;
   const { averageRate } = useProvider();
   const { user } = useAuth();
 
@@ -65,7 +65,7 @@ const ServiceDetailsScreen = () => {
     Promise.all([fetchData(), statusData()]).then(() => {
       setIsRatingsLoading(false);
     });
-  }, []);
+  }, [bookingData !== undefined ? bookingData : null]);
 
   const averageRating =
     averageRate === 0 ? calculateAverageRating(ratings) : averageRate;
@@ -92,7 +92,7 @@ const ServiceDetailsScreen = () => {
   const initiateBooking = () => {
     if (
       serviceStatus === "request pending" ||
-      serviceStatus === "accepted and incomplete"
+      serviceStatus === "request in progress"
     ) {
       setIsBookingModalVisible(true);
     } else {
