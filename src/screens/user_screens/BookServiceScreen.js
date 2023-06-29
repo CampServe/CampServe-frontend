@@ -84,7 +84,7 @@ const BookServiceScreen = () => {
 
     if (isSuccessModalVisible) {
       timeout = setTimeout(() => {
-        navigation.replace("ServiceDetails", { provider });
+        navigation.navigate("ServiceDetails", { provider });
       }, 3000);
     }
 
@@ -233,13 +233,13 @@ const BookServiceScreen = () => {
                       style={{ fontSize: 15 }}
                     />
                     <Picker.Item
-                      label="MTN Mobile Money"
-                      value="MTN Mobile Money"
+                      label="MTN Momo"
+                      value="MTN Momo"
                       style={{ fontSize: 15 }}
                     />
                     <Picker.Item
-                      label="Vodafone Cash"
-                      value="Vodafone Cash"
+                      label="VodaCash"
+                      value="VodaCash"
                       style={{ fontSize: 15 }}
                     />
                   </Picker>
@@ -421,13 +421,11 @@ const BookServiceScreen = () => {
         }}
       >
         <View
-          className="flex-1 p-4 justify-center items-center"
+          className="flex-1 w-full p-4 justify-center items-center"
           style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
         >
           {isConfirming ? (
-            <View className="w-screen">
-              <ActivityIndicator color="green" size="large" />
-            </View>
+            <ActivityIndicator color="green" size="large" />
           ) : (
             <View className="bg-white p-6 rounded-2xl">
               <Text className="text-xl text-center font-bold mb-4">

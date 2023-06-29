@@ -1,16 +1,10 @@
 import React, { useState, useEffect } from "react";
-import {
-  Image,
-  View,
-  Text,
-  Button,
-  ActivityIndicator,
-  TouchableOpacity,
-} from "react-native";
+import { Image, View, Text, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import useOnboardingStatus from "../../hooks/useOnboardingStatus";
 import Loader from "../../components/Loader";
+import * as SplashScreen from "expo-splash-screen";
+import { ImageBackground } from "react-native";
 
 const OnboardingScreen = () => {
   const [activeScreenIndex, setActiveScreenIndex] = useState(0);
@@ -58,15 +52,17 @@ const OnboardingScreen = () => {
       description: "Join our community and start exploring!",
       image: require("../../../assets/onboarding3.jpg"),
     },
-    // {
-    //   title: "Get Started",
-    //   description: "Join our community and start exploring!",
-    //   image: require("../../../assets/onboarding4.jpg"),
-    // },
   ];
 
   if (loading) {
-    return <Loader />;
+    return (
+      // <ImageBackground
+      //   source={require("../../../assets/white.png")}
+      //   style={{ flex: 1, opacity: 0.9 }}
+      //   resizeMode="cover"
+      // />
+      <Loader />
+    );
   }
 
   const currentScreen = onboardingScreens[activeScreenIndex];

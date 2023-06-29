@@ -134,9 +134,11 @@ const UserTabNavigator = () => {
             iconName = focused ? "home" : "home-outline";
           } else if (route.name === "Search") {
             iconName = focused ? "search" : "search-outline";
-          } else if (route.name === "Payment") {
-            iconName = focused ? "card" : "card-outline";
-          } else if (route.name === "Activity") {
+          }
+          // else if (route.name === "Payment") {
+          //   iconName = focused ? "card" : "card-outline";
+          // }
+          else if (route.name === "Activity") {
             iconName = focused ? "time" : "time-outline";
           } else if (route.name === "Message") {
             iconName = focused ? "chatbubbles" : "chatbubbles-outline";
@@ -182,7 +184,7 @@ const UserTabNavigator = () => {
         options={{ tabBarLabel: "Home" }}
       />
       <Tab.Screen name="Search" component={SearchScreen} />
-      <Tab.Screen name="Payment" component={PaymentScreen} />
+      {/* <Tab.Screen name="Payment" component={PaymentScreen} /> */}
       <Tab.Screen name="Activity" component={ActivityScreen} />
       <Tab.Screen name="Message" component={MessageScreen} />
     </Tab.Navigator>
@@ -395,72 +397,76 @@ const SPDrawerNavigator = () => {
 };
 
 export const StackNavigator = () => {
-  const { user } = useAuth();
+  const { user, isLoadingToken } = useAuth();
 
-  return (
-    <AppWrapper>
+  if (isLoadingToken) {
+    return (
       <ImageBackground
         source={require("./assets/white.png")}
         style={{ flex: 1 }}
         resizeMode="cover"
-      >
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          {!user ? (
-            <Stack.Group>
-              <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-              <Stack.Screen name="Login" component={LoginScreen} />
-              <Stack.Screen
-                name="StudentVerification"
-                component={StudentVerificationScreen}
-              />
-              <Stack.Screen
-                name="OTPVerification"
-                component={OTPVerificationScreen}
-                options={{ presentation: "transparentModal" }}
-              />
-              <Stack.Screen name="UserSignup" component={UserSignupScreen} />
-            </Stack.Group>
-          ) : (
-            <>
-              {user.account_type === "regular user" && (
+      />
+    );
+  }
+
+  return (
+    <AppWrapper>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {!user ? (
+          <Stack.Group>
+            <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen
+              name="StudentVerification"
+              component={StudentVerificationScreen}
+            />
+            <Stack.Screen
+              name="OTPVerification"
+              component={OTPVerificationScreen}
+              options={{ presentation: "transparentModal" }}
+            />
+            <Stack.Screen name="UserSignup" component={UserSignupScreen} />
+          </Stack.Group>
+        ) : (
+          <>
+            {user.account_type === "regular user" && (
+              <Stack.Group>
+                <Stack.Screen name="User" component={UserDrawerNavigator} />
+              </Stack.Group>
+            )}
+
+            {user.account_type === "regular user" &&
+              (user.is_service_provider !== true ||
+                user.is_service_provider !== "true") && (
                 <Stack.Group>
-                  <Stack.Screen name="User" component={UserDrawerNavigator} />
+                  <Stack.Screen
+                    name="SPOnboarding"
+                    component={ServiceProviderOnboardingScreen}
+                  />
+                  <Stack.Screen
+                    name="SProfileSetup"
+                    component={SProfileSetup}
+                  />
+                  <Stack.Screen
+                    name="SelectCategories"
+                    component={SelectCategoriesScreen}
+                  />
                 </Stack.Group>
               )}
 
-              {user.account_type === "regular user" &&
-                (user.is_service_provider !== true ||
-                  user.is_service_provider !== "true") && (
-                  <Stack.Group>
-                    <Stack.Screen
-                      name="SPOnboarding"
-                      component={ServiceProviderOnboardingScreen}
-                    />
-                    <Stack.Screen
-                      name="SProfileSetup"
-                      component={SProfileSetup}
-                    />
-                    <Stack.Screen
-                      name="SelectCategories"
-                      component={SelectCategoriesScreen}
-                    />
-                  </Stack.Group>
-                )}
-
-              {user.account_type == "provider" &&
-                (user.is_service_provider !== false ||
-                  user.is_service_provider !== "false") && (
-                  <Stack.Group>
-                    <Stack.Screen
-                      name="Service Provider"
-                      component={SPDrawerNavigator}
-                    />
-                  </Stack.Group>
-                )}
-            </>
-          )}
-        </Stack.Navigator>
-      </ImageBackground>
+            {user.account_type == "provider" &&
+              (user.is_service_provider !== false ||
+                user.is_service_provider !== "false") && (
+                <Stack.Group>
+                  <Stack.Screen
+                    name="Service Provider"
+                    component={SPDrawerNavigator}
+                  />
+                </Stack.Group>
+              )}
+          </>
+        )}
+      </Stack.Navigator>
     </AppWrapper>
   );
 };

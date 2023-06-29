@@ -1,26 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { StatusBar as ExpoStatusBar } from "expo-status-bar";
-import { useFonts } from "expo-font";
+import useOnboardingStatus from "./src/hooks/useOnboardingStatus";
 import * as SplashScreen from "expo-splash-screen";
 
 const AppWrapper = ({ children }) => {
-  const [fontsLoaded] = useFonts({
-    Montserrat: require("./src/fonts/static/Montserrat-Regular.ttf"),
-  });
+  const { loading } = useOnboardingStatus();
+  const [appReady, setAppReady] = useState(false);
 
-  useEffect(() => {
-    async function prepare() {
-      await SplashScreen.preventAutoHideAsync();
-    }
+  // useEffect(() => {
+  //   async function prepare() {
+  //     await SplashScreen.preventAutoHideAsync();
+  //     setAppReady(true);
+  //   }
 
-    prepare();
-  }, []);
+  //   prepare();
+  // }, []);
 
-  if (!fontsLoaded) {
-    return undefined;
-  } else {
-    SplashScreen.hideAsync();
-  }
+  // useEffect(() => {
+  //   if (!loading && appReady) {
+  //     SplashScreen.hideAsync();
+  //   }
+  // }, [loading, appReady]);
+
+  // if (!appReady) {
+  //   return null;
+  // }
 
   return (
     <>

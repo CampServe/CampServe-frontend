@@ -19,10 +19,6 @@ const UserDashboard = () => {
   const [loadingCategory, setLoadingCategory] = useState(true);
   const { setAverageRate } = useProvider();
 
-  if (isLoadingToken) {
-    return <Loader />;
-  }
-
   useEffect(() => {
     const fetchData = async () => {
       try {

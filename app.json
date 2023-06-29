@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "CampServe-frontend",
-    "slug": "CampServe-frontend",
+    "name": "CampServe",
+    "slug": "CampServe",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/lg.png",
+    "icon": "./assets/applogo.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/white.png",
