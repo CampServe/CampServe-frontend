@@ -15,6 +15,7 @@ import {
 } from "firebase/firestore";
 import { db } from "./src/utils/firebase";
 import useProvider from "./src/hooks/useProvider";
+import { ImageBackground } from "react-native";
 
 import AppWrapper from "./AppWrapper";
 import OnboardingScreen from "./src/screens/common_screens/OnboardingScreen";
@@ -39,12 +40,11 @@ import BookServiceScreen from "./src/screens/user_screens/BookServiceScreen";
 import ServiceProviderOnboardingScreen from "./src/screens/serviceprov_screens/ServiceProviderOnboardingScreen";
 import ServiceProviderDashboard from "./src/screens/serviceprov_screens/ServiceProviderDashboard";
 import ServiceProviderSettingsScreen from "./src/screens/serviceprov_screens/ServiceProviderSettingsScreen";
-import ServiceProviderPaymentScreen from "./src/screens/serviceprov_screens/ServiceProviderPaymentScreen";
+import SPActivityScreen from "./src/screens/serviceprov_screens/SPActivityScreen";
 import CustomSPDrawerContent from "./src/components/CustomSPDrawerContent";
 import SProfileSetup from "./src/screens/serviceprov_screens/SProfileSetup";
 import SelectCategoriesScreen from "./src/screens/serviceprov_screens/SelectCategoriesScreen";
 import ServiceDetailsScreen from "./src/screens/user_screens/ServiceDetailsScreen";
-import { ImageBackground } from "react-native";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -185,7 +185,11 @@ const UserTabNavigator = () => {
       />
       <Tab.Screen name="Search" component={SearchScreen} />
       {/* <Tab.Screen name="Payment" component={PaymentScreen} /> */}
-      <Tab.Screen name="Activity" component={ActivityScreen} />
+      <Tab.Screen
+        name="Activity"
+        component={ActivityScreen}
+        options={{ tabBarLabel: "Request" }}
+      />
       <Tab.Screen name="Message" component={MessageScreen} />
     </Tab.Navigator>
   );
@@ -305,8 +309,8 @@ const ServiceProviderTabNavigator = () => {
 
           if (route.name === "ServiceProviderDashboard") {
             iconName = focused ? "home" : "home-outline";
-          } else if (route.name === "ServiceProviderPayment") {
-            iconName = focused ? "card" : "card-outline";
+          } else if (route.name === "SPActivity") {
+            iconName = focused ? "time" : "time-outline";
           } else if (route.name === "ServiceProviderMessage") {
             iconName = focused ? "chatbubbles" : "chatbubbles-outline";
             return (
@@ -351,9 +355,9 @@ const ServiceProviderTabNavigator = () => {
         options={{ tabBarLabel: "Home" }}
       />
       <Tab.Screen
-        name="ServiceProviderPayment"
-        component={ServiceProviderPaymentScreen}
-        options={{ tabBarLabel: "Payment" }}
+        name="SPActivity"
+        component={SPActivityScreen}
+        options={{ tabBarLabel: "Request" }}
       />
       <Tab.Screen
         name="ServiceProviderMessage"

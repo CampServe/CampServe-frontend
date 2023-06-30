@@ -1,4 +1,10 @@
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  FlatList,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomHeader from "../../components/CustomHeader";
@@ -6,7 +12,6 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { getAllUserRequests } from "../../hooks/useApi";
 import useAuth from "../../hooks/useAuth";
 import Loader from "../../components/Loader";
-import { FlatList } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Animatable from "react-native-animatable";
 
