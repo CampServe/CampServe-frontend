@@ -1,6 +1,6 @@
 import { View, Text, FlatList } from "react-native";
 import React, { useEffect, useState } from "react";
-import { getProviderRequests } from "../../hooks/SPuseApi";
+import { changeRequestStatus, getProviderRequests } from "../../hooks/SPuseApi";
 import useAuth from "../../hooks/useAuth";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Loader from "../../components/Loader";
@@ -23,7 +23,7 @@ const SPActivityScreen = () => {
   const [filteredSubcategories, setFilteredSubcategories] = useState([]);
   const [loadingRequestId, setLoadingRequestId] = useState(null);
   const [loadingActionType, setLoadingActionType] = useState(null);
-  const [actionCompleted, setActionCompleted] = useState(false);
+  const [actionCompleted, setActionCompleted] = useState(true);
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -34,6 +34,7 @@ const SPActivityScreen = () => {
         setIsRequestsLoading(true);
         const response = await getProviderRequests(data);
         setRequests(response.all_requests);
+        setFilteredSubcategories(response.all_requests);
       } catch (error) {
         console.log(error);
         setRequests([]);
@@ -41,12 +42,8 @@ const SPActivityScreen = () => {
         setIsRequestsLoading(false);
       }
     };
-    fetchRequests();
 
-    if (actionCompleted) {
-      fetchRequests();
-      setActionCompleted(false);
-    }
+    fetchRequests();
   }, [actionCompleted]);
 
   useEffect(() => {
@@ -70,9 +67,11 @@ const SPActivityScreen = () => {
       action_type: actionType,
     };
 
-    console.log(data);
     try {
-      setActionCompleted(true);
+      const response = await changeRequestStatus(data);
+      if (response) {
+        setActionCompleted(!actionCompleted);
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -284,7 +283,7 @@ const SPActivityScreen = () => {
                   />
                 ) : (
                   <TouchableOpacity
-                    className="p-2 mt-4 flex-1 rounded-xl mr-3"
+                    className="p-2 mt-4 rounded-xl mr-3"
                     style={{ backgroundColor: "green" }}
                     onPress={() =>
                       triggerAction(item.request_id, "mark_complete")
@@ -294,6 +293,19 @@ const SPActivityScreen = () => {
                   </TouchableOpacity>
                 )}
               </View>
+            )}
+            {(statusText == "Completed" || statusText == "Declined") && (
+              <Animatable.View
+                className="p-2 rounded-xl mr-3"
+                animation="pulse"
+                iterationCount="infinite"
+                duration={1000}
+                style={{
+                  backgroundColor: statusColor,
+                }}
+              >
+                <Text style={{ color: textColor }}>{statusText}</Text>
+              </Animatable.View>
             )}
           </View>
         </View>

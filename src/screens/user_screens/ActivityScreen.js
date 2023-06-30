@@ -14,6 +14,8 @@ import useAuth from "../../hooks/useAuth";
 import Loader from "../../components/Loader";
 import { Ionicons } from "@expo/vector-icons";
 import * as Animatable from "react-native-animatable";
+import { changeRequestStatus } from "../../hooks/SPuseApi";
+import { DotIndicator } from "react-native-indicators";
 
 const ActivityScreen = () => {
   const navigation = useNavigation();
@@ -22,6 +24,9 @@ const ActivityScreen = () => {
   const [filteredRequests, setFilteredRequests] = useState([]);
   const [isRequestsLoading, setisRequestsLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState("");
+  const [loadingRequestId, setLoadingRequestId] = useState(null);
+  const [loadingActionType, setLoadingActionType] = useState(null);
+  const [actionCompleted, setActionCompleted] = useState(true);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -44,9 +49,12 @@ const ActivityScreen = () => {
           setisRequestsLoading(false);
         }
       };
-
       fetchRequests();
-    }, [])
+      // if (actionCompleted) {
+      //   fetchRequests();
+      //   setActionCompleted(false);
+      // }
+    }, [actionCompleted])
   );
 
   useEffect(() => {
@@ -108,6 +116,32 @@ const ActivityScreen = () => {
       hour12: false,
     });
     return `${formattedDate}, ${formattedTime}`;
+  };
+
+  const triggerCancel = async (requestId, actionType) => {
+    if (loadingRequestId || loadingActionType) {
+      return;
+    }
+
+    setLoadingRequestId(requestId);
+    setLoadingActionType(actionType);
+
+    const data = {
+      request_id: requestId,
+      action_type: actionType,
+    };
+
+    try {
+      const response = await changeRequestStatus(data);
+      if (response) {
+        setActionCompleted(!actionCompleted);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadingRequestId(null);
+      setLoadingActionType(null);
+    }
   };
 
   const renderItem = ({ item }) => {
@@ -217,14 +251,25 @@ const ActivityScreen = () => {
             >
               <Text style={{ color: textColor }}>{statusText}</Text>
             </Animatable.View>
-            {statusText === "Pending" && (
-              <TouchableOpacity
-                className="p-2 mt-4 rounded-xl mr-3"
-                style={{ backgroundColor: "red" }}
-              >
-                <Text style={{ color: "white" }}>Cancel</Text>
-              </TouchableOpacity>
-            )}
+            {statusText === "Pending" &&
+              (loadingRequestId === item.request_id &&
+              loadingActionType === "cancel" ? (
+                <DotIndicator
+                  color="red"
+                  count={3}
+                  size={5}
+                  style={{ flexGrow: 0, paddingTop: 20 }}
+                />
+              ) : (
+                <TouchableOpacity
+                  className="p-2 mt-4 rounded-xl mr-3"
+                  style={{ backgroundColor: "red" }}
+                  onPress={() => triggerCancel(item.request_id, "cancel")}
+                >
+                  <Text style={{ color: "white" }}>Cancel</Text>
+                </TouchableOpacity>
+              ))}
+
             {/* )} */}
           </View>
         </View>
