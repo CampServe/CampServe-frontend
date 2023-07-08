@@ -9,15 +9,17 @@ import CustomCard from "../../components/CustomCard";
 import Loader from "../../components/Loader";
 import { calculateAverageRating } from "../../components/RatingsandReviews";
 import useProvider from "../../hooks/useProvider";
+import useSearch from "../../hooks/useSearch";
 
 const UserDashboard = () => {
   const navigation = useNavigation();
-  const { isLoadingToken, user } = useAuth();
+  const { user } = useAuth();
   const [serviceProviders, setServiceProviders] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("Room");
   const [selectedProviders, setSelectedProviders] = useState([]);
   const [loadingCategory, setLoadingCategory] = useState(true);
   const { setAverageRate } = useProvider();
+  const { searchQueries, updateSearchQuery } = useSearch();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,8 +42,10 @@ const UserDashboard = () => {
   useEffect(() => {
     if (serviceProviders.length > 0) {
       filterProvidersByCategory(selectedCategory);
+    } else {
+      setSelectedProviders([]);
     }
-  }, [selectedCategory, serviceProviders]);
+  }, [selectedCategory, serviceProviders, searchQueries]);
 
   const dummyFeaturedProviders = [
     {
@@ -78,12 +82,22 @@ const UserDashboard = () => {
 
   const filterProvidersByCategory = (category) => {
     setSelectedCategory(category);
+
     if (category === "Featured") {
       setSelectedProviders(dummyFeaturedProviders);
     } else {
-      const filteredProviders = serviceProviders.filter(
+      let filteredProviders = serviceProviders.filter(
         (provider) => provider.main_categories === category
       );
+
+      const searchQuery = searchQueries["userDashboard"]?.trim().toLowerCase();
+
+      if (searchQuery) {
+        filteredProviders = filteredProviders.filter((provider) =>
+          provider.business_name.toLowerCase().includes(searchQuery)
+        );
+      }
+
       setSelectedProviders(filteredProviders);
     }
   };
@@ -138,13 +152,15 @@ const UserDashboard = () => {
         <CustomHeader
           showMenuIcon={true}
           OpenDrawer={() => navigation.openDrawer()}
+          updateSearchQuery={updateSearchQuery}
+          screen="userDashboard"
         />
         {loadingCategory ? (
           <Loader />
         ) : (
           <ScrollView showsVerticalScrollIndicator={false}>
             <Text className="text-xl text-[#0A4014] font-bold mb-4">
-              Browse By Category
+              Browse By Category{" "}
             </Text>
 
             <ScrollView
@@ -178,44 +194,52 @@ const UserDashboard = () => {
               ))}
             </ScrollView>
 
-            <ScrollView>
-              {uniqueSubCategories.map((subCategory) => (
-                <View key={subCategory} className="pb-6">
-                  <Text className="font-bold text-[#0A4014] uppercase text-lg">
-                    {subCategory !== "Featured" && subCategory}
-                  </Text>
-                  <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    className="flex flex-row flex-wrap"
-                  >
-                    {selectedProviders
-                      .filter(
-                        (provider) => provider.sub_categories === subCategory
-                      )
-                      .map((filteredProvider) => (
-                        <CustomCard
-                          key={filteredProvider.user_id}
-                          image={
-                            filteredProvider.subcategory_image !== null
-                              ? filteredProvider.subcategory_image
-                              : getImageBySubCategory(
-                                  filteredProvider.sub_categories
-                                )
-                          }
-                          businessName={filteredProvider.business_name}
-                          bio={filteredProvider.bio}
-                          contactNumber={filteredProvider.provider_contact}
-                          ratings={calculateAverageRating(
-                            filteredProvider.no_of_stars
-                          )}
-                          onPress={() => handleCardPress(filteredProvider)}
-                        />
-                      ))}
-                  </ScrollView>
-                </View>
-              ))}
-            </ScrollView>
+            {selectedProviders.length === 0 ? (
+              <View className="flex-1 items-center justify-center">
+                <Text className="text-lg font-semibold text-center">
+                  No service providers available under this category.
+                </Text>
+              </View>
+            ) : (
+              <ScrollView>
+                {uniqueSubCategories.map((subCategory) => (
+                  <View key={subCategory} className="pb-6">
+                    <Text className="font-bold text-[#0A4014] uppercase text-lg">
+                      {subCategory !== "Featured" && subCategory}
+                    </Text>
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      className="flex flex-row flex-wrap"
+                    >
+                      {selectedProviders
+                        .filter(
+                          (provider) => provider.sub_categories === subCategory
+                        )
+                        .map((filteredProvider) => (
+                          <CustomCard
+                            key={filteredProvider.user_id}
+                            image={
+                              filteredProvider.subcategory_image !== null
+                                ? filteredProvider.subcategory_image
+                                : getImageBySubCategory(
+                                    filteredProvider.sub_categories
+                                  )
+                            }
+                            businessName={filteredProvider.business_name}
+                            bio={filteredProvider.bio}
+                            contactNumber={filteredProvider.provider_contact}
+                            ratings={calculateAverageRating(
+                              filteredProvider.no_of_stars
+                            )}
+                            onPress={() => handleCardPress(filteredProvider)}
+                          />
+                        ))}
+                    </ScrollView>
+                  </View>
+                ))}
+              </ScrollView>
+            )}
           </ScrollView>
         )}
       </SafeAreaView>

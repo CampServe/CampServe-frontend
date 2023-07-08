@@ -23,11 +23,9 @@ export const storeRatings = async (commentData) => {
   }
 };
 
-export const getRatings = async (provider_id) => {
+export const getRatings = async (data) => {
   try {
-    const response = await axios.post("/get_ratings", {
-      provider_id: provider_id,
-    });
+    const response = await axios.post("/get_ratings", data);
     return response.data;
   } catch (error) {
     console.log(error);

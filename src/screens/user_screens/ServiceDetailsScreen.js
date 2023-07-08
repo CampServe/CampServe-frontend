@@ -32,8 +32,12 @@ const ServiceDetailsScreen = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      const data = {
+        provider_id: provider.provider_id,
+        subcategory: provider.sub_categories,
+      };
       try {
-        const response = await getRatings(provider.provider_id);
+        const response = await getRatings(data);
         if (response.error === "could not retrieve the information") {
           setRatings([]);
         } else if (response.length !== 0) {
@@ -152,6 +156,7 @@ const ServiceDetailsScreen = () => {
               business_name={provider.business_name}
               rating={ratings}
               provider_id={provider.provider_id}
+              sub_categories={provider.sub_categories}
             />
           </>
         )}

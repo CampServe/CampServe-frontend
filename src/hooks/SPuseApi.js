@@ -21,3 +21,14 @@ export const changeRequestStatus = async (data) => {
     console.log(error);
   }
 };
+
+export const getProviderInfo = async (provider_id) => {
+  try {
+    const response = await axios.post("/get_provider_info", {
+      provider_id: provider_id,
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

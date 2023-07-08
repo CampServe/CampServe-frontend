@@ -31,7 +31,12 @@ export const calculateAverageRating = (ratings) => {
   }
 };
 
-const RatingsAndReviews = ({ rating, provider_id, business_name }) => {
+const RatingsAndReviews = ({
+  rating,
+  sub_categories,
+  provider_id,
+  business_name,
+}) => {
   const [ratings, setRatings] = useState(rating);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [displayedReviews, setDisplayedReviews] = useState([]);
@@ -49,6 +54,7 @@ const RatingsAndReviews = ({ rating, provider_id, business_name }) => {
       ratings: selectedRating,
       review: review.trim(),
       timestamp: new Date(),
+      subcategory: sub_categories,
     };
 
     setIsLoading(true);

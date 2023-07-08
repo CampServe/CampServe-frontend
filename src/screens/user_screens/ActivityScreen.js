@@ -16,6 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Animatable from "react-native-animatable";
 import { changeRequestStatus } from "../../hooks/SPuseApi";
 import { DotIndicator } from "react-native-indicators";
+import useSearch from "../../hooks/useSearch";
 
 const ActivityScreen = () => {
   const navigation = useNavigation();
@@ -27,6 +28,7 @@ const ActivityScreen = () => {
   const [loadingRequestId, setLoadingRequestId] = useState(null);
   const [loadingActionType, setLoadingActionType] = useState(null);
   const [actionCompleted, setActionCompleted] = useState(true);
+  const { searchQueries, updateSearchQuery } = useSearch();
 
   useFocusEffect(
     React.useCallback(() => {
@@ -50,10 +52,6 @@ const ActivityScreen = () => {
         }
       };
       fetchRequests();
-      // if (actionCompleted) {
-      //   fetchRequests();
-      //   setActionCompleted(false);
-      // }
     }, [actionCompleted])
   );
 
@@ -61,37 +59,48 @@ const ActivityScreen = () => {
     filterRequests("All");
   }, [requests]);
 
+  useEffect(() => {
+    filterRequests(activeFilter);
+  }, [searchQueries]);
+
   const filterRequests = (filterType) => {
-    if (filterType == "All") {
-      setFilteredRequests(requests);
-    } else if (filterType == "Pending") {
-      const filtered = requests.filter(
+    let filtered = requests;
+
+    if (filterType === "Pending") {
+      filtered = requests.filter(
         (req) =>
-          req.status_acc_dec == "no action" &&
-          req.status_comp_inco == "no action"
+          req.status_acc_dec === "no action" &&
+          req.status_comp_inco === "no action"
       );
-      setFilteredRequests(filtered);
-    } else if (filterType == "Completed") {
-      const filtered = requests.filter(
+    } else if (filterType === "Completed") {
+      filtered = requests.filter(
         (req) =>
-          req.status_acc_dec == "accepted" && req.status_comp_inco == "complete"
+          req.status_acc_dec === "accepted" &&
+          req.status_comp_inco === "complete"
       );
-      setFilteredRequests(filtered);
-    } else if (filterType == "Declined") {
-      const filtered = requests.filter(
+    } else if (filterType === "Declined") {
+      filtered = requests.filter(
         (req) =>
-          req.status_acc_dec == "declined" &&
-          req.status_comp_inco == "no action"
+          req.status_acc_dec === "declined" &&
+          req.status_comp_inco === "no action"
       );
-      setFilteredRequests(filtered);
-    } else if (filterType == "In Progress") {
-      const filtered = requests.filter(
+    } else if (filterType === "In Progress") {
+      filtered = requests.filter(
         (req) =>
-          req.status_acc_dec == "accepted" &&
-          req.status_comp_inco == "incomplete"
+          req.status_acc_dec === "accepted" &&
+          req.status_comp_inco === "incomplete"
       );
-      setFilteredRequests(filtered);
     }
+
+    const searchQuery = searchQueries["request"]?.trim().toLowerCase();
+
+    if (searchQuery) {
+      filtered = filtered.filter((req) =>
+        req.business_name.toLowerCase().includes(searchQuery)
+      );
+    }
+
+    setFilteredRequests(filtered);
     setActiveFilter(filterType);
   };
 
@@ -148,7 +157,6 @@ const ActivityScreen = () => {
     let statusColor = "gray";
     let statusText = "";
 
-    // if (activeFilter === "All") {
     if (
       item.status_acc_dec == "no action" &&
       item.status_comp_inco == "no action"
@@ -178,12 +186,10 @@ const ActivityScreen = () => {
       statusText = "In Progress";
       textColor = "#D1A800";
     }
-    // }
     return (
       <TouchableOpacity
         className="flex ml-[2px]"
         activeOpacity={0.7}
-        // onPress={() => console.log(item)}
         style={{
           backgroundColor: "white",
           borderRadius: 8,
@@ -239,7 +245,6 @@ const ActivityScreen = () => {
             </View>
           </View>
           <View className="w-[30%] flex-[0.5] justify-center items-center">
-            {/* {activeFilter === "All" && ( */}
             <Animatable.View
               className="p-2 rounded-xl mr-3"
               animation="pulse"
@@ -269,8 +274,6 @@ const ActivityScreen = () => {
                   <Text style={{ color: "white" }}>Cancel</Text>
                 </TouchableOpacity>
               ))}
-
-            {/* )} */}
           </View>
         </View>
       </TouchableOpacity>
@@ -282,6 +285,8 @@ const ActivityScreen = () => {
       <CustomHeader
         OpenDrawer={() => navigation.openDrawer()}
         showMenuIcon={true}
+        updateSearchQuery={updateSearchQuery}
+        screen="request"
       />
       {isRequestsLoading ? (
         <Loader />

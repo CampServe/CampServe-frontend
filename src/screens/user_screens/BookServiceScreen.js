@@ -57,7 +57,6 @@ const BookServiceScreen = () => {
   };
 
   const handleConfirm = async () => {
-    setIsConfirmationModalVisible(false);
     try {
       setIsConfirming(true);
       const success = await bookService(bookingData);

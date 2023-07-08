@@ -20,6 +20,7 @@ import useAuth from "../hooks/useAuth";
 import ChatRow from "./ChatRow";
 import Loader from "./Loader";
 import useProvider from "../hooks/useProvider";
+import useSearch from "../hooks/useSearch";
 
 const ChatList = () => {
   const { user } = useAuth();
@@ -29,6 +30,7 @@ const ChatList = () => {
   const [filteredMatches, setFilteredMatches] = useState([]);
   const [selectedSubCategory, setSelectedSubCategory] = useState(null);
   const [subCategories, setSubCategories] = useState([]);
+  const { searchQueries } = useSearch();
 
   const sortMessagesByTimestamp = (matches) => {
     return matches.sort((b, a) => {
@@ -202,6 +204,41 @@ const ChatList = () => {
   }, [matches]);
 
   useEffect(() => {
+    if (matches.length > 0) {
+      let filtered = matches.filter((match) => {
+        const users = Object.values(match.users);
+        return users.some(
+          (user) =>
+            user.sub_categories &&
+            user.sub_categories.includes(selectedSubCategory)
+        );
+      });
+
+      const searchQuery = searchQueries["message"]?.trim().toLowerCase();
+
+      if (searchQuery) {
+        filtered = filtered.filter((match) => {
+          const { users } = match;
+          const businessName = Object.values(users)[1]?.business_name || "";
+          const firstName = Object.values(users)[0]?.first_name || "";
+          const lastName = Object.values(users)[0]?.last_name || "";
+
+          const fullName = `${firstName} ${lastName}`;
+
+          return (
+            businessName.toLowerCase().includes(searchQuery) ||
+            fullName.toLowerCase().includes(searchQuery)
+          );
+        });
+      }
+
+      const sortedFilteredMatches = sortMessagesByTimestamp(filtered);
+
+      setFilteredMatches(sortedFilteredMatches);
+    }
+  }, [matches, selectedSubCategory, searchQueries]);
+
+  useEffect(() => {
     if (subCategories.length > 0) {
       handleSubCategorySelect(subCategories[0].name);
     }
@@ -287,11 +324,17 @@ const ChatList = () => {
             ))}
           </ScrollView>
 
-          <FlatList
-            data={filteredMatches}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => <ChatRow matchDetails={item} />}
-          />
+          {filteredMatches.length == 0 ? (
+            <View className="flex items-center justify-center">
+              <Text className="font-semibold text-base">No chats found</Text>
+            </View>
+          ) : (
+            <FlatList
+              data={filteredMatches}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => <ChatRow matchDetails={item} />}
+            />
+          )}
         </>
       ) : (
         <View className="flex items-center justify-center">

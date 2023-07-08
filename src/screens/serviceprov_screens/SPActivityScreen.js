@@ -11,6 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Animatable from "react-native-animatable";
 import { useNavigation } from "@react-navigation/native";
 import { DotIndicator } from "react-native-indicators";
+import useSearch from "../../hooks/useSearch";
 
 const SPActivityScreen = () => {
   const navigation = useNavigation();
@@ -24,6 +25,7 @@ const SPActivityScreen = () => {
   const [loadingRequestId, setLoadingRequestId] = useState(null);
   const [loadingActionType, setLoadingActionType] = useState(null);
   const [actionCompleted, setActionCompleted] = useState(true);
+  const { searchQueries, updateSearchQuery } = useSearch();
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -33,8 +35,11 @@ const SPActivityScreen = () => {
       try {
         setIsRequestsLoading(true);
         const response = await getProviderRequests(data);
-        setRequests(response.all_requests);
-        setFilteredSubcategories(response.all_requests);
+        if (response.message) {
+          setRequests([]);
+        } else {
+          setRequests(response.all_requests);
+        }
       } catch (error) {
         console.log(error);
         setRequests([]);
@@ -104,39 +109,51 @@ const SPActivityScreen = () => {
   };
 
   const filterRequests = (filterType) => {
-    if (filterType === "All") {
-      setFilteredRequests(filteredSubcategories);
-    } else if (filterType === "Pending") {
-      const filtered = filteredSubcategories.filter(
+    let filtered = filteredSubcategories;
+
+    if (filterType === "Pending") {
+      filtered = filteredSubcategories.filter(
         (req) =>
           req.status_acc_dec === "no action" &&
           req.status_comp_inco === "no action"
       );
-      setFilteredRequests(filtered);
     } else if (filterType === "Completed") {
-      const filtered = filteredSubcategories.filter(
+      filtered = filteredSubcategories.filter(
         (req) =>
           req.status_acc_dec === "accepted" &&
           req.status_comp_inco === "complete"
       );
-      setFilteredRequests(filtered);
     } else if (filterType === "Declined") {
-      const filtered = filteredSubcategories.filter(
+      filtered = filteredSubcategories.filter(
         (req) =>
           req.status_acc_dec === "declined" &&
           req.status_comp_inco === "no action"
       );
-      setFilteredRequests(filtered);
     } else if (filterType === "In Progress") {
-      const filtered = filteredSubcategories.filter(
+      filtered = filteredSubcategories.filter(
         (req) =>
           req.status_acc_dec === "accepted" &&
           req.status_comp_inco === "incomplete"
       );
-      setFilteredRequests(filtered);
     }
+
+    const searchQuery = searchQueries["SPrequest"]?.trim().toLowerCase();
+
+    if (searchQuery) {
+      filtered = filtered.filter(
+        (req) =>
+          req.first_name.toLowerCase().includes(searchQuery) ||
+          req.last_name.toLowerCase().includes(searchQuery)
+      );
+    }
+
+    setFilteredRequests(filtered);
     setActiveFilter(filterType);
   };
+
+  useEffect(() => {
+    filterRequests(activeFilter);
+  }, [searchQueries]);
 
   const filterBySubcategory = (subcategory) => {
     const filtered = requests.filter((req) => req.subcategory === subcategory);
@@ -177,12 +194,10 @@ const SPActivityScreen = () => {
       statusText = "In Progress";
       textColor = "#D1A800";
     }
-    // }
     return (
       <TouchableOpacity
         className="flex ml-[2px]"
         activeOpacity={0.7}
-        // onPress={() => console.log(item)}
         style={{
           backgroundColor: "white",
           borderRadius: 8,
@@ -318,6 +333,8 @@ const SPActivityScreen = () => {
       <CustomHeader
         OpenDrawer={() => navigation.openDrawer()}
         showMenuIcon={true}
+        updateSearchQuery={updateSearchQuery}
+        screen="SPrequest"
       />
       <View className="flex-row justify-around items-center">
         <ScrollView
@@ -382,7 +399,7 @@ const SPActivityScreen = () => {
             </ScrollView>
           </View>
           <View className="flex-1">
-            {filteredRequests.length > 0 ? (
+            {filteredRequests && filteredRequests.length > 0 ? (
               <FlatList
                 data={filteredRequests}
                 renderItem={renderItem}
@@ -390,7 +407,7 @@ const SPActivityScreen = () => {
               />
             ) : (
               <View className="flex flex-1 justify-center items-center">
-                <Text className="text-center text-lg font-bold ">
+                <Text className="text-center text-lg font-bold">
                   No Requests
                 </Text>
               </View>

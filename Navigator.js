@@ -132,9 +132,10 @@ const UserTabNavigator = () => {
 
           if (route.name === "UserDashboard") {
             iconName = focused ? "home" : "home-outline";
-          } else if (route.name === "Search") {
-            iconName = focused ? "search" : "search-outline";
           }
+          //  else if (route.name === "Search") {
+          //   iconName = focused ? "search" : "search-outline";
+          // }
           // else if (route.name === "Payment") {
           //   iconName = focused ? "card" : "card-outline";
           // }
@@ -183,7 +184,7 @@ const UserTabNavigator = () => {
         component={UserDashboard}
         options={{ tabBarLabel: "Home" }}
       />
-      <Tab.Screen name="Search" component={SearchScreen} />
+      {/* <Tab.Screen name="Search" component={SearchScreen} /> */}
       {/* <Tab.Screen name="Payment" component={PaymentScreen} /> */}
       <Tab.Screen
         name="Activity"

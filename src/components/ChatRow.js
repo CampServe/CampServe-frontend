@@ -158,6 +158,31 @@ const ChatRow = ({ matchDetails }) => {
     navigation.navigate("Chat", { matchDetails });
   };
 
+  const renderMessageTicks = () => {
+    if (lastMessage) {
+      const isSentByUser = lastMessage.userId === user.user_id;
+
+      if (isSentByUser) {
+        if (lastMessage.read) {
+          return (
+            <>
+              <Ionicons name="checkmark-done-outline" size={20} color="green" />
+            </>
+          );
+        } else {
+          return (
+            <>
+              <Ionicons name="checkmark-done-outline" size={20} color="gray" />
+            </>
+          );
+        }
+      } else {
+        return null;
+      }
+    }
+    return null;
+  };
+
   return (
     <>
       {loadingChats ? (
@@ -173,15 +198,6 @@ const ChatRow = ({ matchDetails }) => {
             backgroundColor: "#FFFFFF",
             marginHorizontal: 12,
             marginBottom: 8,
-            // borderRadius: 10,
-            // shadowColor: "#000",
-            // shadowOffset: {
-            //   width: 0,
-            //   height: 1,
-            // },
-            // shadowOpacity: 0.2,
-            // shadowRadius: 1.41,
-            // elevation: 2,
           }}
           onPress={navigateToMessages}
         >
@@ -210,27 +226,34 @@ const ChatRow = ({ matchDetails }) => {
                       " " +
                       matchedUserInfo?.last_name}
                 </Text>
-                {lastMessage && lastMessage.messageType === "audio" ? (
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Ionicons name="mic" size={16} color="gray" />
-                    <Text className="text-gray-400 ml-2 text-sm">
-                      {lastMessage.duration}
+                <View className="flex-row">
+                  {renderMessageTicks()}
+                  {lastMessage && lastMessage.messageType === "audio" ? (
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <Ionicons name="mic" size={16} color="gray" />
+                      <Text className="text-gray-400 ml-2 text-sm">
+                        {lastMessage.duration}
+                      </Text>
+                    </View>
+                  ) : lastMessage && lastMessage.messageType === "image" ? (
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <Ionicons name="image" size={16} color="gray" />
+                      <Text className="text-gray-400 ml-2 text-sm">Photo</Text>
+                    </View>
+                  ) : (
+                    <Text className="text-gray-400 ml-[2px] text-sm">
+                      {lastMessage &&
+                      lastMessage.message &&
+                      lastMessage.length > 28
+                        ? `${lastMessage.message.substring(0, 28)}...`
+                        : lastMessage.message}
                     </Text>
-                  </View>
-                ) : lastMessage && lastMessage.messageType === "image" ? (
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Ionicons name="image" size={16} color="gray" />
-                    <Text className="text-gray-400 ml-2 text-sm">Photo</Text>
-                  </View>
-                ) : (
-                  <Text className="text-gray-400 ml-[2px] text-sm">
-                    {lastMessage &&
-                    lastMessage.message &&
-                    lastMessage.length > 28
-                      ? `${lastMessage.message.substring(0, 28)}...`
-                      : lastMessage.message}
-                  </Text>
-                )}
+                  )}
+                </View>
               </View>
             </View>
           </View>
