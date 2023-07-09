@@ -1,13 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import {
-  TextInput,
-  TouchableOpacity,
-  View,
-  Animated,
-  Text,
-} from "react-native";
+import { TextInput, TouchableOpacity, View, Animated } from "react-native";
 import { Image } from "react-native-elements";
+import { useNavigation } from "@react-navigation/native";
 
 const CustomHeader = ({
   showMenuIcon = false,
@@ -17,6 +12,7 @@ const CustomHeader = ({
   updateSearchQuery,
   screen,
 }) => {
+  const navigation = useNavigation();
   const [showSearchInput, setShowSearchInput] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -33,6 +29,15 @@ const CustomHeader = ({
       useNativeDriver: true,
     }).start();
   }, [showSearchInput]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("blur", () => {
+      setShowSearchInput(false);
+      updateSearchQuery(screen, "");
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   const renderLeftIcon = () => {
     if (showMenuIcon) {
@@ -64,7 +69,7 @@ const CustomHeader = ({
   const renderSearchInput = () => {
     return (
       <Animated.View
-        className="rounded-lg px-4 py-1 bg-white border-b border-gray-200 focus:border-gray-400"
+        className="rounded-lg px-4 bg-white border-b border-gray-200 focus:border-gray-400"
         style={{
           flexDirection: "row",
           alignItems: "center",
@@ -87,7 +92,7 @@ const CustomHeader = ({
             backgroundColor: "#FFFFFF",
             marginRight: 8,
           }}
-          placeholder="Search"
+          placeholder="Search..."
           onChangeText={handleSearchQueryChange}
         />
         <TouchableOpacity onPress={handleClearSearch}>
@@ -101,7 +106,7 @@ const CustomHeader = ({
   const notification = !showBackIcon && showMenuIcon;
 
   return (
-    <View className="flex-row items-center justify-between py-2 bg-white">
+    <View className="flex-row items-center justify-between pb-4 pt-2 bg-white">
       {showSearchInput ? (
         renderSearchInput()
       ) : (
