@@ -33,7 +33,9 @@ const CustomHeader = ({
   useEffect(() => {
     const unsubscribe = navigation.addListener("blur", () => {
       setShowSearchInput(false);
-      updateSearchQuery(screen, "");
+      if (screen) {
+        updateSearchQuery(screen, "");
+      }
     });
 
     return unsubscribe;
