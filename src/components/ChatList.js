@@ -123,10 +123,6 @@ const ChatList = () => {
             }
           });
 
-          const sortedMessages = await sortMessagesByTimestamp(
-            filteredMessages
-          );
-
           setMatches(filteredMessages);
 
           if (filteredMessages.length === 0) {

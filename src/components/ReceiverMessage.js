@@ -175,10 +175,12 @@ const ReceiverMessage = ({ message }) => {
                   marginTop: 4,
                   marginRight: 8,
                 }}
-                resizeMode="contain"
+                resizeMode={`${
+                  message.resizeMode === "cover" ? "cover" : "contain"
+                }`}
               />
               <View className="absolute bottom-1 right-5">
-                <Text className="text-black text-xs">{time}</Text>
+                <Text className="text-gray-500 text-xs">{time}</Text>
               </View>
             </View>
           </React.Fragment>

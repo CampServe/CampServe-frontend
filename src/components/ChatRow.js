@@ -6,6 +6,7 @@ import getMatchedUserInfo from "../lib/getMatchedUserInfo";
 import { db } from "../utils/firebase";
 import {
   collection,
+  getDocs,
   onSnapshot,
   orderBy,
   query,
@@ -140,9 +141,14 @@ const ChatRow = ({ matchDetails }) => {
   }, [matchDetails, db, user]);
 
   const markMessagesAsRead = async () => {
-    const messageDocs = await query(
-      collection(db, "matches", matchDetails.id, "messages")
-    ).get();
+    const messageCollectionRef = collection(
+      db,
+      "matches",
+      matchDetails.id,
+      "messages"
+    );
+    const messageQuery = query(messageCollectionRef);
+    const messageDocs = await getDocs(messageQuery);
 
     messageDocs.forEach(async (doc) => {
       if (doc.data().userId !== user.user_id && !doc.data().read) {

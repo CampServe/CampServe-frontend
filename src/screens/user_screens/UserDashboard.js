@@ -196,8 +196,8 @@ const UserDashboard = () => {
 
             {selectedProviders.length === 0 ? (
               <View className="flex-1 items-center justify-center">
-                <Text className="text-lg font-semibold text-center">
-                  No service providers available under this category.
+                <Text className="text-base font-semibold text-center">
+                  No service providers available.
                 </Text>
               </View>
             ) : (

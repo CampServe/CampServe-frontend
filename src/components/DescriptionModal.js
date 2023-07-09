@@ -109,7 +109,7 @@ const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
       const response = await fetch(uri);
       const blob = await response.blob();
 
-      const imageName = `image_${Date.now()}`;
+      const imageName = filename;
       const imageRef = ref(storage, imageName);
       const uploadTask = uploadBytes(imageRef, blob);
 

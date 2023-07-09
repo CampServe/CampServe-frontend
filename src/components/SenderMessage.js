@@ -124,7 +124,22 @@ const SenderMessage = ({ message, isSending }) => {
             {isSending || date == null ? (
               <Ionicons name="time" size={12} color="gray" />
             ) : (
-              time
+              <View className="flex-row">
+                <Text className="text-gray-400 text-xs self-end">{time}</Text>
+                {message.read == true ? (
+                  <Ionicons
+                    name="checkmark-done-outline"
+                    size={20}
+                    color="green"
+                  />
+                ) : (
+                  <Ionicons
+                    name="checkmark-done-outline"
+                    size={20}
+                    color="gray"
+                  />
+                )}
+              </View>
             )}
           </Text>
         </View>
@@ -160,7 +175,22 @@ const SenderMessage = ({ message, isSending }) => {
               {isSending || date == null ? (
                 <Ionicons name="time" size={12} color="gray" />
               ) : (
-                time
+                <View className="flex-row">
+                  <Text className="text-gray-400 text-xs self-end">{time}</Text>
+                  {message.read == true ? (
+                    <Ionicons
+                      name="checkmark-done-outline"
+                      size={20}
+                      color="green"
+                    />
+                  ) : (
+                    <Ionicons
+                      name="checkmark-done-outline"
+                      size={20}
+                      color="gray"
+                    />
+                  )}
+                </View>
               )}
             </Text>
           </View>
@@ -187,14 +217,33 @@ const SenderMessage = ({ message, isSending }) => {
                 marginTop: 4,
                 marginRight: 8,
               }}
-              resizeMode="contain"
+              resizeMode={`${
+                message.resizeMode === "cover" ? "cover" : "contain"
+              }`}
             />
             <View className="absolute bottom-1 right-5">
-              <Text className="text-black text-xs">
+              <Text className="text-gray-500 text-xs">
                 {isSending || date == null ? (
                   <Ionicons name="time" size={12} color="gray" />
                 ) : (
-                  time
+                  <View className="flex-row">
+                    <Text className="text-gray-500 text-xs self-end">
+                      {time}
+                    </Text>
+                    {message.read == true ? (
+                      <Ionicons
+                        name="checkmark-done-outline"
+                        size={20}
+                        color="green"
+                      />
+                    ) : (
+                      <Ionicons
+                        name="checkmark-done-outline"
+                        size={20}
+                        color="gray"
+                      />
+                    )}
+                  </View>
                 )}
               </Text>
             </View>

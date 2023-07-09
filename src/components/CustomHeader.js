@@ -38,7 +38,7 @@ const CustomHeader = ({
     if (showMenuIcon) {
       return (
         <TouchableOpacity className="mr-4 " onPress={OpenDrawer}>
-          <Ionicons name="menu" size={24} />
+          <Ionicons name="menu-outline" size={28} />
         </TouchableOpacity>
       );
     } else if (showBackIcon) {
@@ -91,7 +91,7 @@ const CustomHeader = ({
           onChangeText={handleSearchQueryChange}
         />
         <TouchableOpacity onPress={handleClearSearch}>
-          <Ionicons name="close" size={24} color="gray" />
+          <Ionicons name="close-outline" size={28} color="gray" />
         </TouchableOpacity>
       </Animated.View>
     );
@@ -117,7 +117,7 @@ const CustomHeader = ({
               />
               {displaySearchIcon ? (
                 <TouchableOpacity onPress={toggleSearchInput}>
-                  <Ionicons name="search" size={24} />
+                  <Ionicons name="search-outline" size={24} />
                 </TouchableOpacity>
               ) : (
                 <View className="pl-6"></View>

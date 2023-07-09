@@ -8,6 +8,7 @@ import {
   FlatList,
   TouchableOpacity,
   Animated,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ChatHeader from "../../components/ChatHeader";
@@ -136,30 +137,154 @@ const ChatScreen = () => {
       return;
     }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
-      aspect: [4, 3],
-      quality: 1,
-    });
+    const showOptions = () => {
+      const options = [
+        { text: "Cancel", style: "cancel" },
+        { text: "Take Photo", onPress: handleCameraOption },
+        { text: "Choose from Media", onPress: handleMediaOption },
+      ];
 
-    if (!result.canceled && result.assets.length > 0) {
-      const { uri } = result.assets[0];
+      Alert.alert("Send Image", "Choose an option", options);
+    };
+
+    const handleMediaOption = async () => {
+      const options = {
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: false,
+        aspect: [4, 3],
+        quality: 1,
+        allowsMultipleSelection: true,
+      };
+
+      const result = await ImagePicker.launchImageLibraryAsync(options);
+
+      if (!result.canceled && result.assets.length > 0) {
+        const selectedImages = result.assets;
+
+        const confirmationOptions = [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Send",
+            onPress: () => handleSendImages(selectedImages),
+          },
+        ];
+
+        Alert.alert(
+          "Send Images",
+          `Are you sure you want to send ${selectedImages.length} image(s)?`,
+          confirmationOptions
+        );
+      }
+    };
+
+    const handleCameraOption = async () => {
+      const options = {
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: false,
+        aspect: [4, 3],
+        quality: 1,
+      };
+
+      const result = await ImagePicker.launchCameraAsync(options);
+
+      if (!result.canceled && result.assets.length > 0) {
+        const selectedImage = result.assets[0];
+
+        const confirmationOptions = [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Send",
+            onPress: () => handleSendImage(selectedImage),
+          },
+        ];
+
+        Alert.alert(
+          "Send Image",
+          "Are you sure you want to send this image?",
+          confirmationOptions
+        );
+      }
+    };
+
+    const handleSendImages = async (images) => {
+      const newMessages = images.map((image) => {
+        const { uri } = image;
+
+        const newMessage = {
+          id: Math.floor(Math.random() * 1000000000).toString(),
+          timestamp: serverTimestamp(),
+          userId: user.user_id,
+          displayName: user.first_name + " " + user.last_name,
+          read: false,
+          date: new Date().toDateString(),
+          messageType: "image",
+          image: uri,
+          isSending: true,
+          resizeMode: "contain",
+        };
+
+        setMessages((prevMessages) => [newMessage, ...prevMessages]);
+
+        return newMessage;
+      });
+
+      for (let i = 0; i < newMessages.length; i++) {
+        const message = newMessages[i];
+        const { uri } = images[i];
+        const filename = uri.split("/").pop();
+        const response = await fetch(uri);
+        const blob = await response.blob();
+
+        const imageName = filename;
+        const imageRef = ref(storage, imageName);
+        const uploadTask = uploadBytes(imageRef, blob);
+
+        try {
+          await uploadTask;
+          const downloadURL = await getDownloadURL(imageRef);
+          await sendMessage(message.messageType, downloadURL, "contain");
+        } catch (error) {
+          console.log("Upload failed:", error);
+        }
+      }
+    };
+
+    const handleSendImage = async (image) => {
+      const { uri } = image;
+      const filename = uri.split("/").pop();
+
+      const newMessage = {
+        id: Math.floor(Math.random() * 1000000000).toString(),
+        timestamp: serverTimestamp(),
+        userId: user.user_id,
+        displayName: user.first_name + " " + user.last_name,
+        read: false,
+        date: new Date().toDateString(),
+        messageType: "image",
+        image: uri,
+        isSending: true,
+        resizeMode: "cover",
+      };
+
+      setMessages((prevMessages) => [newMessage, ...prevMessages]);
+
       const response = await fetch(uri);
       const blob = await response.blob();
 
-      const imageName = `image_${Date.now()}`;
+      const imageName = filename;
       const imageRef = ref(storage, imageName);
       const uploadTask = uploadBytes(imageRef, blob);
 
       try {
         await uploadTask;
         const downloadURL = await getDownloadURL(imageRef);
-        sendMessage("image", downloadURL);
+        sendMessage("image", downloadURL, "cover");
       } catch (error) {
         console.log("Upload failed:", error);
       }
-    }
+    };
+
+    showOptions();
   };
 
   const startRecording = async () => {
@@ -243,7 +368,7 @@ const ChatScreen = () => {
     }
   };
 
-  const sendMessage = async (messageType, messageContent) => {
+  const sendMessage = async (messageType, messageContent, resizeMode) => {
     const message = {
       timestamp: serverTimestamp(),
       userId: user.user_id,
@@ -261,14 +386,19 @@ const ChatScreen = () => {
     } else if (messageType === "image") {
       message.messageType = "image";
       message.image = messageContent;
+      message.resizeMode = resizeMode;
     }
 
-    const id = "qwerty12345";
-    const timestamp = new Date().toDateString();
+    const id = Math.floor(Math.random() * 1000000000).toString();
 
-    const newMessage = { ...message, timestamp, id, isSending: true };
+    const newMessage = { ...message, id, isSending: true };
 
-    setMessages((prevMessages) => [newMessage, ...prevMessages]);
+    setMessages((prevMessages) => {
+      if (messageType === "image") {
+        return prevMessages;
+      }
+      return [newMessage, ...prevMessages];
+    });
     setInput("");
 
     try {
@@ -341,19 +471,10 @@ const ChatScreen = () => {
   const matchedBusinessName = matchedUserInfo.business_name;
 
   const renderMessageItem = (message, index) => {
-    let messageDate;
-
-    if (/^\w{3} \w{3} \d{2} \d{4}$/.test(message.date)) {
-      messageDate = message.date;
-    } else {
-      messageDate = message.timestamp.toDate().toDateString();
-    }
+    const messageDate = message.date;
 
     const isFirstMessageOfDay =
-      index === messages.length - 1 ||
-      messageDate !==
-        (messages[index + 1].timestamp.toDate().toDateString() ||
-          messages[index + 1].date);
+      index === messages.length - 1 || messageDate !== messages[index + 1].date;
 
     return (
       <>
@@ -460,7 +581,7 @@ const ChatScreen = () => {
                   onContentSizeChange={handleContentSizeChange}
                 />
                 <TouchableOpacity onPress={pickImage}>
-                  <Ionicons name="attach" size={28} />
+                  <Ionicons name="camera-outline" size={28} />
                 </TouchableOpacity>
               </>
             )}
