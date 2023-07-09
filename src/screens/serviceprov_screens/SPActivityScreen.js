@@ -53,11 +53,11 @@ const SPActivityScreen = () => {
 
   useEffect(() => {
     filterBySubcategory(user.subcategories[0]);
-  }, [user.subcategories]);
+  }, [user.subcategories, actionCompleted]);
 
   useEffect(() => {
     filterRequests("All");
-  }, [requests, filteredSubcategories]);
+  }, [requests, filteredSubcategories, actionCompleted]);
 
   const triggerAction = async (requestId, actionType) => {
     if (loadingRequestId || loadingActionType) {
