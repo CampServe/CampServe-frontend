@@ -160,7 +160,7 @@ const UserDashboard = () => {
         ) : (
           <ScrollView showsVerticalScrollIndicator={false}>
             <Text className="text-xl text-[#0A4014] font-bold mb-4">
-              Browse By Category{" "}
+              Browse By Category
             </Text>
 
             <ScrollView

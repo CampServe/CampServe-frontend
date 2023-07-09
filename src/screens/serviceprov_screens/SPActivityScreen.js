@@ -342,7 +342,7 @@ const SPActivityScreen = () => {
           contentContainerStyle={{ flexGrow: 1 }}
           horizontal
           showsHorizontalScrollIndicator={false}
-          className="gap-2 my-2"
+          className="gap-2 mb-2"
         >
           {Object.values(user.subcategories).map((subcategory) => (
             <TouchableOpacity

@@ -268,7 +268,7 @@ const ChatList = () => {
           >
             {subCategories.map((subCategory) => (
               <TouchableOpacity
-                className="mt-2 mr-2 mb-4 rounded-3xl"
+                className="mr-2 mb-4 rounded-3xl"
                 key={subCategory.name}
                 style={{
                   paddingHorizontal: 12,
