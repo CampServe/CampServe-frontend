@@ -15,7 +15,7 @@ const ServiceProviderDashboard = () => {
     const fetchProviderData = async () => {
       try {
         const response = await getProviderInfo(user.provider_id);
-        // console.log(JSON.stringify(response, null, 2));
+        console.log(JSON.stringify(response, null, 2));
       } catch (error) {}
     };
 

@@ -57,12 +57,17 @@ const RatingsAndReviews = ({
       subcategory: sub_categories,
     };
 
+    const data = {
+      provider_id: provider_id,
+      subcategory: sub_categories,
+    };
+
     setIsLoading(true);
 
     try {
       const ratingSent = await storeRatings(newRating);
       if (ratingSent) {
-        const newRatings = await getRatings(provider_id);
+        const newRatings = await getRatings(data);
         setRatings(newRatings);
         setAverageRate(calculateAverageRating(newRatings));
       } else {

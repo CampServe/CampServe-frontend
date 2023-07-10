@@ -176,6 +176,7 @@ const UserSignupScreen = () => {
         />
         <Text className="text-2xl font-bold mb-6">Sign Up</Text>
         <ScrollView
+          keyboardShouldPersistTaps="handled"
           contentContainerStyle={{
             alignItems: "center",
             justifyContent: "center",

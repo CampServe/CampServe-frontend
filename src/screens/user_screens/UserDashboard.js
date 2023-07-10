@@ -21,23 +21,25 @@ const UserDashboard = () => {
   const { setAverageRate } = useProvider();
   const { searchQueries, updateSearchQuery } = useSearch();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await getServiceProviders();
-        const filteredData = data.filter(
-          (provider) => provider.user_id !== user.user_id
-        );
-        setServiceProviders(filteredData);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoadingCategory(false);
-      }
-    };
-    setAverageRate(0);
-    fetchData();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        try {
+          const data = await getServiceProviders();
+          const filteredData = data.filter(
+            (provider) => provider.user_id !== user.user_id
+          );
+          setServiceProviders(filteredData);
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setLoadingCategory(false);
+        }
+      };
+      setAverageRate(0);
+      fetchData();
+    }, [])
+  );
 
   useEffect(() => {
     if (serviceProviders.length > 0) {
