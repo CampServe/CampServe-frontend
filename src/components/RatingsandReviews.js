@@ -36,6 +36,7 @@ const RatingsAndReviews = ({
   sub_categories,
   provider_id,
   business_name,
+  canPostReview = true,
 }) => {
   const [ratings, setRatings] = useState(rating);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -141,14 +142,16 @@ const RatingsAndReviews = ({
       <View className="px-4 pt-4">
         <View className="flex-row justify-between">
           <Text className="text-lg font-bold">Ratings and Reviews</Text>
-          <TouchableOpacity
-            className="flex items-center justify-center rounded-lg"
-            onPress={() => {
-              setIsReviewsModalVisible(true);
-            }}
-          >
-            <Text className="text-green-600">Post a review</Text>
-          </TouchableOpacity>
+          {canPostReview && (
+            <TouchableOpacity
+              className="flex items-center justify-center rounded-lg"
+              onPress={() => {
+                setIsReviewsModalVisible(true);
+              }}
+            >
+              <Text className="text-green-600">Post a review</Text>
+            </TouchableOpacity>
+          )}
         </View>
         {displayedReviews.length > 0 ? (
           <View className="bg-white rounded-lg p-4 pb-0">
