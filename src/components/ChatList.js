@@ -216,8 +216,8 @@ const ChatList = () => {
         filtered = filtered.filter((match) => {
           const { users } = match;
           const businessName = Object.values(users)[1]?.business_name || "";
-          const firstName = Object.values(users)[0]?.first_name || "";
-          const lastName = Object.values(users)[0]?.last_name || "";
+          const firstName = Object.values(users)[1]?.first_name || "";
+          const lastName = Object.values(users)[1]?.last_name || "";
 
           const fullName = `${firstName} ${lastName}`;
 
@@ -268,11 +268,9 @@ const ChatList = () => {
           >
             {subCategories.map((subCategory) => (
               <TouchableOpacity
-                className="mr-2 mb-4 rounded-3xl"
+                className="mr-2 px-4 py-2 mb-4 rounded-xl"
                 key={subCategory.name}
                 style={{
-                  paddingHorizontal: 12,
-                  paddingVertical: 12,
                   backgroundColor:
                     subCategory.name === selectedSubCategory
                       ? "#22543D"

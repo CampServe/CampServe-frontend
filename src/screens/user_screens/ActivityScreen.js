@@ -309,7 +309,7 @@ const ActivityScreen = () => {
                   onPress={() => filterRequests(filterType)}
                 >
                   <Text
-                    className={`text-base ${
+                    className={`text-base font-semibold ${
                       activeFilter === filterType ? "text-white" : "text-black"
                     }`}
                   >

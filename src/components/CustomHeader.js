@@ -1,7 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { TextInput, TouchableOpacity, View, Animated } from "react-native";
-import { Image } from "react-native-elements";
+import {
+  TextInput,
+  TouchableOpacity,
+  View,
+  Animated,
+  Image,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 const CustomHeader = ({
@@ -51,7 +56,7 @@ const CustomHeader = ({
     } else if (showBackIcon) {
       return (
         <TouchableOpacity className="mr-4 " onPress={GoBack}>
-          <Ionicons name="arrow-left" size={24} />
+          <Ionicons name="arrow-back" size={24} />
         </TouchableOpacity>
       );
     } else {

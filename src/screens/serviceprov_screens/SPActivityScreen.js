@@ -339,7 +339,7 @@ const SPActivityScreen = () => {
       <View className="flex-row justify-around items-center">
         <ScrollView
           style={{ flex: 1 }}
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
           horizontal
           showsHorizontalScrollIndicator={false}
           className="gap-2 mb-2"
@@ -349,13 +349,13 @@ const SPActivityScreen = () => {
               key={subcategory}
               className={`px-4 py-2 rounded-xl ${
                 activeSubcategory === subcategory
-                  ? "bg-green-900"
+                  ? "bg-[#22543D]"
                   : "bg-gray-300"
               }`}
               onPress={() => filterBySubcategory(subcategory)}
             >
               <Text
-                className={`text-base ${
+                className={`text-base font-bold ${
                   activeSubcategory === subcategory
                     ? "text-white"
                     : "text-black"
@@ -388,7 +388,7 @@ const SPActivityScreen = () => {
                   onPress={() => filterRequests(filterType)}
                 >
                   <Text
-                    className={`text-base ${
+                    className={`text-base font-semibold ${
                       activeFilter === filterType ? "text-white" : "text-black"
                     }`}
                   >
