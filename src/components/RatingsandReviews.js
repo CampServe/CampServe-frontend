@@ -129,7 +129,6 @@ const RatingsAndReviews = ({
 
   const averageRating = calculateAverageRating(ratings);
   const ratingCounts = calculateRatingCounts(ratings);
-  const maxCount = Math.max(...ratingCounts);
 
   useEffect(() => {
     const sortedReviews = [...ratings].sort((a, b) => b.stars - a.stars);
@@ -193,7 +192,9 @@ const RatingsAndReviews = ({
                       <View
                         className="bg-green-500 h-2"
                         style={{
-                          width: `${(ratingCounts[index] / maxCount) * 100}%`,
+                          width: `${
+                            (ratingCounts[index] / ratings.length) * 100
+                          }%`,
                         }}
                       />
                     </View>
@@ -242,7 +243,7 @@ const RatingsAndReviews = ({
             ))}
           </View>
         ) : (
-          <View className="flex flex-1 my-10 justify-center items-center">
+          <View className="flex my-10 justify-center items-center">
             <Text className="text-gray-600 text-xl">
               No ratings and reviews
             </Text>

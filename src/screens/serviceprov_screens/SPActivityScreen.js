@@ -1,6 +1,10 @@
 import { View, Text, FlatList } from "react-native";
 import React, { useEffect, useState } from "react";
-import { changeRequestStatus, getProviderRequests } from "../../hooks/SPuseApi";
+import {
+  changeRequestStatus,
+  getProviderInfo,
+  getProviderRequests,
+} from "../../hooks/SPuseApi";
 import useAuth from "../../hooks/useAuth";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Loader from "../../components/Loader";
@@ -26,19 +30,30 @@ const SPActivityScreen = () => {
   const [loadingActionType, setLoadingActionType] = useState(null);
   const [actionCompleted, setActionCompleted] = useState(true);
   const { searchQueries, updateSearchQuery } = useSearch();
+  const [subData, setSubData] = useState([]);
 
   useEffect(() => {
-    const fetchRequests = async () => {
-      const data = {
-        provider_id: user.provider_id,
-      };
+    const fetchData = async () => {
       try {
         setIsRequestsLoading(true);
-        const response = await getProviderRequests(data);
-        if (response.message) {
+
+        const fetchRequestsPromise = getProviderRequests({
+          provider_id: user.provider_id,
+        });
+        const getProviderInfoPromise = getProviderInfo(user.provider_id);
+
+        const [requestsResponse, providerInfoResponse] = await Promise.all([
+          fetchRequestsPromise,
+          getProviderInfoPromise,
+        ]);
+
+        const { sub_categories, ...otherData } = providerInfoResponse;
+        setSubData(sub_categories);
+
+        if (requestsResponse.message) {
           setRequests([]);
         } else {
-          setRequests(response.all_requests);
+          setRequests(requestsResponse.all_requests);
         }
       } catch (error) {
         console.log(error);
@@ -48,12 +63,14 @@ const SPActivityScreen = () => {
       }
     };
 
-    fetchRequests();
+    fetchData();
   }, [actionCompleted]);
 
+  const subcategories = Object.keys(subData);
+
   useEffect(() => {
-    filterBySubcategory(user.subcategories[0]);
-  }, [user.subcategories, actionCompleted]);
+    filterBySubcategory(subcategories[0]);
+  }, [requests, actionCompleted]);
 
   useEffect(() => {
     filterRequests("All");
@@ -336,41 +353,42 @@ const SPActivityScreen = () => {
         updateSearchQuery={updateSearchQuery}
         screen="SPrequest"
       />
-      <View className="flex-row justify-around items-center">
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          className="gap-2 mb-2"
-        >
-          {Object.values(user.subcategories).map((subcategory) => (
-            <TouchableOpacity
-              key={subcategory}
-              className={`px-4 py-2 rounded-xl ${
-                activeSubcategory === subcategory
-                  ? "bg-[#22543D]"
-                  : "bg-gray-300"
-              }`}
-              onPress={() => filterBySubcategory(subcategory)}
-            >
-              <Text
-                className={`text-base font-bold ${
-                  activeSubcategory === subcategory
-                    ? "text-white"
-                    : "text-black"
-                }`}
-              >
-                {subcategory}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
       {isRequestsLoading ? (
         <Loader />
       ) : (
         <>
+          <View className="flex-row justify-around items-center">
+            <ScrollView
+              style={{ flex: 1 }}
+              contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              className="gap-2 mb-2"
+            >
+              {Object.values(subcategories).map((subcategory) => (
+                <TouchableOpacity
+                  key={subcategory}
+                  className={`px-4 py-2 rounded-xl ${
+                    activeSubcategory === subcategory
+                      ? "bg-[#22543D]"
+                      : "bg-gray-300"
+                  }`}
+                  onPress={() => filterBySubcategory(subcategory)}
+                >
+                  <Text
+                    className={`text-base font-bold ${
+                      activeSubcategory === subcategory
+                        ? "text-white"
+                        : "text-black"
+                    }`}
+                  >
+                    {subcategory}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+
           <View className="flex flex-row justify-around py-2">
             <ScrollView
               style={{ flex: 1 }}
