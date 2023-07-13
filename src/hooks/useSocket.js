@@ -19,12 +19,12 @@ export const SocketProvider = ({ children }) => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   if (user?.provider_id) {
-  //     socket.emit("join_room", { provider_id: user.provider_id });
-  //     console.log("Sent");
-  //   }
-  // }, [user?.provider_id]);
+  useEffect(() => {
+    if (user?.provider_id) {
+      socket.emit("join_room", { provider_id: user.provider_id });
+      console.log("Sent");
+    }
+  }, [user?.provider_id]);
 
   return (
     <SocketContext.Provider value={socketTrigger}>
