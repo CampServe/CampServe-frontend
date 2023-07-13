@@ -309,7 +309,7 @@ const BookServiceScreen = () => {
                     <TouchableOpacity
                       onPress={() => {
                         googlePlacesAutocompleteRef.current?.setAddressText("");
-                        setIsLocationEmpty(true);
+                        // setIsLocationEmpty(true);
                         setBookingData((prevData) => ({
                           ...prevData,
                           location: "",

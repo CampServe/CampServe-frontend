@@ -16,10 +16,12 @@ import * as Animatable from "react-native-animatable";
 import { useNavigation } from "@react-navigation/native";
 import { DotIndicator } from "react-native-indicators";
 import useSearch from "../../hooks/useSearch";
+import useSocket from "../../hooks/useSocket";
 
 const SPActivityScreen = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
+  const { socketTrigger } = useSocket();
   const [requests, setRequests] = useState([]);
   const [filteredRequests, setFilteredRequests] = useState([]);
   const [isRequestsLoading, setIsRequestsLoading] = useState(false);
@@ -65,6 +67,38 @@ const SPActivityScreen = () => {
 
     fetchData();
   }, [actionCompleted]);
+
+  // useEffect(() => {
+  //   if (socketTrigger) {
+  //     const fetchData = async () => {
+  //       try {
+  //         const fetchRequestsPromise = getProviderRequests({
+  //           provider_id: user.provider_id,
+  //         });
+  //         const getProviderInfoPromise = getProviderInfo(user.provider_id);
+
+  //         const [requestsResponse, providerInfoResponse] = await Promise.all([
+  //           fetchRequestsPromise,
+  //           getProviderInfoPromise,
+  //         ]);
+
+  //         const { sub_categories, ...otherData } = providerInfoResponse;
+  //         setSubData(sub_categories);
+
+  //         if (requestsResponse.message) {
+  //           setRequests([]);
+  //         } else {
+  //           setRequests(requestsResponse.all_requests);
+  //         }
+  //       } catch (error) {
+  //         console.log(error);
+  //         setRequests([]);
+  //       }
+  //     };
+
+  //     fetchData();
+  //   }
+  // }, [socketTrigger]);
 
   const subcategories = Object.keys(subData);
 

@@ -5,6 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthProvider } from "./src/hooks/useAuth";
 import { RatingProvider } from "./src/hooks/useProvider";
 import { SearchProvider } from "./src/hooks/useSearch";
+import { SocketProvider } from "./src/hooks/useSocket";
 
 const clearAsyncStorage = async () => {
   try {
@@ -22,9 +23,11 @@ export default function App() {
     <NavigationContainer>
       <RatingProvider>
         <AuthProvider>
-          <SearchProvider>
-            <StackNavigator />
-          </SearchProvider>
+          <SocketProvider>
+            <SearchProvider>
+              <StackNavigator />
+            </SearchProvider>
+          </SocketProvider>
         </AuthProvider>
       </RatingProvider>
     </NavigationContainer>
