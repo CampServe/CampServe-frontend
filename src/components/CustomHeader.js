@@ -16,6 +16,7 @@ const CustomHeader = ({
   GoBack,
   updateSearchQuery,
   screen,
+  clearInput = false,
 }) => {
   const navigation = useNavigation();
   const [showSearchInput, setShowSearchInput] = useState(false);
@@ -24,6 +25,15 @@ const CustomHeader = ({
   const toggleSearchInput = () => {
     setShowSearchInput(!showSearchInput);
   };
+
+  useEffect(() => {
+    if (clearInput) {
+      setShowSearchInput(false);
+      if (screen) {
+        updateSearchQuery(screen, "");
+      }
+    }
+  }, [clearInput]);
 
   useEffect(() => {
     const toValue = showSearchInput ? 1 : 0;

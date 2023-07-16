@@ -1,4 +1,4 @@
-import { View, Text, FlatList } from "react-native";
+import { View, Text, FlatList, RefreshControl } from "react-native";
 import React, { useEffect, useState } from "react";
 import {
   changeRequestStatus,
@@ -21,7 +21,7 @@ import useSocket from "../../hooks/useSocket";
 const SPActivityScreen = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
-  const { socketTrigger } = useSocket();
+  const { socketTrigger, isOffline } = useSocket();
   const [requests, setRequests] = useState([]);
   const [filteredRequests, setFilteredRequests] = useState([]);
   const [isRequestsLoading, setIsRequestsLoading] = useState(false);
@@ -33,6 +33,8 @@ const SPActivityScreen = () => {
   const [actionCompleted, setActionCompleted] = useState(true);
   const { searchQueries, updateSearchQuery } = useSearch();
   const [subData, setSubData] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const refreshColours = ["#22543D"];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,8 +67,43 @@ const SPActivityScreen = () => {
       }
     };
 
-    fetchData();
-  }, [actionCompleted]);
+    if (!isOffline) {
+      fetchData();
+    }
+  }, [actionCompleted, isOffline]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    if (!isOffline) {
+      try {
+        const fetchRequestsPromise = getProviderRequests({
+          provider_id: user.provider_id,
+        });
+        const getProviderInfoPromise = getProviderInfo(user.provider_id);
+
+        const [requestsResponse, providerInfoResponse] = await Promise.all([
+          fetchRequestsPromise,
+          getProviderInfoPromise,
+        ]);
+
+        const { sub_categories, ...otherData } = providerInfoResponse;
+        setSubData(sub_categories);
+
+        if (requestsResponse.message) {
+          setRequests([]);
+        } else {
+          setRequests(requestsResponse.all_requests);
+        }
+      } catch (error) {
+        console.log(error);
+        setRequests([]);
+      } finally {
+        setRefreshing(false);
+      }
+    } else {
+      setRefreshing(false);
+    }
+  };
 
   // useEffect(() => {
   //   if (socketTrigger) {
@@ -456,13 +493,31 @@ const SPActivityScreen = () => {
                 data={filteredRequests}
                 renderItem={renderItem}
                 keyExtractor={(item, index) => index.toString()}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    colors={refreshColours}
+                  />
+                }
               />
             ) : (
-              <View className="flex flex-1 justify-center items-center">
-                <Text className="text-center text-lg font-bold">
-                  No Requests
-                </Text>
-              </View>
+              <ScrollView
+                contentContainerStyle={{ flex: 1 }}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    colors={refreshColours}
+                  />
+                }
+              >
+                <View className="flex flex-1 justify-center items-center">
+                  <Text className="text-center text-lg font-bold">
+                    No Requests
+                  </Text>
+                </View>
+              </ScrollView>
             )}
           </View>
         </>

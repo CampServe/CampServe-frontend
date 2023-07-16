@@ -45,6 +45,8 @@ import CustomSPDrawerContent from "./src/components/CustomSPDrawerContent";
 import SProfileSetup from "./src/screens/serviceprov_screens/SProfileSetup";
 import SelectCategoriesScreen from "./src/screens/serviceprov_screens/SelectCategoriesScreen";
 import ServiceDetailsScreen from "./src/screens/user_screens/ServiceDetailsScreen";
+import useSocket from "./src/hooks/useSocket";
+import OfflineAlert from "./src/components/OfflineAlert";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -53,10 +55,11 @@ const Drawer = createDrawerNavigator();
 const UserTabNavigator = () => {
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const { user } = useAuth();
+  const { isOffline } = useSocket();
   const { newMessageTrigger } = useProvider();
 
   useEffect(() => {
-    if (user && user !== null) {
+    if (user && user !== null && !isOffline) {
       const unsubscribe = onSnapshot(
         query(collection(db, "matches")),
         async (snapshot) => {
@@ -120,7 +123,7 @@ const UserTabNavigator = () => {
         unsubscribe();
       };
     }
-  }, [user, newMessageTrigger]);
+  }, [user, newMessageTrigger, isOffline]);
 
   return (
     <Tab.Navigator
@@ -231,10 +234,11 @@ const UserDrawerNavigator = () => {
 const ServiceProviderTabNavigator = () => {
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const { user } = useAuth();
+  const { isOffline } = useSocket();
   const { newMessageTrigger } = useProvider();
 
   useEffect(() => {
-    if (user && user !== null) {
+    if (user && user !== null && !isOffline) {
       const unsubscribe = onSnapshot(
         query(collection(db, "matches")),
         async (snapshot) => {
@@ -298,7 +302,7 @@ const ServiceProviderTabNavigator = () => {
         unsubscribe();
       };
     }
-  }, [user, newMessageTrigger]);
+  }, [user, newMessageTrigger, isOffline]);
 
   return (
     <Tab.Navigator
@@ -416,6 +420,7 @@ export const StackNavigator = () => {
 
   return (
     <AppWrapper>
+      <OfflineAlert />
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!user ? (
           <Stack.Group>

@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   ScrollView,
   FlatList,
+  RefreshControl,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,10 +18,12 @@ import * as Animatable from "react-native-animatable";
 import { changeRequestStatus } from "../../hooks/SPuseApi";
 import { DotIndicator } from "react-native-indicators";
 import useSearch from "../../hooks/useSearch";
+import useSocket from "../../hooks/useSocket";
 
 const ActivityScreen = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
+  const { isOffline } = useSocket();
   const [requests, setRequests] = useState([]);
   const [filteredRequests, setFilteredRequests] = useState([]);
   const [isRequestsLoading, setisRequestsLoading] = useState(false);
@@ -29,6 +32,8 @@ const ActivityScreen = () => {
   const [loadingActionType, setLoadingActionType] = useState(null);
   const [actionCompleted, setActionCompleted] = useState(true);
   const { searchQueries, updateSearchQuery } = useSearch();
+  const [refreshing, setRefreshing] = useState(false);
+  const refreshColours = ["#22543D"];
 
   useFocusEffect(
     React.useCallback(() => {
@@ -51,9 +56,35 @@ const ActivityScreen = () => {
           setisRequestsLoading(false);
         }
       };
-      fetchRequests();
-    }, [actionCompleted])
+      if (!isOffline) {
+        fetchRequests();
+      }
+    }, [actionCompleted, isOffline])
   );
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    if (!isOffline) {
+      try {
+        const data = {
+          user_id: user.user_id,
+        };
+        const response = await getAllUserRequests(data);
+        if (response.message) {
+          setRequests([]);
+        } else {
+          setRequests(response.all_requests);
+        }
+      } catch (error) {
+        console.log(error);
+        setRequests([]);
+      } finally {
+        setRefreshing(false);
+      }
+    } else {
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     filterRequests("All");
@@ -325,13 +356,31 @@ const ActivityScreen = () => {
                 data={filteredRequests}
                 renderItem={renderItem}
                 keyExtractor={(item, index) => index.toString()}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    colors={refreshColours}
+                  />
+                }
               />
             ) : (
-              <View className="flex flex-1 justify-center items-center">
-                <Text className="text-center text-lg font-bold ">
-                  No Requests
-                </Text>
-              </View>
+              <ScrollView
+                contentContainerStyle={{ flex: 1 }}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    colors={refreshColours}
+                  />
+                }
+              >
+                <View className="flex flex-1 justify-center items-center">
+                  <Text className="text-center text-lg font-bold">
+                    No Requests
+                  </Text>
+                </View>
+              </ScrollView>
             )}
           </View>
         </>

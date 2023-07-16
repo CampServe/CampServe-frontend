@@ -37,9 +37,11 @@ import * as Animatable from "react-native-animatable";
 import * as ImagePicker from "expo-image-picker";
 import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import useProvider from "../../hooks/useProvider";
+import useSocket from "../../hooks/useSocket";
 
 const ChatScreen = () => {
   const { user } = useAuth();
+  const { isOffline } = useSocket();
   const { setNewMessageTrigger } = useProvider();
   const { params } = useRoute();
   const [input, setInput] = useState("");
@@ -63,66 +65,68 @@ const ChatScreen = () => {
   const inputRef = useRef(null);
 
   useEffect(() => {
-    const checkMatchDetails = async () => {
-      try {
-        const matchDocRef = doc(db, "matches", matchDetails.id);
-        const matchDocSnapshot = await getDoc(matchDocRef);
-
-        if (matchDocSnapshot.exists()) {
-        } else {
-          await setDoc(matchDocRef, matchDetails);
-        }
-      } catch (error) {
-        console.log("Error checking match details:", error);
-      }
-    };
-
-    if (matchDetails) {
-      checkMatchDetails();
-    }
-
-    const unsubscribe = onSnapshot(
-      query(
-        collection(db, "matches", matchDetails.id, "messages"),
-        orderBy("timestamp", "desc")
-      ),
-      async (snapshot) => {
+    if (!isOffline) {
+      const checkMatchDetails = async () => {
         try {
-          const updatedMessages = snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
+          const matchDocRef = doc(db, "matches", matchDetails.id);
+          const matchDocSnapshot = await getDoc(matchDocRef);
 
-          const unreadMessages = updatedMessages.filter(
-            (message) => !message.read && message.userId !== user.user_id
-          );
-
-          if (unreadMessages.length > 0) {
-            await Promise.all(
-              unreadMessages.map((message) =>
-                updateDoc(
-                  doc(db, "matches", matchDetails.id, "messages", message.id),
-                  {
-                    read: true,
-                  }
-                )
-              )
-            );
+          if (matchDocSnapshot.exists()) {
+          } else {
+            await setDoc(matchDocRef, matchDetails);
           }
-
-          setMessages(updatedMessages);
         } catch (error) {
-          console.error("Error updating messages:", error);
-        } finally {
-          setLoading(false);
+          console.log("Error checking match details:", error);
         }
-      }
-    );
+      };
 
-    return () => {
-      unsubscribe();
-    };
-  }, [matchDetails]);
+      if (matchDetails) {
+        checkMatchDetails();
+      }
+
+      const unsubscribe = onSnapshot(
+        query(
+          collection(db, "matches", matchDetails.id, "messages"),
+          orderBy("timestamp", "desc")
+        ),
+        async (snapshot) => {
+          try {
+            const updatedMessages = snapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+
+            const unreadMessages = updatedMessages.filter(
+              (message) => !message.read && message.userId !== user.user_id
+            );
+
+            if (unreadMessages.length > 0) {
+              await Promise.all(
+                unreadMessages.map((message) =>
+                  updateDoc(
+                    doc(db, "matches", matchDetails.id, "messages", message.id),
+                    {
+                      read: true,
+                    }
+                  )
+                )
+              );
+            }
+
+            setMessages(updatedMessages);
+          } catch (error) {
+            console.error("Error updating messages:", error);
+          } finally {
+            setLoading(false);
+          }
+        }
+      );
+
+      return () => {
+        unsubscribe();
+      };
+    }
+  }, [matchDetails, isOffline]);
 
   const handleContentSizeChange = (event) => {
     const { contentSize } = event.nativeEvent;

@@ -69,7 +69,7 @@ const LoginScreen = () => {
           style={{ width: 150, height: 50 }}
           resizeMode="contain"
         />
-        <Text className="text-2xl font-bold mb-6">
+        <Text className="text-2xl font-bold">
           {!isServiceProviderLogin ? "User Login" : "Service Provider Login"}
         </Text>
 

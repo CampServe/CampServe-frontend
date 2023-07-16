@@ -1,4 +1,10 @@
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -10,16 +16,21 @@ import Loader from "../../components/Loader";
 import { calculateAverageRating } from "../../components/RatingsandReviews";
 import useProvider from "../../hooks/useProvider";
 import useSearch from "../../hooks/useSearch";
+import useSocket from "../../hooks/useSocket";
 
 const UserDashboard = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
+  const { isOffline } = useSocket();
   const [serviceProviders, setServiceProviders] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("Room");
   const [selectedProviders, setSelectedProviders] = useState([]);
   const [loadingCategory, setLoadingCategory] = useState(true);
   const { setAverageRate } = useProvider();
   const { searchQueries, updateSearchQuery } = useSearch();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [clearInput, setclearInput] = useState(false);
+  const refreshColours = ["#22543D"];
 
   useFocusEffect(
     React.useCallback(() => {
@@ -37,9 +48,33 @@ const UserDashboard = () => {
         }
       };
       setAverageRate(0);
-      fetchData();
-    }, [])
+      if (!isOffline) {
+        fetchData();
+      }
+    }, [isOffline])
   );
+
+  const onRefresh = async () => {
+    setIsRefreshing(true);
+
+    if (!isOffline) {
+      try {
+        const data = await getServiceProviders();
+        const filteredData = data.filter(
+          (provider) => provider.user_id !== user.user_id
+        );
+        setServiceProviders(filteredData);
+        setclearInput(true);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsRefreshing(false);
+        setclearInput(false);
+      }
+    } else {
+      setIsRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     if (serviceProviders.length > 0) {
@@ -156,11 +191,21 @@ const UserDashboard = () => {
           OpenDrawer={() => navigation.openDrawer()}
           updateSearchQuery={updateSearchQuery}
           screen="userDashboard"
+          clearInput={clearInput}
         />
         {loadingCategory ? (
           <Loader />
         ) : (
-          <ScrollView showsVerticalScrollIndicator={false}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={isRefreshing}
+                onRefresh={onRefresh}
+                colors={refreshColours}
+              />
+            }
+          >
             <Text className="text-xl text-[#0A4014] font-bold mb-4">
               Browse By Category
             </Text>
@@ -197,11 +242,22 @@ const UserDashboard = () => {
             </ScrollView>
 
             {selectedProviders.length === 0 ? (
-              <View className="flex-1 items-center justify-center">
-                <Text className="text-base font-semibold text-center">
-                  No service providers available.
-                </Text>
-              </View>
+              <ScrollView
+                contentContainerStyle={{ flex: 1 }}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={isRefreshing}
+                    onRefresh={onRefresh}
+                    colors={refreshColours}
+                  />
+                }
+              >
+                <View className="flex-1 items-center justify-center">
+                  <Text className="text-base font-semibold text-center">
+                    No service providers available.
+                  </Text>
+                </View>
+              </ScrollView>
             ) : (
               <ScrollView>
                 {uniqueSubCategories.map((subCategory) => (

@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  RefreshControl,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { FontAwesome, Feather, MaterialIcons } from "@expo/vector-icons";
@@ -11,6 +18,7 @@ import Loader from "../../components/Loader";
 import useProvider from "../../hooks/useProvider";
 import useAuth from "../../hooks/useAuth";
 import BookingModal from "../../components/BookingModal";
+import useSocket from "../../hooks/useSocket";
 
 const ServiceDetailsScreen = () => {
   const navigation = useNavigation();
@@ -22,6 +30,9 @@ const ServiceDetailsScreen = () => {
   const { provider, bookingData } = route.params;
   const { averageRate } = useProvider();
   const { user } = useAuth();
+  const { isOffline } = useSocket();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const refreshColours = ["#22543D"];
 
   const isNumber = typeof provider.image === "number";
   const imageSource = isNumber ? provider.image : { uri: `${provider.image}` };
@@ -64,12 +75,40 @@ const ServiceDetailsScreen = () => {
       }
     };
 
-    setIsRatingsLoading(true);
+    if (!isOffline) {
+      setIsRatingsLoading(true);
 
-    Promise.all([fetchData(), statusData()]).then(() => {
-      setIsRatingsLoading(false);
-    });
-  }, [bookingData !== undefined ? bookingData : null]);
+      Promise.all([fetchData(), statusData()]).then(() => {
+        setIsRatingsLoading(false);
+      });
+    }
+  }, [bookingData !== undefined ? bookingData : null, isOffline]);
+
+  const onRefresh = async () => {
+    setIsRefreshing(true);
+    if (!isOffline) {
+      try {
+        const data = {
+          provider_id: provider.provider_id,
+          subcategory: provider.sub_categories,
+        };
+        const response = await getRatings(data);
+        if (response.error === "could not retrieve the information") {
+          setRatings([]);
+        } else if (response.length !== 0) {
+          setRatings(response);
+        } else {
+          setRatings([]);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsRefreshing(false);
+      }
+    } else {
+      setIsRefreshing(false);
+    }
+  };
 
   const averageRating =
     averageRate === 0 ? calculateAverageRating(ratings) : averageRate;
@@ -106,7 +145,15 @@ const ServiceDetailsScreen = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={onRefresh}
+            colors={refreshColours}
+          />
+        }
+      >
         <View className="relative">
           <Image source={imageSource} className="h-56 w-full bg-gray-300" />
           <TouchableOpacity
@@ -161,7 +208,7 @@ const ServiceDetailsScreen = () => {
           </>
         )}
       </ScrollView>
-      {!isRatingsLoading && (
+      {!isRatingsLoading && !isOffline && (
         <View className="flex-row justify-around items-center p-4 border-t border-gray-300">
           <TouchableOpacity
             className="flex-row items-center bg-green-500 py-2 px-4 rounded-xl"

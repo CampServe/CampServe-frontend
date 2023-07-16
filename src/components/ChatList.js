@@ -21,9 +21,11 @@ import ChatRow from "./ChatRow";
 import Loader from "./Loader";
 import useProvider from "../hooks/useProvider";
 import useSearch from "../hooks/useSearch";
+import useSocket from "../hooks/useSocket";
 
 const ChatList = () => {
   const { user } = useAuth();
+  const { isOffline } = useSocket();
   const { newMessageTrigger } = useProvider();
   const [matches, setMatches] = useState([]);
   const [loadingChats, setLoadingChats] = useState(true);
@@ -41,9 +43,8 @@ const ChatList = () => {
   };
 
   useEffect(() => {
-    setLoadingChats(true);
-
     const fetchData = async () => {
+      setLoadingChats(true);
       try {
         const matchesSnapshot = await new Promise((resolve, reject) => {
           const unsubscribeMatches = onSnapshot(
@@ -137,9 +138,10 @@ const ChatList = () => {
         setLoadingChats(false);
       }
     };
-
-    fetchData();
-  }, [user, newMessageTrigger]);
+    if (!isOffline) {
+      fetchData();
+    }
+  }, [user, newMessageTrigger, isOffline]);
 
   useEffect(() => {
     if (matches.length > 0) {
