@@ -1,9 +1,9 @@
 import {
-  View,
   Text,
-  TouchableOpacity,
   ScrollView,
   RefreshControl,
+  TouchableOpacity,
+  FlatList,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -11,12 +11,13 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import CustomHeader from "../../components/CustomHeader";
 import useAuth from "../../hooks/useAuth";
 import { getServiceProviders } from "../../hooks/useApi";
-import CustomCard from "../../components/CustomCard";
 import Loader from "../../components/Loader";
-import { calculateAverageRating } from "../../components/RatingsandReviews";
+import { Picker } from "@react-native-picker/picker";
 import useProvider from "../../hooks/useProvider";
 import useSearch from "../../hooks/useSearch";
 import useSocket from "../../hooks/useSocket";
+import ProviderCategories from "../../components/ProviderCategories";
+import { View } from "react-native";
 
 const UserDashboard = () => {
   const navigation = useNavigation();
@@ -31,6 +32,11 @@ const UserDashboard = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [clearInput, setclearInput] = useState(false);
   const refreshColours = ["#22543D"];
+  const [selectedView, setSelectedView] = useState("category");
+
+  const handleViewToggle = (view) => {
+    setSelectedView(view);
+  };
 
   useFocusEffect(
     React.useCallback(() => {
@@ -183,6 +189,41 @@ const UserDashboard = () => {
     return image;
   };
 
+  const CustomDropdown = ({ selectedView, handleViewToggle }) => {
+    const dropdownOptions = [
+      { key: "category", label: "Category" },
+      { key: "recommendation", label: "Recommendation" },
+    ];
+    return (
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          marginBottom: 20,
+        }}
+      >
+        <Text style={{ fontSize: 20, color: "#0A4014", fontWeight: "700" }}>
+          Browse By
+        </Text>
+        <TouchableOpacity
+          style={{
+            flexGrow: 1,
+          }}
+          onPress={() =>
+            handleViewToggle(
+              selectedView === "category" ? "recommendation" : "category"
+            )
+          }
+        >
+          <Text style={{ fontSize: 20, color: "#0A4014", fontWeight: "700" }}>
+            {" "}
+            {selectedView === "category" ? "Category" : "Recommendation"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   return (
     <>
       <SafeAreaView className="bg-white px-4 flex-1">
@@ -206,97 +247,26 @@ const UserDashboard = () => {
               />
             }
           >
-            <Text className="text-xl text-[#0A4014] font-bold mb-4">
-              Browse By Category
-            </Text>
+            <CustomDropdown
+              selectedView={selectedView}
+              handleViewToggle={handleViewToggle}
+            />
 
-            <ScrollView
-              style={{ flex: 1 }}
-              contentContainerStyle={{ flexGrow: 1 }}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              className="gap-2 mb-2"
-            >
-              {mainCategories.map((category) => (
-                <TouchableOpacity
-                  key={category}
-                  style={{
-                    width: 120,
-                    transform: [
-                      { scale: category === selectedCategory ? 1.05 : 1 },
-                    ],
-                    transition: "transform 0.2s",
-                  }}
-                  onPress={() => filterProvidersByCategory(category)}
-                  className={`flex-1 items-center justify-center py-2 mb-3 rounded-lg ${
-                    category === selectedCategory
-                      ? "bg-green-900"
-                      : "bg-green-900 opacity-60"
-                  }`}
-                >
-                  <Text className="text-white text-bold text-center text-lg">
-                    {category}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-
-            {selectedProviders.length === 0 ? (
-              <ScrollView
-                contentContainerStyle={{ flex: 1 }}
-                refreshControl={
-                  <RefreshControl
-                    refreshing={isRefreshing}
-                    onRefresh={onRefresh}
-                    colors={refreshColours}
-                  />
-                }
-              >
-                <View className="flex-1 items-center justify-center">
-                  <Text className="text-base font-semibold text-center">
-                    No service providers available.
-                  </Text>
-                </View>
-              </ScrollView>
+            {selectedView === "category" ? (
+              <ProviderCategories
+                mainCategories={mainCategories}
+                selectedCategory={selectedCategory}
+                filterProvidersByCategory={filterProvidersByCategory}
+                uniqueSubCategories={uniqueSubCategories}
+                selectedProviders={selectedProviders}
+                refreshColours={refreshColours}
+                isRefreshing={isRefreshing}
+                onRefresh={onRefresh}
+                getImageBySubCategory={getImageBySubCategory}
+                handleCardPress={handleCardPress}
+              />
             ) : (
-              <ScrollView>
-                {uniqueSubCategories.map((subCategory) => (
-                  <View key={subCategory} className="pb-6">
-                    <Text className="font-bold text-[#0A4014] uppercase text-lg">
-                      {subCategory !== "Featured" && subCategory}
-                    </Text>
-                    <ScrollView
-                      horizontal
-                      showsHorizontalScrollIndicator={false}
-                      className="flex flex-row flex-wrap"
-                    >
-                      {selectedProviders
-                        .filter(
-                          (provider) => provider.sub_categories === subCategory
-                        )
-                        .map((filteredProvider) => (
-                          <CustomCard
-                            key={filteredProvider.user_id}
-                            image={
-                              filteredProvider.subcategory_image !== null
-                                ? filteredProvider.subcategory_image
-                                : getImageBySubCategory(
-                                    filteredProvider.sub_categories
-                                  )
-                            }
-                            businessName={filteredProvider.business_name}
-                            bio={filteredProvider.bio}
-                            contactNumber={filteredProvider.provider_contact}
-                            ratings={calculateAverageRating(
-                              filteredProvider.no_of_stars
-                            )}
-                            onPress={() => handleCardPress(filteredProvider)}
-                          />
-                        ))}
-                    </ScrollView>
-                  </View>
-                ))}
-              </ScrollView>
+              <Text>Placeholder for Browse By Recommendation</Text>
             )}
           </ScrollView>
         )}

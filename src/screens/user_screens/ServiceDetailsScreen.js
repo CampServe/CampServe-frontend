@@ -168,6 +168,9 @@ const ServiceDetailsScreen = () => {
         ) : (
           <>
             <View className="px-4 pt-4">
+              <Text className="text-xs ml-2 font-semibold capitalize">
+                {provider.sub_categories}
+              </Text>
               <Text className="text-3xl font-bold capitalize">
                 {provider.business_name}
               </Text>

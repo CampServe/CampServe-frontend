@@ -11,42 +11,16 @@ export const SocketProvider = ({ children }) => {
   const { user } = useAuth();
 
   // useEffect(() => {
-  //   socket.on("new_request", (newData) => {
-  //     console.log(newData);
-  //     //   setSocketTrigger(newData);
-  //   });
-
-  //   return () => {
-  //     socket.off("new_request");
-  //   };
-  // }, []);
-
-  // socket.on("new_request", (data) => {
-  //   console.log(data);
-  // });
-
-  // socket.on("connect", (data) => {
-  //   // console.log("Connected to the backend");
-  //   console.log(data);
-  // });
-
-  useEffect(() => {
-    if (user) {
-      socket.connect();
-      // socket.on("connect", (data) => {
-      //   console.log(data);
-      // });
-    } else {
-      socket.disconnect();
-    }
-  }, [user]);
-
-  // useEffect(() => {
-  //   if (user?.provider_id) {
-  //     socket.emit("user_login", { provider_id: user.provider_id });
-  //     console.log("Sent");
+  //   if (user) {
+  //     socket.connect();
+  //  socket.on("connect", (data) => {
+  //    // console.log("Connected to the backend");
+  //    console.log(data);
+  //  });
+  //   } else {
+  //     socket.disconnect();
   //   }
-  // }, [user?.provider_id]);
+  // }, [user]);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
