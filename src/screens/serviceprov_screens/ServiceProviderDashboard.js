@@ -331,7 +331,6 @@ const ServiceProviderDashboard = () => {
                     <RatingsAndReviews
                       key={activeSubcategory}
                       rating={filteredData.rating_details}
-                      canPostReview={false}
                     />
                   )}
                 </>

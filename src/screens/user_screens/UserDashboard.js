@@ -18,6 +18,8 @@ import useSearch from "../../hooks/useSearch";
 import useSocket from "../../hooks/useSocket";
 import ProviderCategories from "../../components/ProviderCategories";
 import { View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { calculateAverageRating } from "../../components/RatingsandReviews";
 
 const UserDashboard = () => {
   const navigation = useNavigation();
@@ -32,7 +34,8 @@ const UserDashboard = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [clearInput, setclearInput] = useState(false);
   const refreshColours = ["#22543D"];
-  const [selectedView, setSelectedView] = useState("category");
+  const [selectedView, setSelectedView] = useState("all");
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   const handleViewToggle = (view) => {
     setSelectedView(view);
@@ -88,34 +91,9 @@ const UserDashboard = () => {
     } else {
       setSelectedProviders([]);
     }
-  }, [selectedCategory, serviceProviders, searchQueries]);
-
-  const dummyFeaturedProviders = [
-    {
-      id: 1,
-      business_name: "Featured Provider 1",
-      sub_categories: "Featured",
-      bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      provider_contact: "1234567890",
-    },
-    {
-      id: 2,
-      business_name: "Featured Provider 2",
-      sub_categories: "Featured",
-      bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      provider_contact: "9876543210",
-    },
-    {
-      id: 3,
-      business_name: "Featured Provider 3",
-      sub_categories: "Featured",
-      bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      provider_contact: "0126543210",
-    },
-  ];
+  }, [selectedCategory, serviceProviders, searchQueries, selectedView]);
 
   const mainCategories = [
-    // "Featured",
     ...new Set(serviceProviders.map((provider) => provider.main_categories)),
   ];
 
@@ -126,22 +104,38 @@ const UserDashboard = () => {
   const filterProvidersByCategory = (category) => {
     setSelectedCategory(category);
 
-    if (category === "Featured") {
-      setSelectedProviders(dummyFeaturedProviders);
-    } else {
-      let filteredProviders = serviceProviders.filter(
-        (provider) => provider.main_categories === category
+    let filteredProviders = serviceProviders.filter(
+      (provider) => provider.main_categories === category
+    );
+
+    const searchQuery = searchQueries["userDashboard"]?.trim().toLowerCase();
+
+    if (searchQuery) {
+      filteredProviders = filteredProviders.filter((provider) =>
+        provider.business_name.toLowerCase().includes(searchQuery)
+      );
+    }
+
+    if (selectedView === "all") {
+      setSelectedProviders(filteredProviders);
+    } else if (selectedView === "highly rated") {
+      const highlyRatedProviders = filteredProviders.filter(
+        (provider) => provider.no_of_stars.length > 0
       );
 
-      const searchQuery = searchQueries["userDashboard"]?.trim().toLowerCase();
+      highlyRatedProviders.sort(
+        (a, b) =>
+          calculateAverageRating(b.no_of_stars) -
+          calculateAverageRating(a.no_of_stars)
+      );
 
-      if (searchQuery) {
-        filteredProviders = filteredProviders.filter((provider) =>
-          provider.business_name.toLowerCase().includes(searchQuery)
-        );
-      }
-
-      setSelectedProviders(filteredProviders);
+      setSelectedProviders(highlyRatedProviders);
+    } else if (selectedView === "most bookings") {
+      setSelectedProviders([]);
+    } else if (selectedView === "most visited") {
+      setSelectedProviders([]);
+    } else {
+      setSelectedProviders([]);
     }
   };
 
@@ -189,39 +183,20 @@ const UserDashboard = () => {
     return image;
   };
 
-  const CustomDropdown = ({ selectedView, handleViewToggle }) => {
-    const dropdownOptions = [
-      { key: "category", label: "Category" },
-      { key: "recommendation", label: "Recommendation" },
-    ];
-    return (
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          marginBottom: 20,
-        }}
-      >
-        <Text style={{ fontSize: 20, color: "#0A4014", fontWeight: "700" }}>
-          Browse By
-        </Text>
-        <TouchableOpacity
-          style={{
-            flexGrow: 1,
-          }}
-          onPress={() =>
-            handleViewToggle(
-              selectedView === "category" ? "recommendation" : "category"
-            )
-          }
-        >
-          <Text style={{ fontSize: 20, color: "#0A4014", fontWeight: "700" }}>
-            {" "}
-            {selectedView === "category" ? "Category" : "Recommendation"}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    );
+  const dropdownOptions = [
+    { key: "all", label: "All" },
+    { key: "highly rated", label: "Highly Rated" },
+    { key: "most bookings", label: "Most Bookings" },
+    { key: "most visited", label: "Most Visited" },
+  ];
+
+  const toggleDropdown = () => {
+    setIsDropdownVisible(!isDropdownVisible);
+  };
+
+  const handleOptionPress = (option) => {
+    handleViewToggle(option);
+    toggleDropdown();
   };
 
   return (
@@ -247,27 +222,73 @@ const UserDashboard = () => {
               />
             }
           >
-            <CustomDropdown
-              selectedView={selectedView}
-              handleViewToggle={handleViewToggle}
-            />
+            <View className="flex-row items-center mb-4 mt-1 relative">
+              <Text className="text-xl text-[#0A4014] font-bold">
+                Browse by
+              </Text>
+              <Text className="text-xl text-[#0A4014] capitalize font-bold">
+                {" "}
+                {selectedView}
+              </Text>
+              <TouchableOpacity
+                className="ml-1"
+                style={{ flexGrow: 1 }}
+                onPress={toggleDropdown}
+              >
+                <Ionicons
+                  name={`${
+                    isDropdownVisible
+                      ? "chevron-up-outline"
+                      : "chevron-down-outline"
+                  }`}
+                  color="gray"
+                  size={20}
+                />
+              </TouchableOpacity>
+            </View>
 
-            {selectedView === "category" ? (
-              <ProviderCategories
-                mainCategories={mainCategories}
-                selectedCategory={selectedCategory}
-                filterProvidersByCategory={filterProvidersByCategory}
-                uniqueSubCategories={uniqueSubCategories}
-                selectedProviders={selectedProviders}
-                refreshColours={refreshColours}
-                isRefreshing={isRefreshing}
-                onRefresh={onRefresh}
-                getImageBySubCategory={getImageBySubCategory}
-                handleCardPress={handleCardPress}
-              />
-            ) : (
-              <Text>Placeholder for Browse By Recommendation</Text>
+            {isDropdownVisible && (
+              <ScrollView
+                className="z-50 absolute top-8 left-0 right-0 bg-white border-2 border-gray-200 rounded-xl"
+                style={{ zIndex: 9999 }}
+              >
+                {dropdownOptions.map((item, index) => (
+                  <TouchableOpacity
+                    key={item.key}
+                    className={`p-2 items-center ${
+                      index !== dropdownOptions.length - 1
+                        ? "border-b border-gray-200"
+                        : ""
+                    } ${item.key == selectedView ? "bg-gray-100" : ""}`}
+                    onPress={() => handleOptionPress(item.key)}
+                    disabled={item.key == selectedView}
+                  >
+                    <Text
+                      className={`text-sm ${
+                        item.key == selectedView
+                          ? "text-gray-300"
+                          : "text-[#0A4014]"
+                      } `}
+                    >
+                      {item.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
             )}
+
+            <ProviderCategories
+              mainCategories={mainCategories}
+              selectedCategory={selectedCategory}
+              filterProvidersByCategory={filterProvidersByCategory}
+              uniqueSubCategories={uniqueSubCategories}
+              selectedProviders={selectedProviders}
+              refreshColours={refreshColours}
+              isRefreshing={isRefreshing}
+              onRefresh={onRefresh}
+              getImageBySubCategory={getImageBySubCategory}
+              handleCardPress={handleCardPress}
+            />
           </ScrollView>
         )}
       </SafeAreaView>

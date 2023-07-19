@@ -54,7 +54,8 @@ const ProviderCategories = ({
 
       {selectedProviders.length === 0 ? (
         <ScrollView
-          contentContainerStyle={{ flex: 1 }}
+          className="h-96"
+          contentContainerStyle={{ flexGrow: 1 }}
           refreshControl={
             <RefreshControl
               refreshing={isRefreshing}
@@ -63,7 +64,7 @@ const ProviderCategories = ({
             />
           }
         >
-          <View className="flex-1 items-center justify-center">
+          <View className="flex-1 justify-center">
             <Text className="text-base font-semibold text-center">
               No service providers available.
             </Text>

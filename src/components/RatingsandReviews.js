@@ -1,18 +1,7 @@
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  TextInput,
-} from "react-native";
+import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Modal from "react-native-modal";
 import React, { useState, useEffect } from "react";
-import useAuth from "../hooks/useAuth";
-import { getRatings, storeRatings } from "../hooks/useApi";
-import { DotIndicator } from "react-native-indicators";
-import useProvider from "../hooks/useProvider";
 
 export const calculateAverageRating = (ratings) => {
   if (!ratings || ratings.length === 0 || ratings[0] == null) return 0;
@@ -31,86 +20,10 @@ export const calculateAverageRating = (ratings) => {
   }
 };
 
-const RatingsAndReviews = ({
-  rating,
-  sub_categories,
-  provider_id,
-  business_name,
-  canPostReview = true,
-}) => {
-  const [ratings, setRatings] = useState(rating);
+const RatingsAndReviews = ({ rating }) => {
+  const ratings = rating;
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [displayedReviews, setDisplayedReviews] = useState([]);
-  const [isReviewsModalVisible, setIsReviewsModalVisible] = useState(false);
-  const [selectedRating, setSelectedRating] = useState(0);
-  const [review, setReview] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const { user } = useAuth();
-  const { setAverageRate } = useProvider();
-
-  const addRatingAndReview = async () => {
-    const newRating = {
-      id: user.user_id,
-      provider_id: provider_id,
-      ratings: selectedRating,
-      review: review.trim(),
-      timestamp: new Date(),
-      subcategory: sub_categories,
-    };
-
-    const data = {
-      provider_id: provider_id,
-      subcategory: sub_categories,
-    };
-
-    setIsLoading(true);
-
-    try {
-      const ratingSent = await storeRatings(newRating);
-      if (ratingSent) {
-        const newRatings = await getRatings(data);
-        setRatings(newRatings);
-        setAverageRate(calculateAverageRating(newRatings));
-      } else {
-        console.log("Failure");
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsLoading(false);
-      closeReview();
-    }
-  };
-
-  const closeReview = () => {
-    setIsReviewsModalVisible(false);
-    setSelectedRating(0);
-    setReview("");
-  };
-
-  const renderStars = () => {
-    const stars = [];
-
-    for (let i = 1; i <= 5; i++) {
-      const isSelected = i <= selectedRating;
-
-      stars.push(
-        <TouchableOpacity
-          key={i}
-          onPress={() => setSelectedRating(i)}
-          style={{ marginRight: 5 }}
-        >
-          <Ionicons
-            name={isSelected ? "star" : "star-outline"}
-            size={32}
-            color={isSelected ? "gold" : "gray"}
-          />
-        </TouchableOpacity>
-      );
-    }
-
-    return stars;
-  };
 
   const calculateRatingCounts = (ratings) => {
     const ratingCounts = Array.from({ length: 5 }, () => 0);
@@ -141,16 +54,6 @@ const RatingsAndReviews = ({
       <View className="px-4 pt-4">
         <View className="flex-row justify-between">
           <Text className="text-lg font-bold">Ratings and Reviews</Text>
-          {canPostReview && (
-            <TouchableOpacity
-              className="flex items-center justify-center rounded-lg"
-              onPress={() => {
-                setIsReviewsModalVisible(true);
-              }}
-            >
-              <Text className="text-green-600">Post a review</Text>
-            </TouchableOpacity>
-          )}
         </View>
         {displayedReviews.length > 0 ? (
           <View className="bg-white rounded-lg p-4 pb-0">
@@ -330,59 +233,6 @@ const RatingsAndReviews = ({
                 </View>
               ))}
             </ScrollView>
-          </View>
-        </View>
-      </Modal>
-
-      <Modal
-        isVisible={isReviewsModalVisible}
-        animationIn="slideInUp"
-        animationOut="slideOutDown"
-        backdropOpacity={0.5}
-        style={{ margin: 0 }}
-      >
-        <View className="flex-1 justify-end">
-          <View className="bg-white rounded-t-3xl px-4">
-            <View className="flex-row items-center justify-between">
-              <Text className="text-2xl flex-1 text-center font-bold my-5 capitalize">
-                Rate {business_name}
-              </Text>
-              <TouchableOpacity onPress={closeReview} className="p-4">
-                <Ionicons name="close-sharp" size={24} color="black" />
-              </TouchableOpacity>
-            </View>
-            <View className="flex flex-row items-center justify-between mb-4">
-              {renderStars()}
-            </View>
-            <View>
-              <Text className="text-base font-semibold mb-1">
-                Review (optional):
-              </Text>
-              <TextInput
-                multiline
-                value={review}
-                onChangeText={(text) => setReview(text)}
-                className={`border focus:border-2 border-green-500 rounded-lg px-4 py-2 focus:border-green-700 focus:outline-none`}
-              />
-            </View>
-
-            <View className="flex items-center justify-center">
-              {isLoading ? (
-                <View className="flex justify-center items-center py-2 px-4 my-10 h-10">
-                  <DotIndicator color="green" count={3} size={10} />
-                </View>
-              ) : (
-                <TouchableOpacity
-                  onPress={addRatingAndReview}
-                  disabled={selectedRating === 0}
-                  className={`${
-                    selectedRating === 0 ? "bg-gray-500" : "bg-green-500"
-                  }  w-52 text-white py-2 px-4 my-10 rounded-lg`}
-                >
-                  <Text className="text-center text-lg">Post</Text>
-                </TouchableOpacity>
-              )}
-            </View>
           </View>
         </View>
       </Modal>

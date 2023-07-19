@@ -19,6 +19,7 @@ import { changeRequestStatus } from "../../hooks/SPuseApi";
 import { DotIndicator } from "react-native-indicators";
 import useSearch from "../../hooks/useSearch";
 import useSocket from "../../hooks/useSocket";
+import PostReviewModal from "../../components/PostReview.Modal";
 
 const ActivityScreen = () => {
   const navigation = useNavigation();
@@ -33,6 +34,8 @@ const ActivityScreen = () => {
   const [actionCompleted, setActionCompleted] = useState(true);
   const { searchQueries, updateSearchQuery } = useSearch();
   const [refreshing, setRefreshing] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [reviewProps, setReviewProps] = useState([]);
   const refreshColours = ["#22543D"];
 
   useFocusEffect(
@@ -221,6 +224,7 @@ const ActivityScreen = () => {
       <TouchableOpacity
         className="flex ml-[2px]"
         activeOpacity={0.7}
+        onPress={() => console.log(item)}
         style={{
           backgroundColor: "white",
           borderRadius: 8,
@@ -305,6 +309,17 @@ const ActivityScreen = () => {
                   <Text style={{ color: "white" }}>Cancel</Text>
                 </TouchableOpacity>
               ))}
+            {statusText === "Completed" && (
+              <TouchableOpacity
+                className="flex pt-2 items-center justify-center rounded-lg"
+                onPress={() => {
+                  setIsVisible(true);
+                  setReviewProps(item);
+                }}
+              >
+                <Text className="text-green-600">Post a review</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </TouchableOpacity>
@@ -383,6 +398,14 @@ const ActivityScreen = () => {
               </ScrollView>
             )}
           </View>
+
+          <PostReviewModal
+            isVisible={isVisible}
+            onClose={() => setIsVisible(false)}
+            businessName={reviewProps?.business_name}
+            provider_id={reviewProps?.provider_id}
+            sub_categories={reviewProps?.subcategory}
+          />
         </>
       )}
     </SafeAreaView>

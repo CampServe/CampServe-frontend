@@ -202,12 +202,7 @@ const ServiceDetailsScreen = () => {
 
             <View className="border border-gray-100 m-2 mx-4" />
 
-            <RatingsandReviews
-              business_name={provider.business_name}
-              rating={ratings}
-              provider_id={provider.provider_id}
-              sub_categories={provider.sub_categories}
-            />
+            <RatingsandReviews rating={ratings} />
           </>
         )}
       </ScrollView>
