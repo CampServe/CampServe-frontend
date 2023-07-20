@@ -50,6 +50,12 @@ const ServiceProviderDashboard = () => {
     if (!isOffline) {
       fetchProviderData();
     }
+  }, []);
+
+  useEffect(() => {
+    if (!isOffline) {
+      onRefresh();
+    }
   }, [isOffline]);
 
   const onRefresh = async () => {

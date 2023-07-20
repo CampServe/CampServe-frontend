@@ -54,10 +54,10 @@ const SPActivityScreen = () => {
         const { sub_categories, ...otherData } = providerInfoResponse;
         setSubData(sub_categories);
 
-        if (requestsResponse.message) {
-          setRequests([]);
-        } else {
+        if (requestsResponse) {
           setRequests(requestsResponse.all_requests);
+        } else {
+          setRequests([]);
         }
       } catch (error) {
         console.log(error);
@@ -70,7 +70,13 @@ const SPActivityScreen = () => {
     if (!isOffline) {
       fetchData();
     }
-  }, [actionCompleted, isOffline]);
+  }, [actionCompleted]);
+
+  useEffect(() => {
+    if (!isOffline) {
+      onRefresh();
+    }
+  }, [isOffline]);
 
   const onRefresh = async () => {
     setRefreshing(true);

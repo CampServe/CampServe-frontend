@@ -1,30 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { StatusBar as ExpoStatusBar } from "expo-status-bar";
-import useOnboardingStatus from "./src/hooks/useOnboardingStatus";
-import * as SplashScreen from "expo-splash-screen";
+import { setCustomText } from "react-native-global-props";
+import * as Font from "expo-font";
 
 const AppWrapper = ({ children }) => {
-  const { loading } = useOnboardingStatus();
-  const [appReady, setAppReady] = useState(false);
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+  useEffect(() => {
+    async function loadFonts() {
+      await Font.loadAsync({
+        Mont: require("./src/fonts/static/Montserrat-Regular.ttf"),
+      });
+
+      setFontsLoaded(true);
+    }
+
+    loadFonts();
+  }, []);
 
   // useEffect(() => {
-  //   async function prepare() {
-  //     await SplashScreen.preventAutoHideAsync();
-  //     setAppReady(true);
+  //   if (fontsLoaded) {
+  //     const customTextProps = {
+  //       style: {
+  //         fontFamily: "Mont",
+  //       },
+  //     };
+  //     setCustomText(customTextProps);
   //   }
-
-  //   prepare();
-  // }, []);
-
-  // useEffect(() => {
-  //   if (!loading && appReady) {
-  //     SplashScreen.hideAsync();
-  //   }
-  // }, [loading, appReady]);
-
-  // if (!appReady) {
-  //   return null;
-  // }
+  // }, [fontsLoaded]);
 
   return (
     <>

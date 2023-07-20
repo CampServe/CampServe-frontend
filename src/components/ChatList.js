@@ -9,7 +9,6 @@ import React, { useEffect, useState } from "react";
 import {
   collection,
   getDocs,
-  limit,
   onSnapshot,
   orderBy,
   query,

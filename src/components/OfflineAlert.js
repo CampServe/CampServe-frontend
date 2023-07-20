@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text } from "react-native";
 import useSocket from "../hooks/useSocket";
 import * as Animatable from "react-native-animatable";
-import Modal from "react-native-modal";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const OfflineAlert = () => {
   const { isOffline } = useSocket();
@@ -12,14 +12,14 @@ const OfflineAlert = () => {
   }
 
   return (
-    <View
-      style={{
-        position: "absolute",
-        top: 20,
-        left: 0,
-        right: 0,
-        zIndex: 9999,
-      }}
+    <SafeAreaView
+    // style={{
+    //   position: "absolute",
+    //   top: 20,
+    //   left: 0,
+    //   right: 0,
+    //   zIndex: 9999,
+    // }}
     >
       <Animatable.View
         animation="slideInDown"
@@ -29,7 +29,7 @@ const OfflineAlert = () => {
           <Text className="text-white text-sm">No Internet Connection</Text>
         </View>
       </Animatable.View>
-    </View>
+    </SafeAreaView>
   );
 };
 

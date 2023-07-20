@@ -3,7 +3,6 @@ import {
   ScrollView,
   RefreshControl,
   TouchableOpacity,
-  FlatList,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -12,7 +11,6 @@ import CustomHeader from "../../components/CustomHeader";
 import useAuth from "../../hooks/useAuth";
 import { getServiceProviders } from "../../hooks/useApi";
 import Loader from "../../components/Loader";
-import { Picker } from "@react-native-picker/picker";
 import useProvider from "../../hooks/useProvider";
 import useSearch from "../../hooks/useSearch";
 import useSocket from "../../hooks/useSocket";
@@ -41,27 +39,31 @@ const UserDashboard = () => {
     setSelectedView(view);
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      const fetchData = async () => {
-        try {
-          const data = await getServiceProviders();
-          const filteredData = data.filter(
-            (provider) => provider.user_id !== user.user_id
-          );
-          setServiceProviders(filteredData);
-        } catch (error) {
-          console.log(error);
-        } finally {
-          setLoadingCategory(false);
-        }
-      };
-      setAverageRate(0);
-      if (!isOffline) {
-        fetchData();
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getServiceProviders();
+        const filteredData = data.filter(
+          (provider) => provider.user_id !== user.user_id
+        );
+        setServiceProviders(filteredData);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoadingCategory(false);
       }
-    }, [isOffline])
-  );
+    };
+    setAverageRate(0);
+    if (!isOffline) {
+      fetchData();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isOffline) {
+      onRefresh();
+    }
+  }, [isOffline]);
 
   const onRefresh = async () => {
     setIsRefreshing(true);

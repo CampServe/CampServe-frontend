@@ -82,7 +82,13 @@ const ServiceDetailsScreen = () => {
         setIsRatingsLoading(false);
       });
     }
-  }, [bookingData !== undefined ? bookingData : null, isOffline]);
+  }, [bookingData !== undefined ? bookingData : null]);
+
+  useEffect(() => {
+    if (!isOffline) {
+      onRefresh();
+    }
+  }, [isOffline]);
 
   const onRefresh = async () => {
     setIsRefreshing(true);

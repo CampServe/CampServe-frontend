@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { socket } from "../utils/axios";
+import axios from "../utils/axios";
 import useAuth from "./useAuth";
 import * as NetInfo from "@react-native-community/netinfo";
 
@@ -23,12 +24,29 @@ export const SocketProvider = ({ children }) => {
   // }, [user]);
 
   useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener((state) => {
+    const axiosInterceptor = axios.interceptors.response.use(
+      (response) => {
+        setIsOffline(false);
+        return response;
+      },
+      (error) => {
+        if (error.isAxiosError && !navigator.onLine) {
+          setIsOffline(true);
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    const checkNetworkStatus = async () => {
+      const state = await NetInfo.fetch();
       setIsOffline(!state.isConnected);
-    });
+    };
+
+    const networkStatusInterval = setInterval(checkNetworkStatus, 5000);
 
     return () => {
-      unsubscribe();
+      axios.interceptors.response.eject(axiosInterceptor);
+      clearInterval(networkStatusInterval);
     };
   }, []);
 

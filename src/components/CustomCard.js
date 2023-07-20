@@ -69,28 +69,45 @@ const CustomCard = ({
         )}
       </View>
       <View className="flex-1 pb-4 px-4 h-1/2">
-        <Text
-          className="capitalize"
-          style={{ fontSize: 20, fontWeight: "bold", marginTop: 8 }}
-        >
-          <Ionicons name="business-outline" size={20} color="#0A4014" />{" "}
-          {truncatedbusinessName}
-        </Text>
-        <Text className="capitalize" style={{ color: "gray", marginTop: 8 }}>
+        <View className="flex-row gap-1" style={{ marginTop: 6 }}>
           <Ionicons
-            name="information-circle-outline"
+            name="business-outline"
             size={20}
             color="#0A4014"
-          />{" "}
-          {truncatedBio}
-        </Text>
-        <Text style={{ color: "gray", marginTop: 8 }}>
-          <Ionicons name="call-outline" size={20} color="#0A4014" />{" "}
-          {contactNumber}
-        </Text>
-        <Text style={{ color: "gray", marginTop: 8 }}>
-          <Ionicons name="star" size={20} color="gold" /> {ratings || "N/A"}
-        </Text>
+            style={{ paddingTop: 2 }}
+          />
+          <Text
+            className="capitalize"
+            style={{ fontSize: 20, fontWeight: "bold" }}
+          >
+            {truncatedbusinessName}
+          </Text>
+        </View>
+
+        <View className="flex-row gap-1" style={{ marginTop: 6 }}>
+          <Ionicons
+            name="information-circle-outline"
+            size={18}
+            color="#0A4014"
+          />
+          <Text className="capitalize pl-1" style={{ color: "gray" }}>
+            {truncatedBio}
+          </Text>
+        </View>
+
+        <View className="flex-row gap-1" style={{ marginTop: 6 }}>
+          <Ionicons name="call-outline" size={18} color="#0A4014" />
+          <Text className="pl-1" style={{ color: "gray" }}>
+            {contactNumber}
+          </Text>
+        </View>
+
+        <View className="flex-row gap-1" style={{ marginTop: 6 }}>
+          <Ionicons name="star" size={18} color="gold" />
+          <Text className="pl-1" style={{ color: "gray" }}>
+            {ratings || "N/A"}
+          </Text>
+        </View>
       </View>
     </TouchableOpacity>
   );

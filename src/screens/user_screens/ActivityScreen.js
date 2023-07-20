@@ -62,8 +62,14 @@ const ActivityScreen = () => {
       if (!isOffline) {
         fetchRequests();
       }
-    }, [actionCompleted, isOffline])
+    }, [actionCompleted])
   );
+
+  useEffect(() => {
+    if (!isOffline) {
+      onRefresh();
+    }
+  }, [isOffline]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -73,10 +79,10 @@ const ActivityScreen = () => {
           user_id: user.user_id,
         };
         const response = await getAllUserRequests(data);
-        if (response.message) {
-          setRequests([]);
-        } else {
+        if (response) {
           setRequests(response.all_requests);
+        } else {
+          setRequests([]);
         }
       } catch (error) {
         console.log(error);
