@@ -224,7 +224,7 @@ const ServiceProviderDashboard = () => {
                     <View className="flex-row items-center">
                       <Ionicons
                         name="business-outline"
-                        size={24}
+                        size={20}
                         color="green"
                       />
                       <Text className="text-xl font-bold capitalize ml-2">
@@ -234,14 +234,14 @@ const ServiceProviderDashboard = () => {
                     <View className="flex-row items-center">
                       <Ionicons
                         name="information-circle-outline"
-                        size={24}
+                        size={20}
                         color="green"
                       />
                       <Text className=" capitalize ml-2">{mainData.bio}</Text>
                     </View>
 
                     <View className="flex-row items-center">
-                      <Ionicons name="call-outline" size={24} color="green" />
+                      <Ionicons name="call-outline" size={20} color="green" />
                       <Text className="ml-2">{mainData.contact}</Text>
                     </View>
                   </View>
