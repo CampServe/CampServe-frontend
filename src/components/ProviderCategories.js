@@ -69,16 +69,9 @@ const ProviderCategories = ({
         <>
           <View>
             {uniqueSubCategories.map((subCategory) => (
-              <View key={subCategory} style={{ paddingBottom: 6 }}>
-                <Text
-                  style={{
-                    fontWeight: "bold",
-                    color: "#0A4014",
-                    textTransform: "uppercase",
-                    fontSize: 20,
-                  }}
-                >
-                  {subCategory !== "Featured" && subCategory}
+              <View key={subCategory} style={{ paddingBottom: 10 }}>
+                <Text className="capitalize text-[#0A4014] font-bold text-xl">
+                  {subCategory}
                 </Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                   {selectedProviders
@@ -110,7 +103,7 @@ const ProviderCategories = ({
           </View>
 
           <ScrollView
-            style={{ flex: 1, height: 96 }}
+            style={{ flex: 1 }}
             contentContainerStyle={{ flexGrow: 1 }}
             refreshControl={
               <RefreshControl
