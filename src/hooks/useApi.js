@@ -61,3 +61,11 @@ export const getAllUserRequests = async (data) => {
     console.log(error);
   }
 };
+
+export const visitedProviders = async (data) => {
+  try {
+    await axios.post("/number_of_visits", data);
+  } catch (error) {
+    console.log(error);
+  }
+};

@@ -6,10 +6,10 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import CustomHeader from "../../components/CustomHeader";
 import useAuth from "../../hooks/useAuth";
-import { getServiceProviders } from "../../hooks/useApi";
+import { getServiceProviders, visitedProviders } from "../../hooks/useApi";
 import Loader from "../../components/Loader";
 import useProvider from "../../hooks/useProvider";
 import useSearch from "../../hooks/useSearch";
@@ -97,7 +97,13 @@ const UserDashboard = () => {
     } else {
       setSelectedProviders([]);
     }
-  }, [selectedCategory, serviceProviders, searchQueries, selectedView]);
+  }, [
+    selectedCategory,
+    serviceProviders,
+    searchQueries,
+    selectedView,
+    isRefreshing,
+  ]);
 
   const mainCategories = [
     ...new Set(serviceProviders.map((provider) => provider.main_categories)),
@@ -137,15 +143,27 @@ const UserDashboard = () => {
 
       setSelectedProviders(highlyRatedProviders);
     } else if (selectedView === "most bookings") {
-      setSelectedProviders([]);
+      const mostbookedProviders = filteredProviders.filter(
+        (provider) => provider.request_count !== 0
+      );
+      mostbookedProviders.sort((a, b) => b.request_count - a.request_count);
+      setSelectedProviders(mostbookedProviders);
     } else if (selectedView === "most visited") {
-      setSelectedProviders([]);
+      filteredProviders.sort((a, b) => b.number_of_visits - a.number_of_visits);
+      setSelectedProviders(filteredProviders);
     } else {
       setSelectedProviders([]);
     }
   };
 
   const handleCardPress = (provider) => {
+    const data = {
+      provider_id: provider.provider_id,
+      subcategory: provider.sub_categories,
+    };
+
+    visitedProviders(data);
+
     const image =
       provider.subcategory_image !== null
         ? provider.subcategory_image
