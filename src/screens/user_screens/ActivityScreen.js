@@ -20,6 +20,7 @@ import { DotIndicator } from "react-native-indicators";
 import useSearch from "../../hooks/useSearch";
 import useSocket from "../../hooks/useSocket";
 import PostReviewModal from "../../components/PostReview.Modal";
+import { useRef } from "react";
 
 const ActivityScreen = () => {
   const navigation = useNavigation();
@@ -37,6 +38,7 @@ const ActivityScreen = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [reviewProps, setReviewProps] = useState([]);
   const refreshColours = ["#22543D"];
+  const isInitialRender = useRef(true);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -66,8 +68,10 @@ const ActivityScreen = () => {
   );
 
   useEffect(() => {
-    if (!isOffline) {
+    if (!isOffline && !isInitialRender.current) {
       onRefresh();
+    } else {
+      isInitialRender.current = false;
     }
   }, [isOffline]);
 

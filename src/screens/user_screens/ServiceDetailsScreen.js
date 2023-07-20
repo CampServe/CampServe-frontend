@@ -19,6 +19,7 @@ import useProvider from "../../hooks/useProvider";
 import useAuth from "../../hooks/useAuth";
 import BookingModal from "../../components/BookingModal";
 import useSocket from "../../hooks/useSocket";
+import { useRef } from "react";
 
 const ServiceDetailsScreen = () => {
   const navigation = useNavigation();
@@ -33,6 +34,7 @@ const ServiceDetailsScreen = () => {
   const { isOffline } = useSocket();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const refreshColours = ["#22543D"];
+  const isInitialRender = useRef(true);
 
   const isNumber = typeof provider.image === "number";
   const imageSource = isNumber ? provider.image : { uri: `${provider.image}` };
@@ -85,8 +87,10 @@ const ServiceDetailsScreen = () => {
   }, [bookingData !== undefined ? bookingData : null]);
 
   useEffect(() => {
-    if (!isOffline) {
+    if (!isOffline && !isInitialRender.current) {
       onRefresh();
+    } else {
+      isInitialRender.current = false;
     }
   }, [isOffline]);
 

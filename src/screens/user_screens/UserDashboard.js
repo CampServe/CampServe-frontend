@@ -18,6 +18,7 @@ import ProviderCategories from "../../components/ProviderCategories";
 import { View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { calculateAverageRating } from "../../components/RatingsandReviews";
+import { useRef } from "react";
 
 const UserDashboard = () => {
   const navigation = useNavigation();
@@ -34,6 +35,7 @@ const UserDashboard = () => {
   const refreshColours = ["#22543D"];
   const [selectedView, setSelectedView] = useState("all");
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const isInitialRender = useRef(true);
 
   const handleViewToggle = (view) => {
     setSelectedView(view);
@@ -60,8 +62,10 @@ const UserDashboard = () => {
   }, []);
 
   useEffect(() => {
-    if (!isOffline) {
+    if (!isOffline && !isInitialRender.current) {
       onRefresh();
+    } else {
+      isInitialRender.current = false;
     }
   }, [isOffline]);
 

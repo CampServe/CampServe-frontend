@@ -17,6 +17,7 @@ import { useNavigation } from "@react-navigation/native";
 import { DotIndicator } from "react-native-indicators";
 import useSearch from "../../hooks/useSearch";
 import useSocket from "../../hooks/useSocket";
+import { useRef } from "react";
 
 const SPActivityScreen = () => {
   const navigation = useNavigation();
@@ -35,6 +36,7 @@ const SPActivityScreen = () => {
   const [subData, setSubData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const refreshColours = ["#22543D"];
+  const isInitialRender = useRef(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,8 +75,10 @@ const SPActivityScreen = () => {
   }, [actionCompleted]);
 
   useEffect(() => {
-    if (!isOffline) {
+    if (!isOffline && !isInitialRender.current) {
       onRefresh();
+    } else {
+      isInitialRender.current = false;
     }
   }, [isOffline]);
 

@@ -18,6 +18,7 @@ import RatingsAndReviews from "../../components/RatingsandReviews";
 import { Image } from "react-native";
 import useSocket from "../../hooks/useSocket";
 import * as Animatable from "react-native-animatable";
+import { useRef } from "react";
 
 const ServiceProviderDashboard = () => {
   const navigation = useNavigation();
@@ -31,6 +32,7 @@ const ServiceProviderDashboard = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [requestSummary, setRequestSummary] = useState([]);
   const refreshColours = ["#22543D"];
+  const isInitialRender = useRef(true);
 
   useEffect(() => {
     const fetchProviderData = async () => {
@@ -53,8 +55,10 @@ const ServiceProviderDashboard = () => {
   }, []);
 
   useEffect(() => {
-    if (!isOffline) {
+    if (!isOffline && !isInitialRender.current) {
       onRefresh();
+    } else {
+      isInitialRender.current = false;
     }
   }, [isOffline]);
 
