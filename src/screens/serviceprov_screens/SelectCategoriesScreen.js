@@ -176,21 +176,18 @@ const SelectCategoriesScreen = () => {
         setModalMessage("An error occurred while signing up as a provider");
       } finally {
         setSelectedCategories([]);
-        setSelectedCategories([]);
+        setSelectedDescriptions([]);
         setIsConfirmationModalVisible(false);
       }
     } else {
-      const serviceData = {
-        selectedSubcategories: selectedDescriptions,
-      };
       try {
         setIsConfirming(true);
-        const success = await addService(user.user_id, serviceData);
+        const success = await addService(user.user_id, selectedDescriptions);
         setIsConfirming(false);
 
         setIsConfirmationModalVisible(false);
         setIsSuccess(success);
-        setModalMessage(success ? "Service Added" : "Service Failed");
+        setModalMessage(success ? "Service Added" : "Service Addition Failed");
         setIsModalVisible(true);
       } catch (error) {
         console.log(error);
@@ -200,7 +197,8 @@ const SelectCategoriesScreen = () => {
         setModalMessage("An error occurred while adding a new service");
       } finally {
         setSelectedCategories([]);
-        setSelectedCategories([]);
+        setSelectedDescriptions([]);
+        setSelectedSubcategories([]);
         setIsConfirmationModalVisible(false);
       }
     }
@@ -209,7 +207,7 @@ const SelectCategoriesScreen = () => {
   const handleModalClose = () => {
     setIsModalVisible(false);
     if (isSuccess) {
-      navigation.replace(params?.formData ? "Service Provider" : "User");
+      navigation.replace(params?.formData ? "User" : "Service Provider");
     }
   };
 
@@ -337,7 +335,7 @@ const SelectCategoriesScreen = () => {
                 Are you sure you want to{" "}
                 {params?.formData
                   ? "create your service provider account?"
-                  : "add new service"}
+                  : "add new service?"}
               </Text>
               <View className="flex-row-reverse justify-evenly">
                 <TouchableOpacity onPress={handleConfirm}>
@@ -368,7 +366,7 @@ const SelectCategoriesScreen = () => {
               className="bg-green-500 py-2 px-4 rounded-lg"
             >
               <Text className="text-white text-center text-lg">
-                {isSuccess ? "Back to UserDashboard" : "Close"}
+                {isSuccess ? "Back to Dashboard" : "Close"}
               </Text>
             </TouchableOpacity>
           </View>

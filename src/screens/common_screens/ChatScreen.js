@@ -155,7 +155,6 @@ const ChatScreen = () => {
       const options = {
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: false,
-        aspect: [4, 3],
         quality: 1,
         allowsMultipleSelection: true,
       };

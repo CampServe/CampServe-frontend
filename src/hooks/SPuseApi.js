@@ -36,11 +36,11 @@ export const getProviderInfo = async (provider_id) => {
 export const addService = async (user_id, serviceData) => {
   const data = {
     user_id: user_id,
-    serviceData: serviceData,
+    selectedSubcategories: serviceData,
   };
   try {
-    const response = await axios.post("/addService", data);
-    if (response.data.status == "Service added successfully") {
+    const response = await axios.post("/add_new_service", data);
+    if (response.data.status === "New Service added") {
       return true;
     } else {
       return false;
