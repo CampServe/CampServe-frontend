@@ -7,7 +7,6 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import useAuth from "../../hooks/useAuth";
 import { useNavigation } from "@react-navigation/native";
 import Backbutton from "../../components/Backbutton";
 

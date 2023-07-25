@@ -12,8 +12,9 @@ import {
 import Backbutton from "../../components/Backbutton";
 import useAuth from "../../hooks/useAuth";
 import DescriptionModal from "../../components/DescriptionModal";
+import { addService } from "../../hooks/SPuseApi";
 
-const categories = [
+const Categories = [
   {
     id: 1,
     name: "Room",
@@ -47,6 +48,8 @@ const SelectCategoriesScreen = () => {
   const { params } = useRoute();
   const navigation = useNavigation();
   const { user, signupAsProvider } = useAuth();
+
+  const categories = params?.categoriesArray || Categories;
 
   const handleCategorySelection = (categoryId) => {
     setSelectedCategories((prevSelectedCategories) => {
@@ -151,37 +154,62 @@ const SelectCategoriesScreen = () => {
   };
 
   const handleConfirm = async () => {
-    const providerData = {
-      ...trimObjectValues(params.formData),
-      selectedSubcategories: selectedDescriptions,
-    };
-    // console.log(JSON.stringify(providerData, null, 2));
-    try {
-      setIsConfirming(true);
-      const success = await signupAsProvider(user.user_id, providerData);
-      setIsConfirming(false);
+    if (params?.formData) {
+      const providerData = {
+        ...trimObjectValues(params.formData),
+        selectedSubcategories: selectedDescriptions,
+      };
+      try {
+        setIsConfirming(true);
+        const success = await signupAsProvider(user.user_id, providerData);
+        setIsConfirming(false);
 
-      setIsConfirmationModalVisible(false);
-      setIsSuccess(success);
-      setModalMessage(success ? "SignUp successful" : "SignUp failed");
-      setIsModalVisible(true);
-    } catch (error) {
-      console.log(error);
-      setIsConfirming(false);
-      setIsSuccess(false);
-      setIsModalVisible(true);
-      setModalMessage("An error occurred while signing up as a provider");
-    } finally {
-      setSelectedCategories([]);
-      setSelectedCategories([]);
-      setIsConfirmationModalVisible(false);
+        setIsConfirmationModalVisible(false);
+        setIsSuccess(success);
+        setModalMessage(success ? "SignUp successful" : "SignUp failed");
+        setIsModalVisible(true);
+      } catch (error) {
+        console.log(error);
+        setIsConfirming(false);
+        setIsSuccess(false);
+        setIsModalVisible(true);
+        setModalMessage("An error occurred while signing up as a provider");
+      } finally {
+        setSelectedCategories([]);
+        setSelectedCategories([]);
+        setIsConfirmationModalVisible(false);
+      }
+    } else {
+      const serviceData = {
+        selectedSubcategories: selectedDescriptions,
+      };
+      try {
+        setIsConfirming(true);
+        const success = await addService(user.user_id, serviceData);
+        setIsConfirming(false);
+
+        setIsConfirmationModalVisible(false);
+        setIsSuccess(success);
+        setModalMessage(success ? "Service Added" : "Service Failed");
+        setIsModalVisible(true);
+      } catch (error) {
+        console.log(error);
+        setIsConfirming(false);
+        setIsSuccess(false);
+        setIsModalVisible(true);
+        setModalMessage("An error occurred while adding a new service");
+      } finally {
+        setSelectedCategories([]);
+        setSelectedCategories([]);
+        setIsConfirmationModalVisible(false);
+      }
     }
   };
 
   const handleModalClose = () => {
     setIsModalVisible(false);
     if (isSuccess) {
-      navigation.replace("User");
+      navigation.replace(params?.formData ? "Service Provider" : "User");
     }
   };
 
@@ -209,9 +237,9 @@ const SelectCategoriesScreen = () => {
           Select Categories
         </Text>
         <View className="flex-row">
-          {categories.map((category) => (
+          {categories.map((category, index) => (
             <TouchableOpacity
-              key={category.id}
+              key={index}
               onPress={() => handleCategorySelection(category.id)}
               className={`rounded-full p-4 m-4 items-center justify-center w-24 h-24 ${
                 selectedCategories.includes(category.id)
@@ -230,12 +258,12 @@ const SelectCategoriesScreen = () => {
                 Select Subcategories
               </Text>
               <View className="flex flex-wrap">
-                {selectedCategories.map((categoryId) => {
+                {selectedCategories.map((categoryId, index) => {
                   const selectedCategory = categories.find(
                     (category) => category.id === categoryId
                   );
                   return (
-                    <React.Fragment key={selectedCategory.id}>
+                    <React.Fragment key={index}>
                       <View className="flex">
                         <Text className="text-base font-semibold">
                           {selectedCategory.name}
@@ -302,10 +330,14 @@ const SelectCategoriesScreen = () => {
           ) : (
             <View className="bg-white p-6 rounded-2xl">
               <Text className="text-xl text-center font-bold mb-4">
-                Confirm Account Creation
+                Confirm{" "}
+                {params?.formData ? "Account Creation" : "Service Addition"}
               </Text>
-              <Text className="mb-6 text-lg">
-                Are you sure you want to create your service provider account?
+              <Text className="mb-6 text-center text-lg">
+                Are you sure you want to{" "}
+                {params?.formData
+                  ? "create your service provider account?"
+                  : "add new service"}
               </Text>
               <View className="flex-row-reverse justify-evenly">
                 <TouchableOpacity onPress={handleConfirm}>

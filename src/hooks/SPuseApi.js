@@ -32,3 +32,18 @@ export const getProviderInfo = async (provider_id) => {
     console.log(error);
   }
 };
+
+export const addService = async (user_id, serviceData) => {
+  const data = {
+    user_id: user_id,
+    serviceData: serviceData,
+  };
+  try {
+    const response = await axios.post("/addService", data);
+    if (response.data.status == "Service added successfully") {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {}
+};

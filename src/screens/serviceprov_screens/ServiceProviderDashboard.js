@@ -31,14 +31,61 @@ const ServiceProviderDashboard = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [requestSummary, setRequestSummary] = useState([]);
+  const [categoriesArray, setCategoriesArray] = useState([]);
   const refreshColours = ["#22543D"];
   const isInitialRender = useRef(true);
+  const categories = [
+    {
+      id: 1,
+      name: "Room",
+      subcategories: ["Laundry", "Room Decoration"],
+    },
+    {
+      id: 2,
+      name: "Tutoring",
+      subcategories: ["Academic Tutoring", "Exams Preparation"],
+    },
+    {
+      id: 3,
+      name: "Design",
+      subcategories: ["UI/UX Design", "Graphic Design"],
+    },
+  ];
+
+  const transformResponseToCategoriesArray = (response, categories) => {
+    const transformedCategories = [];
+    const updatedCategories = JSON.parse(JSON.stringify(categories));
+
+    if (response.sub_categories) {
+      const subcategoriesData = response.sub_categories;
+      const subcategoriesToRemove = Object.keys(subcategoriesData);
+
+      updatedCategories.forEach((category) => {
+        category.subcategories = category.subcategories.filter(
+          (subcategory) => !subcategoriesToRemove.includes(subcategory)
+        );
+
+        if (category.subcategories.length > 0) {
+          transformedCategories.push(category);
+        }
+      });
+    } else {
+      transformedCategories.push(...updatedCategories);
+    }
+
+    return transformedCategories;
+  };
 
   useEffect(() => {
     const fetchProviderData = async () => {
       try {
         setisLoading(true);
         const response = await getProviderInfo(user.provider_id);
+        const transformedData = transformResponseToCategoriesArray(
+          response,
+          categories
+        );
+        setCategoriesArray(transformedData);
         const { sub_categories, ...otherData } = response;
         setMainData(otherData);
         setSubData(sub_categories);
@@ -161,7 +208,6 @@ const ServiceProviderDashboard = () => {
       <Animatable.View
         className="p-2 rounded-xl mr-3"
         animation="pulse"
-        // animation={item.status !== "Total Amount Earned" ? "pulse" : ""}
         iterationCount="infinite"
         duration={5000}
         style={{
@@ -206,6 +252,7 @@ const ServiceProviderDashboard = () => {
         <Loader />
       ) : (
         <>
+          <Text className="text-2xl text-[#0A4014] font-bold">General</Text>
           {mainData.length !== 0 ? (
             <FlatList
               refreshControl={
@@ -245,6 +292,25 @@ const ServiceProviderDashboard = () => {
                       <Text className="ml-2">{mainData.contact}</Text>
                     </View>
                   </View>
+                  <View className="flex-row justify-between">
+                    <Text className="text-xl  text-[#0A4014] font-bold">
+                      Services Offered
+                    </Text>
+                    <TouchableOpacity
+                      className="bg-green-600 px-3 py-1 rounded-lg flex-row gap-1"
+                      onPress={() =>
+                        navigation.navigate("AddService", { categoriesArray })
+                      }
+                    >
+                      <Ionicons
+                        name="add-outline"
+                        size={24}
+                        color="black"
+                        style={{ marginBottom: 2 }}
+                      />
+                      <Text className="text-base">Add Service</Text>
+                    </TouchableOpacity>
+                  </View>
                   <View className="flex-row justify-around items-center">
                     <ScrollView
                       style={{ flex: 1 }}
@@ -254,7 +320,7 @@ const ServiceProviderDashboard = () => {
                       }}
                       horizontal
                       showsHorizontalScrollIndicator={false}
-                      className="gap-2 mb-2"
+                      className="gap-2 my-2"
                     >
                       {Object.values(subcategories).map((subcategory) => (
                         <TouchableOpacity
@@ -324,9 +390,7 @@ const ServiceProviderDashboard = () => {
                   <View className="border border-gray-100 m-2 mx-4" />
 
                   <View className="py-2 px-4">
-                    <Text className="font-semibold text-lg">
-                      Request Summary
-                    </Text>
+                    <Text className="font-bold text-lg">Request Summary</Text>
                   </View>
                   <FlatList
                     data={summaryData}

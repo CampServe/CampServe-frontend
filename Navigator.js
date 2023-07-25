@@ -472,6 +472,10 @@ export const StackNavigator = () => {
                     name="Service Provider"
                     component={SPDrawerNavigator}
                   />
+                  <Stack.Screen
+                    name="AddService"
+                    component={SelectCategoriesScreen}
+                  />
                 </Stack.Group>
               )}
           </>
