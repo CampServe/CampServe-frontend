@@ -17,6 +17,7 @@ const CustomHeader = ({
   updateSearchQuery,
   screen,
   clearInput = false,
+  setEditModalVisible,
 }) => {
   const navigation = useNavigation();
   const [showSearchInput, setShowSearchInput] = useState(false);
@@ -142,7 +143,9 @@ const CustomHeader = ({
                   <Ionicons name="search-outline" size={24} />
                 </TouchableOpacity>
               ) : (
-                <View className="pl-6"></View>
+                <TouchableOpacity onPress={setEditModalVisible}>
+                  <Ionicons name="create-outline" size={24} />
+                </TouchableOpacity>
               )}
             </>
           )}

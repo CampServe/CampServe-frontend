@@ -4,6 +4,7 @@ const SearchContext = createContext();
 
 export const SearchProvider = ({ children }) => {
   const [searchQueries, setSearchQueries] = useState({});
+  const [editModalVisible, setEditModalVisible] = useState(false);
 
   const updateSearchQuery = (screen, query) => {
     setSearchQueries((prevQueries) => ({
@@ -15,6 +16,8 @@ export const SearchProvider = ({ children }) => {
   const searchContextValues = {
     searchQueries,
     updateSearchQuery,
+    editModalVisible,
+    setEditModalVisible,
   };
 
   return (

@@ -19,6 +19,8 @@ import { Image } from "react-native";
 import useSocket from "../../hooks/useSocket";
 import * as Animatable from "react-native-animatable";
 import { useRef } from "react";
+import EditSettingsModal from "../../components/EditSettingsModal";
+import useSearch from "../../hooks/useSearch";
 
 const ServiceProviderDashboard = () => {
   const navigation = useNavigation();
@@ -32,6 +34,8 @@ const ServiceProviderDashboard = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [requestSummary, setRequestSummary] = useState([]);
   const [categoriesArray, setCategoriesArray] = useState([]);
+  const { editModalVisible, setEditModalVisible } = useSearch();
+
   const refreshColours = ["#22543D"];
   const isInitialRender = useRef(true);
   const categories = [
@@ -247,6 +251,7 @@ const ServiceProviderDashboard = () => {
       <CustomHeader
         showMenuIcon={true}
         OpenDrawer={() => navigation.openDrawer()}
+        setEditModalVisible={() => setEditModalVisible(true)}
       />
       {isLoading ? (
         <Loader />
@@ -430,6 +435,10 @@ const ServiceProviderDashboard = () => {
           )}
         </>
       )}
+      <EditSettingsModal
+        visible={editModalVisible}
+        onClose={() => setEditModalVisible(false)}
+      />
     </SafeAreaView>
   );
 };

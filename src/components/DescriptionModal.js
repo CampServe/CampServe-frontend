@@ -6,16 +6,19 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
+  Image,
 } from "react-native";
 import Modal from "react-native-modal";
 import * as ImagePicker from "expo-image-picker";
 import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import { storage } from "../utils/firebase";
+import { DotIndicator } from "react-native-indicators";
 
 const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
   const [descriptions, setDescriptions] = useState([]);
   const [images, setImages] = useState([]);
   const [imageInfo, setImageInfo] = useState([]);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (visible) {
@@ -101,9 +104,20 @@ const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
     });
 
     if (!result.canceled && result.assets.length > 0) {
+      setUploading(true);
       const { uri } = result.assets[0];
       const filename = uri.split("/").pop();
       const extension = filename.split(".").pop();
+
+      const imageInfoEntry = {
+        category,
+        subcategoryIndex,
+        filename,
+        extension,
+        localUri: uri,
+      };
+
+      setImageInfo((prevImageInfo) => [...prevImageInfo, imageInfoEntry]);
 
       const response = await fetch(uri);
       const blob = await response.blob();
@@ -120,17 +134,10 @@ const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
           ...prevImages,
           { category, subcategoryIndex, downloadURL },
         ]);
-
-        const updatedImageInfo = [...imageInfo];
-        updatedImageInfo.push({
-          category,
-          subcategoryIndex,
-          filename,
-          extension,
-        });
-        setImageInfo(updatedImageInfo);
       } catch (error) {
         console.log("Upload failed:", error);
+      } finally {
+        setUploading(false);
       }
     }
   };
@@ -144,7 +151,7 @@ const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
       style={{ margin: 0 }}
     >
       <View className="flex-1 justify-end">
-        <View className="bg-white h-[95%] rounded-t-3xl px-4">
+        <View className="bg-white h-[95%] rounded-t-3xl">
           <View
             style={{
               flexDirection: "row",
@@ -174,92 +181,120 @@ const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
                 )}
                 {subcategoryGroup.subcategory.map((subcategory, index) => (
                   <React.Fragment>
-                    <View className="pt-4">
-                      <Text className="text-base font-semibold mb-1">
-                        {subcategory}
-                      </Text>
-                      <TextInput
-                        multiline={true}
-                        numberOfLines={3}
-                        textAlignVertical="top"
-                        placeholder="Enter description"
-                        onChangeText={(text) =>
-                          handleInputChange(
-                            subcategoryGroup.category,
-                            index,
-                            text
-                          )
-                        }
-                        onBlur={() =>
-                          handleBlur(subcategoryGroup.category, index)
-                        }
-                        className={`border focus:border-2 ${
-                          descriptions[subcategoryGroup.category]?.[index]
-                            ?.length < 10
-                            ? "border-red-500"
-                            : "border-green-500"
-                        } rounded-lg px-4 py-2 ${
-                          descriptions[subcategoryGroup.category]?.[index]
-                            ?.length < 10
-                            ? "focus:border-red-700"
-                            : "focus:border-green-700"
-                        } focus:outline-none`}
-                      />
-                      {descriptions[subcategoryGroup.category]?.[index]
-                        ?.length < 10 && (
-                        <Text className="text-red-500 text-xs">
-                          Description should be at least 10 characters
-                        </Text>
-                      )}
-                    </View>
-                    <View className="flex-row items-center gap-2 py-2 justify-center">
-                      <TouchableOpacity
-                        onPress={() =>
-                          pickImage(subcategoryGroup.category, index)
-                        }
-                      >
-                        <Ionicons
-                          name="cloud-upload-outline"
-                          size={20}
-                          color="green"
+                    <Text className="text-base pt-4 font-semibold">
+                      {subcategory}
+                    </Text>
+                    <View className="flex-row items-center">
+                      <View className="pt-3 w-[70%]">
+                        <TextInput
+                          multiline={true}
+                          numberOfLines={4}
+                          textAlignVertical="top"
+                          placeholder="Enter description"
+                          onChangeText={(text) =>
+                            handleInputChange(
+                              subcategoryGroup.category,
+                              index,
+                              text
+                            )
+                          }
+                          onBlur={() =>
+                            handleBlur(subcategoryGroup.category, index)
+                          }
+                          className={`border focus:border-2 ${
+                            descriptions[subcategoryGroup.category]?.[index]
+                              ?.length < 10
+                              ? "border-red-500"
+                              : "border-green-500"
+                          } rounded-lg px-4 py-2 ${
+                            descriptions[subcategoryGroup.category]?.[index]
+                              ?.length < 10
+                              ? "focus:border-red-700"
+                              : "focus:border-green-700"
+                          } focus:outline-none`}
                         />
-                      </TouchableOpacity>
-                      {imageInfo.find(
-                        (info) =>
-                          info.category === subcategoryGroup.category &&
-                          info.subcategoryIndex === index
-                      ) ? (
-                        <Text className="text-sm">
-                          {imageInfo.find(
-                            (info) =>
-                              info.category === subcategoryGroup.category &&
-                              info.subcategoryIndex === index
-                          ).filename.length > 20
-                            ? imageInfo
-                                .find(
+                        {descriptions[subcategoryGroup.category]?.[index]
+                          ?.length < 10 && (
+                          <Text className="text-red-500 text-xs">
+                            Description should be at least 10 characters
+                          </Text>
+                        )}
+                      </View>
+                      <View className="flex-col flex-1 w-[30%] items-center pt-4">
+                        <TouchableOpacity
+                          onPress={() =>
+                            pickImage(subcategoryGroup.category, index)
+                          }
+                        >
+                          <Image
+                            source={
+                              imageInfo.find(
+                                (info) =>
+                                  info.category === subcategoryGroup.category &&
+                                  info.subcategoryIndex === index
+                              )
+                                ? {
+                                    uri: imageInfo.find(
+                                      (info) =>
+                                        info.category ===
+                                          subcategoryGroup.category &&
+                                        info.subcategoryIndex === index
+                                    ).localUri,
+                                  }
+                                : require("../../assets/camera.jpg")
+                            }
+                            resizeMode="cover"
+                            className="rounded-md w-[90px] h-[70px]"
+                          />
+                        </TouchableOpacity>
+                        {imageInfo.find(
+                          (info) =>
+                            info.category === subcategoryGroup.category &&
+                            info.subcategoryIndex === index
+                        ) ? (
+                          <Text className="text-xs pt-1">
+                            {uploading ? (
+                              <DotIndicator color="green" size={8} count={3} />
+                            ) : (
+                              <>
+                                {imageInfo.find(
                                   (info) =>
                                     info.category ===
                                       subcategoryGroup.category &&
                                     info.subcategoryIndex === index
-                                )
-                                .filename.slice(0, 17) + "..."
-                            : imageInfo.find(
-                                (info) =>
-                                  info.category === subcategoryGroup.category &&
-                                  info.subcategoryIndex === index
-                              ).filename}
-                          .
-                          {
-                            imageInfo.find(
-                              (info) =>
-                                info.category === subcategoryGroup.category &&
-                                info.subcategoryIndex === index
-                            ).extension
-                          }
-                        </Text>
-                      ) : (
-                        <Text className="text-sm">Upload Image (optional)</Text>
-                      )}
+                                ).filename.length > 20
+                                  ? imageInfo
+                                      .find(
+                                        (info) =>
+                                          info.category ===
+                                            subcategoryGroup.category &&
+                                          info.subcategoryIndex === index
+                                      )
+                                      .filename.slice(0, 8) + "..."
+                                  : imageInfo.find(
+                                      (info) =>
+                                        info.category ===
+                                          subcategoryGroup.category &&
+                                        info.subcategoryIndex === index
+                                    ).filename}
+                                .
+                                {
+                                  imageInfo.find(
+                                    (info) =>
+                                      info.category ===
+                                        subcategoryGroup.category &&
+                                      info.subcategoryIndex === index
+                                  ).extension
+                                }
+                              </>
+                            )}
+                          </Text>
+                        ) : (
+                          <>
+                            <Text className="text-xs pt-1">(optional)</Text>
+                          </>
+                        )}
+                      </View>
                     </View>
                   </React.Fragment>
                 ))}
@@ -270,7 +305,7 @@ const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
           <View className="flex items-center justify-center">
             <TouchableOpacity
               onPress={handleSave}
-              disabled={hasErrors()}
+              disabled={hasErrors() || uploading}
               className={`bg-${
                 hasErrors() ? "gray" : "green"
               }-500 w-52 text-white py-2 px-4 my-10 rounded-lg`}
