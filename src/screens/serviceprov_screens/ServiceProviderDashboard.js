@@ -206,6 +206,21 @@ const ServiceProviderDashboard = () => {
     }
   };
 
+  const providerDetails = {
+    user_id: user.user_id,
+    provider_id: user.provider_id,
+    business_name: mainData?.business_name,
+    bio: mainData?.bio,
+    contact: mainData?.contact,
+    subcategories: Object.entries(subData).map(([subcategory, details]) => ({
+      subcategory,
+      subcategory_image: details?.subcategory_image
+        ? { uri: `${details?.subcategory_image}` }
+        : getImageBySubCategory(subcategory),
+      description: details?.description,
+    })),
+  };
+
   const renderItem = ({ item }) => {
     const statusColor = getStatusStyles(item.status);
     return (
@@ -257,7 +272,6 @@ const ServiceProviderDashboard = () => {
         <Loader />
       ) : (
         <>
-          <Text className="text-2xl text-[#0A4014] font-bold">General</Text>
           {mainData.length !== 0 ? (
             <FlatList
               refreshControl={
@@ -272,6 +286,9 @@ const ServiceProviderDashboard = () => {
               keyExtractor={(item, index) => index.toString()}
               renderItem={() => (
                 <>
+                  <Text className="text-2xl text-[#0A4014] font-bold">
+                    General Details
+                  </Text>
                   <View className="flex justify-around space-y-2 py-2 mb-4">
                     <View className="flex-row items-center">
                       <Ionicons
@@ -438,6 +455,7 @@ const ServiceProviderDashboard = () => {
       <EditSettingsModal
         visible={editModalVisible}
         onClose={() => setEditModalVisible(false)}
+        providerDetails={providerDetails}
       />
     </SafeAreaView>
   );

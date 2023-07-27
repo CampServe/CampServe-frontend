@@ -218,7 +218,7 @@ const UserDrawerNavigator = () => {
   const navigation = useNavigation();
   return (
     <Drawer.Navigator
-      useLegacyImplementation={true}
+      // useLegacyImplementation={true}
       initialRouteName="DrawerTabs"
       screenOptions={{
         headerTitle: () => null,
@@ -392,7 +392,7 @@ const SPDrawerStackNavigator = () => {
 const SPDrawerNavigator = () => {
   return (
     <Drawer.Navigator
-      useLegacyImplementation={true}
+      // useLegacyImplementation={true}
       initialRouteName="SPDrawerTabs"
       screenOptions={{
         headerTitle: () => null,

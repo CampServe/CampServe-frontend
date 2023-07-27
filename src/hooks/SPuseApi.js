@@ -47,3 +47,16 @@ export const addService = async (user_id, serviceData) => {
     }
   } catch (error) {}
 };
+
+export const updateDetails = async (providerDetails) => {
+  try {
+    const response = await axios.post("/update_provider", providerDetails);
+    if (response.data.message === "Data updated successfully") {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};

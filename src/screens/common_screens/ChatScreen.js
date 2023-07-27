@@ -38,6 +38,7 @@ import * as ImagePicker from "expo-image-picker";
 import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import useProvider from "../../hooks/useProvider";
 import useSocket from "../../hooks/useSocket";
+import { uriToBlob } from "../../lib/uriToBlob";
 
 const ChatScreen = () => {
   const { user } = useAuth();
@@ -184,7 +185,6 @@ const ChatScreen = () => {
       const options = {
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: false,
-        aspect: [4, 3],
         quality: 1,
       };
 
@@ -235,8 +235,7 @@ const ChatScreen = () => {
         const message = newMessages[i];
         const { uri } = images[i];
         const filename = uri.split("/").pop();
-        const response = await fetch(uri);
-        const blob = await response.blob();
+        const blob = await uriToBlob(uri);
 
         const imageName = filename;
         const imageRef = ref(storage, imageName);
@@ -271,8 +270,7 @@ const ChatScreen = () => {
 
       setMessages((prevMessages) => [newMessage, ...prevMessages]);
 
-      const response = await fetch(uri);
-      const blob = await response.blob();
+      const blob = await uriToBlob(uri);
 
       const imageName = filename;
       const imageRef = ref(storage, imageName);

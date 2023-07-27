@@ -13,6 +13,7 @@ import * as ImagePicker from "expo-image-picker";
 import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import { storage } from "../utils/firebase";
 import { DotIndicator } from "react-native-indicators";
+import { uriToBlob } from "../lib/uriToBlob";
 
 const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
   const [descriptions, setDescriptions] = useState([]);
@@ -109,18 +110,7 @@ const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
       const filename = uri.split("/").pop();
       const extension = filename.split(".").pop();
 
-      const imageInfoEntry = {
-        category,
-        subcategoryIndex,
-        filename,
-        extension,
-        localUri: uri,
-      };
-
-      setImageInfo((prevImageInfo) => [...prevImageInfo, imageInfoEntry]);
-
-      const response = await fetch(uri);
-      const blob = await response.blob();
+      const blob = await uriToBlob(uri);
 
       const imageName = filename;
       const imageRef = ref(storage, imageName);
@@ -129,6 +119,16 @@ const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
       try {
         await uploadTask;
         const downloadURL = await getDownloadURL(imageRef);
+
+        const imageInfoEntry = {
+          category,
+          subcategoryIndex,
+          filename,
+          extension,
+          localUri: uri,
+        };
+
+        setImageInfo((prevImageInfo) => [...prevImageInfo, imageInfoEntry]);
 
         setImages((prevImages) => [
           ...prevImages,
@@ -308,7 +308,7 @@ const DescriptionModal = ({ visible, onClose, subcategories, onSave }) => {
               disabled={hasErrors() || uploading}
               className={`bg-${
                 hasErrors() ? "gray" : "green"
-              }-500 w-52 text-white py-2 px-4 my-10 rounded-lg`}
+              }-500 w-52 text-white py-2 px-4 my-3 rounded-lg`}
             >
               <Text className="text-center text-lg">Done</Text>
             </TouchableOpacity>

@@ -268,30 +268,32 @@ const SelectCategoriesScreen = () => {
                         </Text>
                       </View>
                       <View className="flex-row flex-wrap justify-center">
-                        {selectedCategory.subcategories.map((subcategory) => (
-                          <TouchableOpacity
-                            key={subcategory}
-                            onPress={() =>
-                              handleSubcategorySelection(
-                                subcategory,
-                                selectedCategory.name
-                              )
-                            }
-                            className={`rounded-full p-4 m-4 items-center justify-center w-24 h-24 ${
-                              selectedSubcategories.some(
-                                (item) =>
-                                  item.category === selectedCategory.name &&
-                                  item.subcategory.has(subcategory)
-                              )
-                                ? "bg-green-900"
-                                : "bg-green-900 opacity-60"
-                            }`}
-                          >
-                            <Text className="text-white text-center">
-                              {subcategory}
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
+                        {selectedCategory.subcategories.map(
+                          (subcategory, index) => (
+                            <TouchableOpacity
+                              key={index}
+                              onPress={() =>
+                                handleSubcategorySelection(
+                                  subcategory,
+                                  selectedCategory.name
+                                )
+                              }
+                              className={`rounded-full p-4 m-4 items-center justify-center w-24 h-24 ${
+                                selectedSubcategories.some(
+                                  (item) =>
+                                    item.category === selectedCategory.name &&
+                                    item.subcategory.has(subcategory)
+                                )
+                                  ? "bg-green-900"
+                                  : "bg-green-900 opacity-60"
+                              }`}
+                            >
+                              <Text className="text-white text-center">
+                                {subcategory}
+                              </Text>
+                            </TouchableOpacity>
+                          )
+                        )}
                       </View>
                     </React.Fragment>
                   );
