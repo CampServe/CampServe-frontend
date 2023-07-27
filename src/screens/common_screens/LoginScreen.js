@@ -111,9 +111,9 @@ const LoginScreen = () => {
               </TouchableOpacity>
             </View>
           </View>
-          <TouchableOpacity>
+          {/* <TouchableOpacity>
             <Text className="text-sm text-red-500">Forgot Password?</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         <View className="w-72">
