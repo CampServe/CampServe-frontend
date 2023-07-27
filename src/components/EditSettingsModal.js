@@ -135,16 +135,15 @@ const EditSettingsModal = ({ visible, onClose, providerDetails }) => {
       const imageRef = ref(storage, imageName);
 
       try {
-        // if (url && url.includes("firebasestorage")) {
-        //   const existingImageRef = ref(storage, url);
-        //   await deleteObject(existingImageRef);
-        // }
+        if (url && url.includes("firebasestorage")) {
+          const existingImageRef = ref(storage, url);
+          await deleteObject(existingImageRef);
+        }
 
-        // const uploadTask = uploadBytes(imageRef, blob);
-        // await uploadTask;
+        const uploadTask = uploadBytes(imageRef, blob);
+        await uploadTask;
 
-        // const downloadURL = await getDownloadURL(imageRef);
-        const downloadURL = url;
+        const downloadURL = await getDownloadURL(imageRef);
         setFormData((prevFormData) => {
           const updatedSubcategories = prevFormData.subcategories.map((item) =>
             item.name === subcategory ? { ...item, image: downloadURL } : item
@@ -252,27 +251,26 @@ const EditSettingsModal = ({ visible, onClose, providerDetails }) => {
   };
 
   const handleConfirm = async () => {
-    console.log(JSON.stringify(details, null, 2));
     try {
-      // setIsConfirming(true);
-      // const success = await updateDetails(details);
-      // setIsConfirming(false);
-      // setIsConfirmationModalVisible(false);
-      // if (success) {
-      //   setIsModalVisible(true);
-      //   setModalMessage({
-      //     message: "Service has been updated",
-      //     image: Success,
-      //   });
-      // } else {
-      //   setIsModalVisible(true);
-      //   setModalMessage({ message: "Service update failed", image: Failure });
-      // }
-      // setTimeout(() => {
-      //   setIsModalVisible(false);
-      //   onClose();
-      //   navigation.replace("Service Provider");
-      // }, 5000);
+      setIsConfirming(true);
+      const success = await updateDetails(details);
+      setIsConfirming(false);
+      setIsConfirmationModalVisible(false);
+      if (success) {
+        setIsModalVisible(true);
+        setModalMessage({
+          message: "Service has been updated",
+          image: Success,
+        });
+      } else {
+        setIsModalVisible(true);
+        setModalMessage({ message: "Service update failed", image: Failure });
+      }
+      setTimeout(() => {
+        setIsModalVisible(false);
+        onClose();
+        navigation.replace("Service Provider");
+      }, 5000);
     } catch (error) {
       console.log(error);
     }

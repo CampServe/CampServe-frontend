@@ -9,7 +9,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import Backbutton from "../../components/Backbutton";
 import { DotIndicator } from "react-native-indicators";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import useAuth from "../../hooks/useAuth";
 import ScreenWithBackground from "../../components/ScreenWithBackground";
 import { Image } from "react-native";
@@ -19,6 +19,8 @@ const StudentVerificationScreen = () => {
   const [isEmailValid, setIsEmailValid] = useState(false);
   const { studentVerification, isLoadingVerify } = useAuth();
   const navigation = useNavigation();
+  const { params } = useRoute();
+  const { resetPassword } = params;
 
   const handleEmailChange = (text) => {
     setEmail(text.trim());
@@ -34,7 +36,10 @@ const StudentVerificationScreen = () => {
     Keyboard.dismiss();
     try {
       await studentVerification(email);
-      navigation.navigate("OTPVerification", { email });
+      navigation.navigate("OTPVerification", {
+        email,
+        resetPassword: resetPassword,
+      });
     } catch (error) {
       console.log(error);
     } finally {
@@ -51,9 +56,7 @@ const StudentVerificationScreen = () => {
           style={{ width: 150, height: 50 }}
           resizeMode="contain"
         />
-        <Text className="text-2xl font-bold mt-6 mb-6">
-          Student Verification
-        </Text>
+        <Text className="text-2xl font-bold mt-6 mb-6">Email Verification</Text>
 
         <View className="items-center justify-center w-full">
           <View className="w-full mb-4">

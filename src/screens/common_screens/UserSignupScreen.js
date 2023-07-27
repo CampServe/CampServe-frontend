@@ -12,7 +12,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import Backbutton from "../../components/Backbutton";
 import CustomModal from "../../components/CustomModal";
 import { DotIndicator } from "react-native-indicators";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import useAuth from "../../hooks/useAuth";
 import ScreenWithBackground from "../../components/ScreenWithBackground";
 import { Image } from "react-native";
@@ -168,7 +168,7 @@ const UserSignupScreen = () => {
   return (
     <ScreenWithBackground>
       <SafeAreaView className="flex-1 items-center justify-center p-6">
-        <Backbutton loc="StudentVerification" />
+        <Backbutton />
         <Image
           source={require("../../../assets/CampServe.png")}
           style={{ width: 150, height: 50 }}
@@ -389,7 +389,7 @@ const UserSignupScreen = () => {
                 error === "reference number is already registered to a user"
               ) {
                 setIsModalVisible(false);
-                navigation.navigate("StudentVerification");
+                navigation.goBack();
               } else {
                 setIsModalVisible(false);
               }

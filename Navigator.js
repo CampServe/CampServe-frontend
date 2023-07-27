@@ -47,6 +47,7 @@ import SelectCategoriesScreen from "./src/screens/serviceprov_screens/SelectCate
 import ServiceDetailsScreen from "./src/screens/user_screens/ServiceDetailsScreen";
 import useSocket from "./src/hooks/useSocket";
 import OfflineAlert from "./src/components/OfflineAlert";
+import ResetPasswordScreen from "./src/screens/common_screens/ResetPasswordScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -434,6 +435,10 @@ export const StackNavigator = () => {
               name="OTPVerification"
               component={OTPVerificationScreen}
               options={{ presentation: "transparentModal" }}
+            />
+            <Stack.Screen
+              name="ResetPassword"
+              component={ResetPasswordScreen}
             />
             <Stack.Screen name="UserSignup" component={UserSignupScreen} />
           </Stack.Group>

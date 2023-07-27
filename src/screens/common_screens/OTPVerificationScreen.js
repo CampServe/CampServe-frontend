@@ -106,9 +106,17 @@ const OTPVerificationScreen = () => {
         <CustomModal
           isVisible={isModalVisible}
           title="Validation Success"
-          message="You may sign up now"
+          message={`You may ${
+            params.resetPassword == false
+              ? "sign up now"
+              : "reset your password"
+          } `}
           buttonText="OK"
-          onButtonPress={() => navigation.replace("UserSignup")}
+          onButtonPress={() => {
+            params.resetPassword == false
+              ? navigation.replace("UserSignup")
+              : navigation.replace("ResetPassword");
+          }}
         />
       ) : (
         <CustomModal
@@ -116,7 +124,7 @@ const OTPVerificationScreen = () => {
           title="Validation Error"
           message="Wrong OTP Entered"
           buttonText="OK"
-          onButtonPress={() => navigation.replace("StudentVerification")}
+          onButtonPress={() => navigation.goBack()}
         />
       )}
     </View>

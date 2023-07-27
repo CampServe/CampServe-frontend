@@ -73,7 +73,7 @@ const LoginScreen = () => {
           {!isServiceProviderLogin ? "User Login" : "Service Provider Login"}
         </Text>
 
-        <View className="items-center justify-center w-full">
+        <View className="items-center justify-center w-full relative pb-3">
           <View className="w-full mb-4">
             <Text className="text-sm font-bold mb-1">Enter username</Text>
             <TextInput
@@ -111,9 +111,16 @@ const LoginScreen = () => {
               </TouchableOpacity>
             </View>
           </View>
-          {/* <TouchableOpacity>
+          <TouchableOpacity
+            className="absolute bottom-1 left-0"
+            onPress={() =>
+              navigation.navigate("StudentVerification", {
+                resetPassword: true,
+              })
+            }
+          >
             <Text className="text-sm text-red-500">Forgot Password?</Text>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
         </View>
 
         <View className="w-72">
@@ -154,7 +161,11 @@ const LoginScreen = () => {
         <View className="text-gray-700 text-sm mt-4 flex-row justify-center items-center pt-4">
           <Text>Don't have an account?</Text>
           <TouchableOpacity
-            onPress={() => navigation.navigate("StudentVerification")}
+            onPress={() =>
+              navigation.navigate("StudentVerification", {
+                resetPassword: false,
+              })
+            }
           >
             <Text className="text-green-900" style={{ fontWeight: "bold" }}>
               {" "}
