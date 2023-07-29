@@ -11,24 +11,21 @@
       "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
-    "assets": [
-      "./src/fonts/static"
-    ],
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assets": ["./src/fonts/static"],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "icon": "./assets/appicon.png"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/applogo.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.synxgh.CampServe"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/applogo.png"
     },
     "extra": {
       "eas": {
