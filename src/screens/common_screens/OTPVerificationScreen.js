@@ -117,8 +117,8 @@ const OTPVerificationScreen = () => {
           buttonText="OK"
           onButtonPress={() => {
             params.resetPassword == false
-              ? navigation.replace("UserSignup")
-              : navigation.replace("ResetPassword");
+              ? navigation.navigate("UserSignup")
+              : navigation.navigate("ResetPassword");
           }}
         />
       ) : (

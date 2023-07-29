@@ -16,7 +16,7 @@ const CustomModal = ({
       <View className="bg-white p-4 rounded-md items-center justify-center">
         <Text className="text-lg font-bold mb-2">{title}</Text>
         <Text className="text-gray-700 mb-4 text-center">
-          {message.charAt(0).toUpperCase() + message.slice(1).toLowerCase()}
+          {message?.charAt(0).toUpperCase() + message?.slice(1).toLowerCase()}
         </Text>
         {/* <Text className="text-gray-700 mb-4 capitalize">{message}</Text> */}
         {showbutton && (
