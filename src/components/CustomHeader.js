@@ -6,6 +6,7 @@ import {
   View,
   Animated,
   Image,
+  Text,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
@@ -17,6 +18,7 @@ const CustomHeader = ({
   updateSearchQuery,
   screen,
   clearInput = false,
+  title = "",
   setEditModalVisible,
 }) => {
   const navigation = useNavigation();
@@ -130,6 +132,12 @@ const CustomHeader = ({
       ) : (
         <>
           {renderLeftIcon()}
+
+          {!notification && (
+            <View className="flex-grow flex items-center">
+              <Text className="text-xl text-gray-700 font-bold">{title}</Text>
+            </View>
+          )}
 
           {notification && (
             <>

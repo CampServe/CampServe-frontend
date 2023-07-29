@@ -23,6 +23,18 @@ const data = [
   },
   {
     id: "2",
+    icon: "help-circle-outline",
+    title: "Help and FAQs",
+    screen: "SPHelp",
+  },
+  // {
+  //   id: "3",
+  //   icon: "information-circle-outline",
+  //   title: "About Us",
+  //   screen: "SPAbout",
+  // },
+  {
+    id: "4",
     icon: "settings",
     title: "Settings",
     screen: "SPSettings",

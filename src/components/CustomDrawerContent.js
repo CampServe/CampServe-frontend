@@ -27,12 +27,12 @@ const data = [
     title: "Help and FAQs",
     screen: "Help",
   },
-  {
-    id: "3",
-    icon: "information-circle-outline",
-    title: "About Us",
-    screen: "About",
-  },
+  // {
+  //   id: "3",
+  //   icon: "information-circle-outline",
+  //   title: "About Us",
+  //   screen: "About",
+  // },
   {
     id: "4",
     icon: "settings",
@@ -101,8 +101,6 @@ const CustomDrawerContent = () => {
       </>
     </TouchableHighlight>
   );
-
-  // console.log(user.is_service_provider);
 
   return (
     <Animated.View style={styles.drawerContainer}>

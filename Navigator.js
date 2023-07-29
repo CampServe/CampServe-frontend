@@ -25,13 +25,14 @@ import OTPVerificationScreen from "./src/screens/common_screens/OTPVerificationS
 import UserSignupScreen from "./src/screens/common_screens/UserSignupScreen";
 import MessageScreen from "./src/screens/common_screens/MessageScreen";
 import ChatScreen from "./src/screens/common_screens/ChatScreen";
+import HelpsAndFaqsScreen from "./src/screens/common_screens/HelpsAndFaqsScreen";
+import AboutUsScreen from "./src/screens/common_screens/AboutUsScreen";
 
 import UserDashboard from "./src/screens/user_screens/UserDashboard";
 import PaymentScreen from "./src/screens/user_screens/PaymentScreen";
 import ActivityScreen from "./src/screens/user_screens/ActivityScreen";
 import SettingsScreen from "./src/screens/user_screens/SettingsScreen";
-import HelpsAndFaqsScreen from "./src/screens/user_screens/HelpsAndFaqsScreen";
-import AboutUsScreen from "./src/screens/user_screens/AboutUsScreen";
+
 import CustomDrawerContent from "./src/components/CustomDrawerContent";
 import SearchScreen from "./src/screens/user_screens/SearchScreen";
 import ProfileScreen from "./src/screens/user_screens/ProfileScreen";
@@ -381,11 +382,11 @@ const SPDrawerStackNavigator = () => {
         name="SPUDrawerTabs"
         component={ServiceProviderTabNavigator}
       />
-      <Stack.Screen
-        name="SPSettings"
-        component={ServiceProviderSettingsScreen}
-      />
       <Stack.Screen name="Chat" component={ChatScreen} />
+      <Stack.Screen name="SPProfile" component={ProfileScreen} />
+      <Stack.Screen name="SPSettings" component={SettingsScreen} />
+      <Stack.Screen name="SPHelp" component={HelpsAndFaqsScreen} />
+      <Stack.Screen name="SPAbout" component={AboutUsScreen} />
     </Stack.Navigator>
   );
 };

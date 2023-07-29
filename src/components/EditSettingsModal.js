@@ -144,6 +144,7 @@ const EditSettingsModal = ({ visible, onClose, providerDetails }) => {
         await uploadTask;
 
         const downloadURL = await getDownloadURL(imageRef);
+
         setFormData((prevFormData) => {
           const updatedSubcategories = prevFormData.subcategories.map((item) =>
             item.name === subcategory ? { ...item, image: downloadURL } : item
@@ -175,7 +176,7 @@ const EditSettingsModal = ({ visible, onClose, providerDetails }) => {
 
     if (data.subcategories) {
       data.subcategories.forEach((subcategory) => {
-        if (subcategory.description.length < 10) {
+        if (subcategory.description && subcategory.description.length < 10) {
           newErrors[subcategory.name] =
             "Description must be at least 10 characters";
         }
@@ -204,25 +205,25 @@ const EditSettingsModal = ({ visible, onClose, providerDetails }) => {
       ...Object.fromEntries(
         Object.entries(trimmedFormData).filter(([key, value]) => value !== "")
       ),
-      subcategories: trimmedFormData.subcategories
+      subcategories: trimmedFormData?.subcategories
         .map((subcategory) => {
           if (subcategory.name === "") {
             return null;
           } else if (
-            subcategory.description !== "" &&
-            subcategory.image === ""
+            subcategory?.description !== "" &&
+            subcategory?.image === ""
           ) {
             const { image, ...rest } = subcategory;
             return rest;
           } else if (
-            subcategory.image !== "" &&
-            subcategory.description === ""
+            subcategory?.image !== "" &&
+            subcategory?.description === ""
           ) {
             const { description, ...rest } = subcategory;
             return rest;
           } else if (
-            subcategory.description === "" &&
-            subcategory.image === ""
+            subcategory?.description === "" &&
+            subcategory?.image === ""
           ) {
             return null;
           }
@@ -230,6 +231,7 @@ const EditSettingsModal = ({ visible, onClose, providerDetails }) => {
         })
         .filter(Boolean),
     };
+
     if (newData.subcategories.length === 0) {
       delete newData.subcategories;
     }
@@ -241,6 +243,7 @@ const EditSettingsModal = ({ visible, onClose, providerDetails }) => {
       setDetails(newData);
       setIsConfirmationModalVisible(true);
     }
+
     setTimeout(() => {
       setErrors({});
     }, 5000);
