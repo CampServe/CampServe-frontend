@@ -30,7 +30,7 @@ const AppWrapper = ({ children }) => {
 
   return (
     <>
-      {/* <ExpoStatusBar style="dark" /> */}
+      <ExpoStatusBar style="dark" />
       {children}
     </>
   );

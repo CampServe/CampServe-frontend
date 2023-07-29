@@ -30,7 +30,10 @@ const OTPVerificationScreen = () => {
     Keyboard.dismiss();
     setIsLoading(true);
     try {
-      const otpSent = await studentEmailVerification(params.email, otp);
+      const otpSent = await studentEmailVerification(
+        params.email.toLowerCase(),
+        otp
+      );
       if (otpSent) {
         setOtpSuccess(true);
         setIsModalVisible(true);

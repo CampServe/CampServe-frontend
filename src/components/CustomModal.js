@@ -15,7 +15,10 @@ const CustomModal = ({
     <Modal isVisible={isVisible} onBackdropPress={onClose}>
       <View className="bg-white p-4 rounded-md items-center justify-center">
         <Text className="text-lg font-bold mb-2">{title}</Text>
-        <Text className="text-gray-700 mb-4 capitalize">{message}</Text>
+        <Text className="text-gray-700 mb-4 text-center">
+          {message.charAt(0).toUpperCase() + message.slice(1).toLowerCase()}
+        </Text>
+        {/* <Text className="text-gray-700 mb-4 capitalize">{message}</Text> */}
         {showbutton && (
           <TouchableOpacity
             className="bg-green-500 text-white py-2 px-4 rounded-lg w-[70%]"

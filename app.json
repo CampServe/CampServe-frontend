@@ -11,18 +11,22 @@
       "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
-    "assets": ["./src/fonts/static"],
+    "updates": {
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/cdde9a33-4e95-4dba-a2b2-e0ada5673067"
+    },
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "icon": "./assets/appicon.png"
+      "bundleIdentifier": "com.synxgh.CampServe"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/applogo.png",
-        "backgroundColor": "#ffffff"
-      },
       "package": "com.synxgh.CampServe"
+    },
+    "androidStatusBar": {
+      "translucent": false,
+      "barStyle": "dark-content",
+      "backgroundColor": "#ffffff"
     },
     "web": {
       "favicon": "./assets/applogo.png"
@@ -31,6 +35,10 @@
       "eas": {
         "projectId": "cdde9a33-4e95-4dba-a2b2-e0ada5673067"
       }
-    }
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "sdkVersion": "48.0.0"
   }
 }

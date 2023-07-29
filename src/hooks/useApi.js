@@ -69,3 +69,21 @@ export const visitedProviders = async (data) => {
     console.log(error);
   }
 };
+
+export const checkEmail = async (data) => {
+  try {
+    const response = await axios.post("/check_email", data);
+    return response.data.message;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const resetPassword = async (data) => {
+  try {
+    const response = await axios.post("/forgot_password", data);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

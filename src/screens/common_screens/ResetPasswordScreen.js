@@ -5,12 +5,16 @@ import {
   TouchableOpacity,
   Image,
   KeyboardAvoidingView,
+  Keyboard,
 } from "react-native";
 import React, { useState } from "react";
 import ScreenWithBackground from "../../components/ScreenWithBackground";
 import { DotIndicator } from "react-native-indicators";
 import Icon from "react-native-vector-icons/Ionicons";
 import Backbutton from "../../components/Backbutton";
+import { resetPassword } from "../../hooks/useApi";
+import { useNavigation } from "@react-navigation/native";
+import CustomModal from "../../components/CustomModal";
 
 const ResetPasswordScreen = () => {
   const [isLoadingReset, setIsLoadingReset] = useState(false);
@@ -22,6 +26,9 @@ const ResetPasswordScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+  const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
+  const [isFailureModalVisible, setIsFailureModalVisible] = useState(false);
+  const navigation = useNavigation();
 
   const handleTogglePassword = (field) => {
     if (field === "password") {
@@ -97,6 +104,28 @@ const ResetPasswordScreen = () => {
       }));
     } else {
       validateConfirmPassword();
+    }
+  };
+
+  const handleReset = async () => {
+    Keyboard.dismiss();
+    const data = {
+      new_password: formData.password,
+    };
+
+    try {
+      setIsLoadingReset(true);
+      const response = await resetPassword(data);
+      if (response.message === "Password reset successful") {
+        setIsSuccessModalVisible(true);
+      } else {
+        setIsFailureModalVisible(true);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoadingReset(false);
+      setFormData(initialFormData);
     }
   };
 
@@ -202,7 +231,7 @@ const ResetPasswordScreen = () => {
                   className={`${
                     !isResetDisabled() ? "bg-green-500" : "bg-gray-500"
                   } text-white py-2 px-4 w-72 rounded-lg`}
-                  // onPress={handleLogin}
+                  onPress={handleReset}
                   disabled={isResetDisabled()}
                 >
                   <Text className="text-center text-base text-white">
@@ -213,17 +242,23 @@ const ResetPasswordScreen = () => {
             </>
           )}
         </View>
+        <CustomModal
+          isVisible={isSuccessModalVisible}
+          onClose={() => setIsSuccessModalVisible(false)}
+          title="Password Reset Successful"
+          message="You have successfully resetted your password."
+          buttonText="OK"
+          onButtonPress={() => navigation.navigate("Login")}
+        />
 
-        {/* {error && (
-          <CustomModal
-            isVisible={isModalVisible}
-            title="Login Error"
-            message={error}
-            buttonText="OK"
-            onButtonPress={handleCloseModal}
-            onClose={handleCloseModal}
-          />
-        )} */}
+        <CustomModal
+          isVisible={isFailureModalVisible}
+          onClose={() => setIsFailureModalVisible(false)}
+          title="Password Reset Failed"
+          message="There was an error resetting your password, Try again"
+          buttonText="OK"
+          onButtonPress={() => setIsFailureModalVisible(false)}
+        />
       </KeyboardAvoidingView>
     </ScreenWithBackground>
   );

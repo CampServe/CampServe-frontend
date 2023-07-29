@@ -13,18 +13,25 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import useAuth from "../../hooks/useAuth";
 import ScreenWithBackground from "../../components/ScreenWithBackground";
 import { Image } from "react-native";
+import { checkEmail } from "../../hooks/useApi";
+import CustomModal from "../../components/CustomModal";
 
 const StudentVerificationScreen = () => {
   const [email, setEmail] = useState("");
   const [isEmailValid, setIsEmailValid] = useState(false);
-  const { studentVerification, isLoadingVerify } = useAuth();
+  const { studentVerification, isLoadingVerify, setIsLoadingVerify } =
+    useAuth();
   const navigation = useNavigation();
   const { params } = useRoute();
   const { resetPassword } = params;
+  const [isInvalidEmailModalVisible, setIsInvalidEmailModalVisible] =
+    useState(false);
+  const [isExistingEmailModalVisible, setIsExistingEmailModalVisible] =
+    useState(false);
 
   const handleEmailChange = (text) => {
     setEmail(text.trim());
-    setIsEmailValid(validateEmail(text.trim()));
+    setIsEmailValid(validateEmail(text.trim().toLowerCase()));
   };
 
   const validateEmail = (email) => {
@@ -34,12 +41,34 @@ const StudentVerificationScreen = () => {
 
   const handleVerification = async () => {
     Keyboard.dismiss();
+    const data = {
+      email: email.toLowerCase(),
+    };
     try {
-      await studentVerification(email);
-      navigation.navigate("OTPVerification", {
-        email,
-        resetPassword: resetPassword,
-      });
+      setIsLoadingVerify(true);
+      const response = await checkEmail(data);
+      setIsLoadingVerify(false);
+      if (resetPassword) {
+        if (response) {
+          await studentVerification(email.toLowerCase());
+          navigation.navigate("OTPVerification", {
+            email,
+            resetPassword: true,
+          });
+        } else {
+          setIsInvalidEmailModalVisible(true);
+        }
+      } else {
+        if (response) {
+          setIsExistingEmailModalVisible(true);
+        } else {
+          await studentVerification(email.toLowerCase());
+          navigation.navigate("OTPVerification", {
+            email,
+            resetPassword: false,
+          });
+        }
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -100,6 +129,23 @@ const StudentVerificationScreen = () => {
             </>
           )}
         </View>
+        <CustomModal
+          isVisible={isInvalidEmailModalVisible}
+          onClose={() => setIsInvalidEmailModalVisible(false)}
+          title="Invalid Email"
+          message="You do not have an account with us."
+          buttonText="OK"
+          onButtonPress={() => setIsInvalidEmailModalVisible(false)}
+        />
+
+        <CustomModal
+          isVisible={isExistingEmailModalVisible}
+          onClose={() => setIsExistingEmailModalVisible(false)}
+          title="Email Exists"
+          message="The email you provided is already registered."
+          buttonText="OK"
+          onButtonPress={() => setIsExistingEmailModalVisible(false)}
+        />
       </SafeAreaView>
     </ScreenWithBackground>
   );
