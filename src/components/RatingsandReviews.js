@@ -14,9 +14,9 @@ export const calculateAverageRating = (ratings) => {
   const roundedRating = averageRating.toFixed(1);
 
   if (roundedRating.endsWith(".0")) {
-    return roundedRating;
+    return `${roundedRating} (${ratings.length})`;
   } else {
-    return parseFloat(roundedRating);
+    return `${parseFloat(roundedRating)} (${ratings.length})`;
   }
 };
 
@@ -40,7 +40,11 @@ const RatingsAndReviews = ({ rating }) => {
     ratingsCount[starIndex]++;
   });
 
-  const averageRating = calculateAverageRating(ratings);
+  const averageRatingValue = calculateAverageRating(ratings);
+  const averageRating = averageRatingValue
+    ? averageRatingValue.split(" ")[0]
+    : null;
+
   const ratingCounts = calculateRatingCounts(ratings);
 
   useEffect(() => {

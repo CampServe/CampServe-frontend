@@ -44,6 +44,12 @@ const ServiceDetailsScreen = () => {
   };
 
   useEffect(() => {
+    if (isRatingsLoading) {
+      setIsRefreshing(false);
+    }
+  }, [isRatingsLoading]);
+
+  useEffect(() => {
     const fetchData = async () => {
       const data = {
         provider_id: provider.provider_id,

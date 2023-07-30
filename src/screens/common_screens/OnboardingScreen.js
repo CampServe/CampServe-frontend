@@ -38,31 +38,39 @@ const OnboardingScreen = () => {
 
   const onboardingScreens = [
     {
-      title: "Welcome to MyApp!",
-      description: "Discover a world of possibilities.",
+      title: "Welcome to CampServe!",
+      description:
+        "Your All-In-One Campus Service Platform designed to make your life easier as a student.",
       image: require("../../../assets/onboarding1.jpg"),
     },
     {
-      title: "Explore",
-      description: "Find what interests you with ease.",
+      title: "Services Overview",
+      description:
+        "Discover a wide range of services at your fingertips. From booking services to seamless payment processing and chat support, we've got you covered.",
       image: require("../../../assets/onboarding2.jpg"),
     },
     {
-      title: "Get Started",
-      description: "Join our community and start exploring!",
+      title: "How It Works",
+      description:
+        "Becoming a service provider is easy. Just sign up as a student and start offering your services. Our streamlined booking and payment systems make accessing essential services a breeze.",
       image: require("../../../assets/onboarding3.jpg"),
+    },
+    {
+      title: "Benefits for Students",
+      description:
+        "Experience the convenience of accessing various services from a single platform. Enjoy seamless interactions with providers and get exclusive offers and rewards as a regular user.",
+      image: require("../../../assets/sub2.jpg"),
+    },
+    {
+      title: "Get Started",
+      description:
+        "Ready to explore? Sign up or log in now to begin your journey with CampServe.",
+      image: require("../../../assets/onboarding4.jpg"),
     },
   ];
 
   if (loading) {
-    return (
-      // <ImageBackground
-      //   source={require("../../../assets/white.png")}
-      //   style={{ flex: 1, opacity: 0.9 }}
-      //   resizeMode="cover"
-      // />
-      <Loader />
-    );
+    return <Loader />;
   }
 
   const currentScreen = onboardingScreens[activeScreenIndex];
@@ -79,8 +87,12 @@ const OnboardingScreen = () => {
 
       <View className="h-1/2 p-6">
         <View className="items-center justify-center h-1/2">
-          <Text className="text-2xl font-bold mb-2">{currentScreen.title}</Text>
-          <Text className="text-lg mb-6">{currentScreen.description}</Text>
+          <Text className="text-2xl text-center font-bold mb-2">
+            {currentScreen.title}
+          </Text>
+          <Text className="text-lg text-center mb-6">
+            {currentScreen.description}
+          </Text>
         </View>
 
         <View className="flex-col items-center justify-center h-1/2">
