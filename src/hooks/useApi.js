@@ -87,3 +87,21 @@ export const resetPassword = async (data) => {
     console.log(error);
   }
 };
+
+export const changePassword = async (data) => {
+  try {
+    const response = await axios.post("/change_password", data);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const changeAccountSettings = async (data) => {
+  try {
+    const response = await axios.post("/account_settings", data);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

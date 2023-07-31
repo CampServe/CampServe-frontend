@@ -17,27 +17,15 @@ import { DotIndicator } from "react-native-indicators";
 const data = [
   {
     id: "1",
-    icon: "person-circle-outline",
-    title: "Profile",
+    icon: "settings",
+    title: "Settings",
     screen: "SPSettings",
   },
   {
     id: "2",
-    icon: "help-circle-outline",
+    icon: "information-circle-outline",
     title: "Help and FAQs",
     screen: "SPHelp",
-  },
-  // {
-  //   id: "3",
-  //   icon: "information-circle-outline",
-  //   title: "About Us",
-  //   screen: "SPAbout",
-  // },
-  {
-    id: "4",
-    icon: "settings",
-    title: "Settings",
-    screen: "SPSettings",
   },
 ];
 
@@ -113,7 +101,7 @@ const CustomSPDrawerContent = () => {
               className="w-14 h-14 rounded-full"
             />
             <Text className="text-gray-500 text-xl capitalize font-bold mt-0">
-              {user.business_name}
+              {user.first_name} {user.last_name}
             </Text>
             <Text className="text-gray-400 text-lg capitalize font-semibold">
               {user.username}

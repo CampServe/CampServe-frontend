@@ -16,6 +16,8 @@ import {
 import { db } from "./src/utils/firebase";
 import useProvider from "./src/hooks/useProvider";
 import { ImageBackground } from "react-native";
+import useSocket from "./src/hooks/useSocket";
+import OfflineAlert from "./src/components/OfflineAlert";
 
 import AppWrapper from "./AppWrapper";
 import OnboardingScreen from "./src/screens/common_screens/OnboardingScreen";
@@ -27,28 +29,24 @@ import MessageScreen from "./src/screens/common_screens/MessageScreen";
 import ChatScreen from "./src/screens/common_screens/ChatScreen";
 import HelpsAndFaqsScreen from "./src/screens/common_screens/HelpsAndFaqsScreen";
 import AboutUsScreen from "./src/screens/common_screens/AboutUsScreen";
+import SettingsScreen from "./src/screens/common_screens/SettingsScreen";
+import ResetPasswordScreen from "./src/screens/common_screens/ResetPasswordScreen";
 
 import UserDashboard from "./src/screens/user_screens/UserDashboard";
 import PaymentScreen from "./src/screens/user_screens/PaymentScreen";
 import ActivityScreen from "./src/screens/user_screens/ActivityScreen";
-import SettingsScreen from "./src/screens/user_screens/SettingsScreen";
 
 import CustomDrawerContent from "./src/components/CustomDrawerContent";
 import SearchScreen from "./src/screens/user_screens/SearchScreen";
-import ProfileScreen from "./src/screens/user_screens/ProfileScreen";
 import BookServiceScreen from "./src/screens/user_screens/BookServiceScreen";
 
 import ServiceProviderOnboardingScreen from "./src/screens/serviceprov_screens/ServiceProviderOnboardingScreen";
 import ServiceProviderDashboard from "./src/screens/serviceprov_screens/ServiceProviderDashboard";
-import ServiceProviderSettingsScreen from "./src/screens/serviceprov_screens/ServiceProviderSettingsScreen";
 import SPActivityScreen from "./src/screens/serviceprov_screens/SPActivityScreen";
 import CustomSPDrawerContent from "./src/components/CustomSPDrawerContent";
 import SProfileSetup from "./src/screens/serviceprov_screens/SProfileSetup";
 import SelectCategoriesScreen from "./src/screens/serviceprov_screens/SelectCategoriesScreen";
 import ServiceDetailsScreen from "./src/screens/user_screens/ServiceDetailsScreen";
-import useSocket from "./src/hooks/useSocket";
-import OfflineAlert from "./src/components/OfflineAlert";
-import ResetPasswordScreen from "./src/screens/common_screens/ResetPasswordScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -208,7 +206,6 @@ const UserDrawerStackNavigator = () => {
       <Stack.Screen name="ServiceDetails" component={ServiceDetailsScreen} />
       <Stack.Screen name="Chat" component={ChatScreen} />
       <Stack.Screen name="Book" component={BookServiceScreen} />
-      <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
       <Stack.Screen name="Help" component={HelpsAndFaqsScreen} />
       <Stack.Screen name="About" component={AboutUsScreen} />
@@ -220,7 +217,6 @@ const UserDrawerNavigator = () => {
   const navigation = useNavigation();
   return (
     <Drawer.Navigator
-      // useLegacyImplementation={true}
       initialRouteName="DrawerTabs"
       screenOptions={{
         headerTitle: () => null,
@@ -383,7 +379,6 @@ const SPDrawerStackNavigator = () => {
         component={ServiceProviderTabNavigator}
       />
       <Stack.Screen name="Chat" component={ChatScreen} />
-      <Stack.Screen name="SPProfile" component={ProfileScreen} />
       <Stack.Screen name="SPSettings" component={SettingsScreen} />
       <Stack.Screen name="SPHelp" component={HelpsAndFaqsScreen} />
       <Stack.Screen name="SPAbout" component={AboutUsScreen} />
@@ -394,7 +389,6 @@ const SPDrawerStackNavigator = () => {
 const SPDrawerNavigator = () => {
   return (
     <Drawer.Navigator
-      // useLegacyImplementation={true}
       initialRouteName="SPDrawerTabs"
       screenOptions={{
         headerTitle: () => null,

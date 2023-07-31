@@ -17,27 +17,15 @@ import { DotIndicator } from "react-native-indicators";
 const data = [
   {
     id: "1",
-    icon: "person-circle-outline",
-    title: "Profile",
-    screen: "Profile",
-  },
-  {
-    id: "2",
-    icon: "help-circle-outline",
-    title: "Help and FAQs",
-    screen: "Help",
-  },
-  // {
-  //   id: "3",
-  //   icon: "information-circle-outline",
-  //   title: "About Us",
-  //   screen: "About",
-  // },
-  {
-    id: "4",
     icon: "settings",
     title: "Settings",
     screen: "Settings",
+  },
+  {
+    id: "2",
+    icon: "information-circle-outline",
+    title: "Help and FAQs",
+    screen: "Help",
   },
 ];
 

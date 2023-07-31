@@ -115,38 +115,6 @@ const SPActivityScreen = () => {
     }
   };
 
-  // useEffect(() => {
-  //   if (socketTrigger) {
-  //     const fetchData = async () => {
-  //       try {
-  //         const fetchRequestsPromise = getProviderRequests({
-  //           provider_id: user.provider_id,
-  //         });
-  //         const getProviderInfoPromise = getProviderInfo(user.provider_id);
-
-  //         const [requestsResponse, providerInfoResponse] = await Promise.all([
-  //           fetchRequestsPromise,
-  //           getProviderInfoPromise,
-  //         ]);
-
-  //         const { sub_categories, ...otherData } = providerInfoResponse;
-  //         setSubData(sub_categories);
-
-  //         if (requestsResponse.message) {
-  //           setRequests([]);
-  //         } else {
-  //           setRequests(requestsResponse.all_requests);
-  //         }
-  //       } catch (error) {
-  //         console.log(error);
-  //         setRequests([]);
-  //       }
-  //     };
-
-  //     fetchData();
-  //   }
-  // }, [socketTrigger]);
-
   const subcategories = Object.keys(subData);
 
   useEffect(() => {

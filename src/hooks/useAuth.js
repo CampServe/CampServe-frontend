@@ -249,6 +249,7 @@ export function AuthProvider({ children }) {
   const contextValue = useMemo(
     () => ({
       user,
+      setUser,
       isLoadingLogin,
       isLoadingSignup,
       isLoadingVerify,
@@ -269,6 +270,7 @@ export function AuthProvider({ children }) {
     }),
     [
       user,
+      setUser,
       isLoadingLogin,
       isLoadingSignup,
       isLoadingVerify,

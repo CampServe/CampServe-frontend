@@ -21,10 +21,12 @@ import useSearch from "../../hooks/useSearch";
 import useSocket from "../../hooks/useSocket";
 import PostReviewModal from "../../components/PostReview.Modal";
 import { useRef } from "react";
+import useProvider from "../../hooks/useProvider";
 
 const ActivityScreen = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
+  const { averageRate } = useProvider();
   const { isOffline } = useSocket();
   const [requests, setRequests] = useState([]);
   const [filteredRequests, setFilteredRequests] = useState([]);
@@ -64,7 +66,7 @@ const ActivityScreen = () => {
       if (!isOffline) {
         fetchRequests();
       }
-    }, [actionCompleted])
+    }, [actionCompleted, averageRate])
   );
 
   useEffect(() => {
@@ -319,17 +321,18 @@ const ActivityScreen = () => {
                   <Text style={{ color: "white" }}>Cancel</Text>
                 </TouchableOpacity>
               ))}
-            {statusText === "Completed" && (
-              <TouchableOpacity
-                className="flex pt-2 items-center justify-center rounded-lg"
-                onPress={() => {
-                  setIsVisible(true);
-                  setReviewProps(item);
-                }}
-              >
-                <Text className="text-green-600">Post a review</Text>
-              </TouchableOpacity>
-            )}
+            {statusText === "Completed" &&
+              (item.reviewed == "false" || item.reviewed === false) && (
+                <TouchableOpacity
+                  className="flex pt-2 items-center justify-center rounded-lg"
+                  onPress={() => {
+                    setIsVisible(true);
+                    setReviewProps(item);
+                  }}
+                >
+                  <Text className="text-green-600">Post a review</Text>
+                </TouchableOpacity>
+              )}
           </View>
         </View>
       </TouchableOpacity>
@@ -415,6 +418,7 @@ const ActivityScreen = () => {
             businessName={reviewProps?.business_name}
             provider_id={reviewProps?.provider_id}
             sub_categories={reviewProps?.subcategory}
+            request_id={reviewProps?.request_id}
           />
         </>
       )}

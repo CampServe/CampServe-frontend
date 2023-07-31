@@ -14,6 +14,7 @@ const PostReviewModal = ({
   businessName,
   provider_id,
   sub_categories,
+  request_id,
 }) => {
   const [selectedRating, setSelectedRating] = useState(0);
   const [review, setReview] = useState("");
@@ -53,6 +54,7 @@ const PostReviewModal = ({
       review: review.trim(),
       timestamp: new Date(),
       subcategory: sub_categories,
+      request_id: request_id,
     };
 
     const data = {

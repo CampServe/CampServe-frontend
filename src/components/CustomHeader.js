@@ -135,7 +135,9 @@ const CustomHeader = ({
 
           {!notification && (
             <View className="flex-grow flex items-center">
-              <Text className="text-xl text-gray-700 font-bold">{title}</Text>
+              <Text className="text-2xl mr-8 text-gray-700 font-bold">
+                {title}
+              </Text>
             </View>
           )}
 
