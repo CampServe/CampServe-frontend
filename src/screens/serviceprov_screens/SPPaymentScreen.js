@@ -135,10 +135,17 @@ const SPPaymentScreen = () => {
           const completedRequests = requestsResponse.all_requests.filter(
             (req) =>
               req.status_acc_dec === "accepted" &&
-              req.status_comp_inco === "complete"
-            //    && req.payment_mode !== "Cash"
+              req.status_comp_inco === "complete" &&
+              req.payment_mode !== "Cash"
           );
-          setcompletedReq(completedRequests);
+          const filteredCompletedRequests = completedRequests.filter((req) => {
+            const requestIdExists = providerTransactionsResponse.some(
+              (transaction) => transaction.request_id === req.request_id
+            );
+            return !requestIdExists;
+          });
+
+          setcompletedReq(filteredCompletedRequests);
         } else {
           setcompletedReq([]);
         }
@@ -185,10 +192,17 @@ const SPPaymentScreen = () => {
           const completedRequests = requestsResponse.all_requests.filter(
             (req) =>
               req.status_acc_dec === "accepted" &&
-              req.status_comp_inco === "complete"
-            //    && req.payment_mode !== "Cash"
+              req.status_comp_inco === "complete" &&
+              req.payment_mode !== "Cash"
           );
-          setcompletedReq(completedRequests);
+          const filteredCompletedRequests = completedRequests.filter((req) => {
+            const requestIdExists = providerTransactionsResponse.some(
+              (transaction) => transaction.request_id === req.request_id
+            );
+            return !requestIdExists;
+          });
+
+          setcompletedReq(filteredCompletedRequests);
         } else {
           setcompletedReq([]);
         }
@@ -220,10 +234,10 @@ const SPPaymentScreen = () => {
     if (filter === "Payment Request") {
       setfilteredData(filtered);
     } else if (filter === "Pending") {
-      filtered = filtered.filter((payment) => payment.has_paid === "false");
+      filtered = payments.filter((payment) => payment.has_paid === "false");
       setfilteredData(filtered);
     } else if (filter === "Paid") {
-      filtered = filtered.filter((payment) => payment.has_paid === "true");
+      filtered = payments.filter((payment) => payment.has_paid === "true");
       setfilteredData(filtered);
     }
 
