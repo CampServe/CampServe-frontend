@@ -237,13 +237,8 @@ const BookServiceScreen = () => {
                       style={{ fontSize: 15 }}
                     />
                     <Picker.Item
-                      label="MTN Momo"
-                      value="MTN Momo"
-                      style={{ fontSize: 15 }}
-                    />
-                    <Picker.Item
-                      label="VodaCash"
-                      value="VodaCash"
+                      label="Hubtel"
+                      value="Hubtel"
                       style={{ fontSize: 15 }}
                     />
                   </Picker>
