@@ -52,27 +52,27 @@ export const SocketProvider = ({ children }) => {
     };
   }, []);
 
-  useEffect(() => {
-    const reactToUpdates = async () => {
-      Updates.addListener((event) => {
-        if (event.type === Updates.UpdateEventType.UPDATE_AVAILABLE) {
-          Alert.alert(
-            "Update Available",
-            "An update is available. Restart your app.",
-            [
-              {
-                text: "Restart",
-                onPress: () => {
-                  Updates.reloadAsync();
-                },
-              },
-            ]
-          );
-        }
-      });
-    };
-    reactToUpdates();
-  }, []);
+  // useEffect(() => {
+  //   const reactToUpdates = async () => {
+  //     Updates.addListener((event) => {
+  //       if (event.type === Updates.UpdateEventType.UPDATE_AVAILABLE) {
+  //         Alert.alert(
+  //           "Update Available",
+  //           "An update is available. Restart your app.",
+  //           [
+  //             {
+  //               text: "Restart",
+  //               onPress: () => {
+  //                 Updates.reloadAsync();
+  //               },
+  //             },
+  //           ]
+  //         );
+  //       }
+  //     });
+  //   };
+  //   reactToUpdates();
+  // }, []);
 
   return (
     <SocketContext.Provider value={{ socketTrigger, isOffline }}>
