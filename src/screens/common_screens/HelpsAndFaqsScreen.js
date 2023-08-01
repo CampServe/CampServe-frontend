@@ -161,21 +161,46 @@ const HelpsAndFaqsScreen = () => {
 
         {showContact && (
           <View className={`bg-gray-100 p-2 mb-2 space-y-[1px] rounded-lg`}>
-            <TouchableOpacity
-              onPress={() => handleCallSupport("+233 551429980")}
-              className="flex-row items-center gap-4"
-            >
-              <Ionicons name="call-outline" size={24} />
-              <Text className="text-gray-500 text-lg">+233 551429980</Text>
-            </TouchableOpacity>
+            <View className="flex-row items-center gap-4">
+              <View style={{ alignSelf: "flex-start" }}>
+                <Ionicons name="call-outline" size={24} />
+              </View>
+              <View className="flex-col">
+                <TouchableOpacity
+                  onPress={() => handleCallSupport("+233 551429980")}
+                >
+                  <Text className="text-gray-500 text-lg">+233 551429980</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => handleEmailSupport("isinesam@gmail.com")}
-              className="flex-row items-center gap-4"
-            >
-              <Ionicons name="mail-outline" size={24} />
-              <Text className="text-gray-500 text-lg">isinesam@gmail.com</Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => handleCallSupport("+233 501334031")}
+                >
+                  <Text className="text-gray-500 text-lg">+233 501334031</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View className="flex-row items-center gap-4">
+              <View style={{ alignSelf: "flex-start" }}>
+                <Ionicons name="mail-outline" size={24} />
+              </View>
+              <View className="flex-col">
+                <TouchableOpacity className="flex-row items-center gap-4">
+                  <Text className="text-gray-500 text-lg">
+                    isinesam@gmail.com
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => handleEmailSupport("jeffkwakye4u@gmail.com")}
+                  className="flex-row items-center gap-4"
+                >
+                  <Text className="text-gray-500 text-lg">
+                    jeffkwakye4u@gmail.com
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
         )}
       </View>

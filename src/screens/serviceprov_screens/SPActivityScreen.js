@@ -231,7 +231,7 @@ const SPActivityScreen = () => {
     setActiveSubcategory(subcategory);
   };
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({ item, index }) => {
     let statusColor = "gray";
     let statusText = "";
 
@@ -266,6 +266,7 @@ const SPActivityScreen = () => {
     }
     return (
       <TouchableOpacity
+        key={index}
         className="flex ml-[2px]"
         activeOpacity={0.7}
         style={{
@@ -344,7 +345,7 @@ const SPActivityScreen = () => {
               </Text>
             </View>
           </View>
-          <View className="w-[30%] flex-[0.5] justify-center items-center">
+          <View className="w-[30%] flex-1 ml-12 justify-center items-center">
             {statusText == "Pending" && (
               <View className="flex justify-evenly">
                 {loadingRequestId == item.request_id &&
@@ -383,30 +384,10 @@ const SPActivityScreen = () => {
                 )}
               </View>
             )}
-            {statusText == "In Progress" && (
-              <View className="flex items-center justify-center">
-                {loadingRequestId == item.request_id &&
-                loadingActionType == "mark_complete" ? (
-                  <DotIndicator
-                    color="green"
-                    count={3}
-                    size={5}
-                    style={{ flexGrow: 0 }}
-                  />
-                ) : (
-                  <TouchableOpacity
-                    className="p-2 mt-4 rounded-xl mr-3"
-                    style={{ backgroundColor: "green" }}
-                    onPress={() =>
-                      triggerAction(item.request_id, "mark_complete")
-                    }
-                  >
-                    <Text style={{ color: "white" }}>Mark as Complete</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            )}
-            {(statusText == "Completed" || statusText == "Declined") && (
+
+            {(statusText == "Completed" ||
+              statusText == "Declined" ||
+              statusText == "In Progress") && (
               <Animatable.View
                 className="p-2 rounded-xl mr-3"
                 animation="pulse"
@@ -498,10 +479,7 @@ const SPActivityScreen = () => {
           </View>
           <View className="flex-1">
             {filteredRequests && filteredRequests.length > 0 ? (
-              <FlatList
-                data={filteredRequests}
-                renderItem={renderItem}
-                keyExtractor={(item, index) => index.toString()}
+              <ScrollView
                 refreshControl={
                   <RefreshControl
                     refreshing={refreshing}
@@ -509,7 +487,11 @@ const SPActivityScreen = () => {
                     colors={refreshColours}
                   />
                 }
-              />
+              >
+                {filteredRequests.map((item, index) =>
+                  renderItem({ item, index })
+                )}
+              </ScrollView>
             ) : (
               <ScrollView
                 contentContainerStyle={{ flex: 1 }}

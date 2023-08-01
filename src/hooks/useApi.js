@@ -105,3 +105,10 @@ export const changeAccountSettings = async (data) => {
     console.log(error);
   }
 };
+
+export const getAllUserTransactions = async (data) => {
+  try {
+    const response = await axios.post("/all_user_transactions", data);
+    return response.data.transactions;
+  } catch (error) {}
+};

@@ -173,7 +173,7 @@ const ActivityScreen = () => {
     return `${formattedDate}, ${formattedTime}`;
   };
 
-  const triggerCancel = async (requestId, actionType) => {
+  const triggerAction = async (requestId, actionType) => {
     if (loadingRequestId || loadingActionType) {
       return;
     }
@@ -199,9 +199,10 @@ const ActivityScreen = () => {
     }
   };
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({ item, index }) => {
     let statusColor = "gray";
     let statusText = "";
+    let textColor = "black";
 
     if (
       item.status_acc_dec == "no action" &&
@@ -234,6 +235,8 @@ const ActivityScreen = () => {
     }
     return (
       <TouchableOpacity
+        key={index}
+        onPress={() => console.log(item)}
         className="flex ml-[2px]"
         activeOpacity={0.7}
         style={{
@@ -317,18 +320,20 @@ const ActivityScreen = () => {
               </Text>
             </View>
           </View>
-          <View className="w-[30%] flex-[0.5] justify-center items-center">
-            <Animatable.View
-              className="p-2 rounded-xl mr-3"
-              animation="pulse"
-              iterationCount="infinite"
-              duration={1000}
-              style={{
-                backgroundColor: statusColor,
-              }}
-            >
-              <Text style={{ color: textColor }}>{statusText}</Text>
-            </Animatable.View>
+          <View className="w-[30%] flex-1 ml-12 justify-center items-center">
+            {statusText !== "In Progress" && (
+              <Animatable.View
+                className="p-2 rounded-xl mr-3"
+                animation="pulse"
+                iterationCount="infinite"
+                duration={1000}
+                style={{
+                  backgroundColor: statusColor,
+                }}
+              >
+                <Text style={{ color: textColor }}>{statusText}</Text>
+              </Animatable.View>
+            )}
             {statusText === "Pending" &&
               (loadingRequestId === item.request_id &&
               loadingActionType === "cancel" ? (
@@ -342,11 +347,35 @@ const ActivityScreen = () => {
                 <TouchableOpacity
                   className="p-2 mt-4 rounded-xl mr-3"
                   style={{ backgroundColor: "red" }}
-                  onPress={() => triggerCancel(item.request_id, "cancel")}
+                  onPress={() => triggerAction(item.request_id, "cancel")}
                 >
                   <Text style={{ color: "white" }}>Cancel</Text>
                 </TouchableOpacity>
               ))}
+            {statusText == "In Progress" && (
+              <View className="flex items-center justify-center">
+                {loadingRequestId == item.request_id &&
+                loadingActionType == "mark_complete" ? (
+                  <DotIndicator
+                    color="green"
+                    count={3}
+                    size={5}
+                    style={{ flexGrow: 0 }}
+                  />
+                ) : (
+                  <TouchableOpacity
+                    className="p-2 mt-4 rounded-xl mr-3"
+                    style={{ backgroundColor: "green" }}
+                    onPress={() =>
+                      triggerAction(item.request_id, "mark_complete")
+                    }
+                  >
+                    <Text style={{ color: "white" }}>Mark as Complete</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
+
             {statusText === "Completed" &&
               (item.reviewed == "false" || item.reviewed === false) && (
                 <TouchableOpacity
@@ -406,10 +435,7 @@ const ActivityScreen = () => {
           </View>
           <View className="flex-1">
             {filteredRequests.length > 0 ? (
-              <FlatList
-                data={filteredRequests}
-                renderItem={renderItem}
-                keyExtractor={(item, index) => index.toString()}
+              <ScrollView
                 refreshControl={
                   <RefreshControl
                     refreshing={refreshing}
@@ -417,7 +443,11 @@ const ActivityScreen = () => {
                     colors={refreshColours}
                   />
                 }
-              />
+              >
+                {filteredRequests.map((item, index) =>
+                  renderItem({ item, index })
+                )}
+              </ScrollView>
             ) : (
               <ScrollView
                 contentContainerStyle={{ flex: 1 }}

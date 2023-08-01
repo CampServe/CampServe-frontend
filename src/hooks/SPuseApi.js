@@ -71,3 +71,12 @@ export const requestMoney = async (requestData) => {
     }
   } catch (error) {}
 };
+
+export const getAllProviderTransactions = async (data) => {
+  try {
+    const response = await axios.post("/all_provider_transactions", data);
+    return response.data.transactions;
+  } catch (error) {
+    console.log(error);
+  }
+};

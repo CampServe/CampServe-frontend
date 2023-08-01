@@ -8,7 +8,11 @@ import {
   TextInput,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
-import { getProviderRequests, requestMoney } from "../../hooks/SPuseApi";
+import {
+  getAllProviderTransactions,
+  getProviderRequests,
+  requestMoney,
+} from "../../hooks/SPuseApi";
 import useAuth from "../../hooks/useAuth";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Loader from "../../components/Loader";
@@ -38,6 +42,7 @@ const SPPaymentScreen = () => {
   const [isLoadingRequest, setIsLoadingRequest] = useState(false);
   const [loadingId, setLoadingId] = useState(null);
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
+  const [payments, setPayments] = useState([]);
 
   const handleRequestMoney = (requestId) => {
     setInputStates((prevState) => ({
@@ -115,7 +120,7 @@ const SPPaymentScreen = () => {
           provider_id: user.provider_id,
         });
 
-        const getProviderTransactionsPromise = getProviderRequests({
+        const getProviderTransactionsPromise = getAllProviderTransactions({
           provider_id: user.provider_id,
         });
 
@@ -125,6 +130,7 @@ const SPPaymentScreen = () => {
             getProviderTransactionsPromise,
           ]);
 
+        setPayments(providerTransactionsResponse);
         if (requestsResponse) {
           const completedRequests = requestsResponse.all_requests.filter(
             (req) =>
@@ -163,7 +169,7 @@ const SPPaymentScreen = () => {
           provider_id: user.provider_id,
         });
 
-        const getProviderTransactionsPromise = getProviderRequests({
+        const getProviderTransactionsPromise = getAllProviderTransactions({
           provider_id: user.provider_id,
         });
 
@@ -172,6 +178,8 @@ const SPPaymentScreen = () => {
             fetchRequestsPromise,
             getProviderTransactionsPromise,
           ]);
+
+        setPayments(providerTransactionsResponse);
 
         if (requestsResponse) {
           const completedRequests = requestsResponse.all_requests.filter(
@@ -196,6 +204,10 @@ const SPPaymentScreen = () => {
     filterByConditions("Payment Request");
   }, [completedReq]);
 
+  useEffect(() => {
+    filterByConditions(activeFilter);
+  }, [searchQueries]);
+
   const filterConditions = {
     "Payment Request": "Payment Request",
     Pending: "Pending",
@@ -203,14 +215,28 @@ const SPPaymentScreen = () => {
   };
 
   const filterByConditions = (filter) => {
-    setActiveFilter(filter);
+    let filtered = completedReq;
+
     if (filter === "Payment Request") {
-      setfilteredData(completedReq);
+      setfilteredData(filtered);
     } else if (filter === "Pending") {
-      setfilteredData([]);
+      filtered = filtered.filter((payment) => payment.has_paid === "false");
+      setfilteredData(filtered);
     } else if (filter === "Paid") {
-      setfilteredData([]);
+      filtered = filtered.filter((payment) => payment.has_paid === "true");
+      setfilteredData(filtered);
     }
+
+    const searchQuery = searchQueries["SPpayment"]?.trim().toLowerCase();
+    if (searchQuery) {
+      filtered = filteredData.filter(
+        (req) =>
+          req.first_name.toLowerCase().includes(searchQuery) ||
+          req.last_name.toLowerCase().includes(searchQuery)
+      );
+    }
+    setfilteredData(filtered);
+    setActiveFilter(filter);
   };
 
   const renderItem = ({ item }) => {
@@ -230,11 +256,9 @@ const SPPaymentScreen = () => {
             borderRadius: 12,
           }}
         >
-          <View>
-            <Text className="text-[11px] ml-9 text-gray-400 font-semibold">
-              {item.subcategory}
-            </Text>
-          </View>
+          <Text className="text-[11px] ml-9 text-gray-400 font-semibold">
+            {item.subcategory}
+          </Text>
           <View className="flex-row justify-between">
             <View className="flex-row">
               <Ionicons
@@ -285,7 +309,7 @@ const SPPaymentScreen = () => {
               }}
             />
             <Text className="ml-2 text-base text-gray-600">
-              {item.agreed_price} ({item.payment_mode})
+              {item.agreed_price}
             </Text>
           </View>
 
@@ -329,7 +353,79 @@ const SPPaymentScreen = () => {
         </View>
       );
     } else {
-      return null;
+      return (
+        <View
+          className="mx-2 mt-1"
+          style={{
+            padding: 16,
+            backgroundColor: "white",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.3,
+            shadowRadius: 4,
+            elevation: 5,
+            marginBottom: 16,
+            borderRadius: 12,
+          }}
+        >
+          <Text className="text-[11px] ml-9 text-gray-400 font-semibold">
+            {item.subcategory}
+          </Text>
+          <View className="flex-row justify-between">
+            <View className="flex-col">
+              <View className="flex-row flex-1">
+                <Ionicons
+                  name="person-outline"
+                  size={20}
+                  color="gray"
+                  style={{
+                    backgroundColor: "#D1D5DB",
+                    borderRadius: 20,
+                    padding: 3,
+                  }}
+                />
+                <Text className="ml-2 text-lg text-gray-700 font-bold">
+                  {item.first_name} {item.last_name}
+                </Text>
+              </View>
+
+              <View className="flex-row mt-2">
+                <Ionicons
+                  name="cash"
+                  size={20}
+                  color="gray"
+                  style={{
+                    backgroundColor: "#D1D5DB",
+                    borderRadius: 20,
+                    padding: 3,
+                  }}
+                />
+                <Text className="ml-2 text-base text-gray-600">
+                  GH¢ {item.amount}0
+                </Text>
+              </View>
+            </View>
+            <Animatable.View
+              className="p-2 rounded-xl mr-3 h-[36px]"
+              animation="pulse"
+              iterationCount="infinite"
+              duration={1000}
+              style={{
+                backgroundColor:
+                  activeFilter === "Pending" ? "#FFF7AA" : "#A2D9A1",
+              }}
+            >
+              <Text
+                style={{
+                  color: activeFilter === "Pending" ? "#D1A800" : "#007F00",
+                }}
+              >
+                {activeFilter === "Pending" ? "Pending" : "Paid"}
+              </Text>
+            </Animatable.View>
+          </View>
+        </View>
+      );
     }
   };
 
@@ -412,7 +508,7 @@ const SPPaymentScreen = () => {
         isVisible={isSuccessModalVisible}
         onClose={() => setIsSuccessModalVisible(false)}
         title="Payment Request Successful"
-        message="Your payment request is being sent to user."
+        message="Your payment request has being sent to the user."
         buttonText="OK"
         onButtonPress={() => setIsSuccessModalVisible(false)}
       />
