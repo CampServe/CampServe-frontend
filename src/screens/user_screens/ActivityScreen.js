@@ -236,7 +236,6 @@ const ActivityScreen = () => {
       <TouchableOpacity
         className="flex ml-[2px]"
         activeOpacity={0.7}
-        onPress={() => console.log(item)}
         style={{
           backgroundColor: "white",
           borderRadius: 8,
@@ -253,15 +252,20 @@ const ActivityScreen = () => {
             <View className="flex flex-row gap-4 mb-[2px] items-center">
               <Ionicons
                 name="business"
-                size={24}
-                color="green"
+                size={20}
+                color="gray"
                 className="mr-2"
+                style={{
+                  backgroundColor: "#D1D5DB",
+                  borderRadius: 20,
+                  padding: 3,
+                }}
               />
               <View className="flex-col-reverse">
-                <Text className="text-xl capitalize font-bold">
+                <Text className="text-lg capitalize font-bold">
                   {item.business_name}
                 </Text>
-                <Text className="text-[11px] font-semibold">
+                <Text className="text-[11px] text-gray-400 font-semibold">
                   {item.subcategory}
                 </Text>
               </View>
@@ -269,26 +273,48 @@ const ActivityScreen = () => {
             <View className="flex flex-row gap-4 mb-[2px] items-center">
               <Ionicons
                 name="pricetags-outline"
-                size={24}
-                color="green"
+                size={20}
+                color="gray"
                 className="mr-2"
+                style={{
+                  backgroundColor: "#D1D5DB",
+                  borderRadius: 20,
+                  padding: 3,
+                }}
               />
-              <Text className="text-base">
+              <Text className="text-sm text-gray-800">
                 {item.agreed_price} ({item.payment_mode})
               </Text>
             </View>
             <View className="flex flex-row gap-4 mb-[2px] items-center">
               <Ionicons
                 name="location"
-                size={24}
-                color="green"
+                size={20}
+                color="gray"
                 className="mr-2"
+                style={{
+                  backgroundColor: "#D1D5DB",
+                  borderRadius: 20,
+                  padding: 3,
+                }}
               />
-              <Text className="text-base">{item.location}</Text>
+              <Text className="text-sm text-gray-800">{item.location}</Text>
             </View>
             <View className="flex flex-row gap-4 mb-[2px] items-center">
-              <Ionicons name="time" size={24} color="green" className="mr-2" />
-              <Text className="text-base">{formatDateTime(item.datetime)}</Text>
+              <Ionicons
+                name="time"
+                size={20}
+                color="gray"
+                className="mr-2"
+                style={{
+                  backgroundColor: "#D1D5DB",
+                  borderRadius: 20,
+                  padding: 3,
+                }}
+              />
+              <Text className="text-sm text-gray-800">
+                {formatDateTime(item.datetime)}
+              </Text>
             </View>
           </View>
           <View className="w-[30%] flex-[0.5] justify-center items-center">

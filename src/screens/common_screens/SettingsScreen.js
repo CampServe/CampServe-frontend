@@ -386,7 +386,7 @@ const SettingsScreen = () => {
               </TouchableOpacity>
             ) : (
               <TouchableOpacity onPress={() => saveField(item.id)}>
-                <Ionicons name="checkmark-outline" size={22} color="gray" />
+                <Ionicons name="close-circle-outline" size={22} color="gray" />
               </TouchableOpacity>
             ))}
         </View>

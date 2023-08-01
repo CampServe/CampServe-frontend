@@ -1,5 +1,12 @@
-import { View, Text, FlatList, RefreshControl } from "react-native";
-import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  RefreshControl,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
+import React, { useEffect, useState, useRef } from "react";
 import {
   changeRequestStatus,
   getProviderInfo,
@@ -9,20 +16,17 @@ import useAuth from "../../hooks/useAuth";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Loader from "../../components/Loader";
 import CustomHeader from "../../components/CustomHeader";
-import { ScrollView } from "react-native";
-import { TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Animatable from "react-native-animatable";
 import { useNavigation } from "@react-navigation/native";
 import { DotIndicator } from "react-native-indicators";
 import useSearch from "../../hooks/useSearch";
 import useSocket from "../../hooks/useSocket";
-import { useRef } from "react";
 
 const SPActivityScreen = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
-  const { socketTrigger, isOffline } = useSocket();
+  const { isOffline } = useSocket();
   const [requests, setRequests] = useState([]);
   const [filteredRequests, setFilteredRequests] = useState([]);
   const [isRequestsLoading, setIsRequestsLoading] = useState(false);
@@ -279,38 +283,65 @@ const SPActivityScreen = () => {
           <View className="pl-4 py-2 w-[70%] flex flex-1 ">
             <View className="flex flex-row gap-4 mb-[2px] items-center">
               <Ionicons
-                name="business"
-                size={24}
-                color="green"
+                name="person-outline"
+                size={20}
+                color="gray"
                 className="mr-2"
+                style={{
+                  backgroundColor: "#D1D5DB",
+                  borderRadius: 20,
+                  padding: 3,
+                }}
               />
-              <Text className="text-xl capitalize font-bold">
+              <Text className="text-lg  capitalize font-bold">
                 {item.first_name} {item.last_name}
               </Text>
             </View>
             <View className="flex flex-row gap-4 mb-[2px] items-center">
               <Ionicons
-                name="pricetags-outline"
-                size={24}
-                color="green"
+                name="cash-outline"
+                size={20}
+                color="gray"
                 className="mr-2"
+                style={{
+                  backgroundColor: "#D1D5DB",
+                  borderRadius: 20,
+                  padding: 3,
+                }}
               />
-              <Text className="text-base">
+              <Text className="text-sm text-gray-800">
                 {item.agreed_price} ({item.payment_mode})
               </Text>
             </View>
             <View className="flex flex-row gap-4 mb-[2px] items-center">
               <Ionicons
                 name="location"
-                size={24}
-                color="green"
+                size={20}
+                color="gray"
                 className="mr-2"
+                style={{
+                  backgroundColor: "#D1D5DB",
+                  borderRadius: 20,
+                  padding: 3,
+                }}
               />
-              <Text className="text-base">{item.location}</Text>
+              <Text className="text-sm text-gray-800">{item.location}</Text>
             </View>
             <View className="flex flex-row gap-4 mb-[2px] items-center">
-              <Ionicons name="time" size={24} color="green" className="mr-2" />
-              <Text className="text-base">{formatDateTime(item.datetime)}</Text>
+              <Ionicons
+                name="time"
+                size={20}
+                color="gray"
+                className="mr-2"
+                style={{
+                  backgroundColor: "#D1D5DB",
+                  borderRadius: 20,
+                  padding: 3,
+                }}
+              />
+              <Text className="text-sm text-gray-800">
+                {formatDateTime(item.datetime)}
+              </Text>
             </View>
           </View>
           <View className="w-[30%] flex-[0.5] justify-center items-center">

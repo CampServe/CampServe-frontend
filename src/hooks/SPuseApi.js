@@ -60,3 +60,14 @@ export const updateDetails = async (providerDetails) => {
     console.log(error);
   }
 };
+
+export const requestMoney = async (requestData) => {
+  try {
+    const response = await axios.post("/request_money", requestData);
+    if (response.data.message === "success") {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {}
+};

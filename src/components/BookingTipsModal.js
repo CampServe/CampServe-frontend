@@ -51,6 +51,13 @@ const BookingTipsModal = ({ isVisible, onClose }) => {
             <View className="flex-row pb-2">
               <Text className="text-base">- </Text>
               <Text className="text-base">
+                If you do not want to pay via the app's payment system, please
+                choose Cash as the payment method.
+              </Text>
+            </View>
+            <View className="flex-row pb-2">
+              <Text className="text-base">- </Text>
+              <Text className="text-base">
                 Make payment only after the service has been provided.
               </Text>
             </View>
