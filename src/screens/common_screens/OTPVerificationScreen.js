@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   Keyboard,
+  Linking,
 } from "react-native";
 import CustomModal from "../../components/CustomModal";
 import useAuth from "../../hooks/useAuth";
@@ -56,6 +57,10 @@ const OTPVerificationScreen = () => {
     return () => clearTimeout(timer);
   }, [error]);
 
+  const openMail = () => {
+    Linking.openURL("https://stdmail.knust.edu.gh/?loginOp=logout");
+  };
+
   return (
     <View
       className="flex-1 items-center justify-center "
@@ -69,6 +74,13 @@ const OTPVerificationScreen = () => {
           <Text className="text-center">
             OTP has been sent to your student mail for verification.
           </Text>
+          <View className="flex-row">
+            <Text>Tap</Text>
+            <TouchableOpacity onPress={openMail}>
+              <Text className="text-green-600 font-bold"> here </Text>
+            </TouchableOpacity>
+            <Text>to open mail.</Text>
+          </View>
         </View>
 
         <View className="mb-4">
