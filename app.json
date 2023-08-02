@@ -13,7 +13,10 @@
     },
     "updates": {
       "fallbackToCacheTimeout": 0,
-      "url": "https://u.expo.dev/cdde9a33-4e95-4dba-a2b2-e0ada5673067"
+      "url": "https://u.expo.dev/cdde9a33-4e95-4dba-a2b2-e0ada5673067",
+      "requestHeaders": {
+        "expo-channel-name": "preview"
+      }
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
